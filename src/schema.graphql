@@ -21,6 +21,29 @@ input CreatePostInput {
   title: String!
 }
 
+input CreateVendorInput {
+  accountNumber: String!
+  active: Boolean!
+  address: String!
+  addressUrl: String!
+  bankName: String!
+  beneficiary: String!
+  demo: Boolean!
+  description: String!
+  description_ar: String!
+  email: String!
+  iban: String!
+  isCheck: Boolean!
+  isOpen: Boolean!
+  name: String!
+  phone: String!
+  shortName: Boolean!
+  slug: String!
+  storeStatus: Boolean!
+  terms: String!
+  url: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -39,10 +62,13 @@ input LoginInput {
 type Mutation {
   changePassword(data: ChangePasswordInput!): User!
   createPost(data: CreatePostInput!): Post!
+  createVendor(data: CreateVendorInput!): Vendor!
+  deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
   signup(data: SignupInput!): Auth!
   updateUser(data: UpdateUserInput!): User!
+  updateVendor(data: CreateVendorInput!, id: String!): Vendor!
 }
 
 """
@@ -101,6 +127,8 @@ enum PostOrderField {
 }
 
 type Query {
+  getVendor(id: String!): Vendor!
+  getVendors: [Vendor!]!
   hello(name: String!): String!
   helloWorld: String!
   me: User!
@@ -151,4 +179,28 @@ type User {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+}
+
+type Vendor {
+  accountNumber: String!
+  active: Boolean!
+  address: String!
+  addressUrl: String!
+  bankName: String!
+  beneficiary: String!
+  demo: Boolean!
+  description: String!
+  description_ar: String!
+  email: String!
+  iban: String!
+  id: String!
+  isCheck: Boolean!
+  isOpen: Boolean!
+  name: String!
+  phone: String!
+  shortName: Boolean!
+  slug: String!
+  storeStatus: Boolean!
+  terms: String!
+  url: String!
 }
