@@ -39,3 +39,27 @@ enum Role {
   ADMIN
   USER
 }
+
+model Vendor {
+  id             String  @id @default(cuid())
+  name           String
+  description    String
+  storeStatus    Boolean
+  active         Boolean @default(false)
+  slug           String
+  address        String
+  phone          String
+  email          String
+  bankName       String
+  iban           String
+  accountNumber  String
+  beneficiary    String
+  addressUrl     String
+  url            String  @unique
+  isCheck        Boolean @default(false)
+  shortName      Boolean
+  description_ar String
+  terms          String  @db.Text
+  isOpen         Boolean @default(false)
+  demo           Boolean @default(false)
+}

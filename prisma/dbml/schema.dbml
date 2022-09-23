@@ -25,6 +25,30 @@ Table Post {
   authorId String
 }
 
+Table Vendor {
+  id String [pk]
+  name String [not null]
+  description String [not null]
+  storeStatus Boolean [not null]
+  active Boolean [not null, default: false]
+  slug String [not null]
+  address String [not null]
+  phone String [not null]
+  email String [not null]
+  bankName String [not null]
+  iban String [not null]
+  accountNumber String [not null]
+  beneficiary String [not null]
+  addressUrl String [not null]
+  url String [unique, not null]
+  isCheck Boolean [not null, default: false]
+  shortName Boolean [not null]
+  description_ar String [not null]
+  terms String [not null]
+  isOpen Boolean [not null, default: false]
+  demo Boolean [not null, default: false]
+}
+
 Enum Role {
   ADMIN
   USER
