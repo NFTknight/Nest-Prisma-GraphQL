@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -13,7 +13,7 @@ generator dbml {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email     String   @unique
@@ -25,7 +25,7 @@ model User {
 }
 
 model Post {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   published Boolean
@@ -41,7 +41,7 @@ enum Role {
 }
 
 model Vendor {
-  id             String  @id @default(cuid())
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   description    String
   storeStatus    Boolean
@@ -59,7 +59,7 @@ model Vendor {
   isCheck        Boolean @default(false)
   shortName      Boolean
   description_ar String
-  terms          String  @db.Text
+  terms          String
   isOpen         Boolean @default(false)
   demo           Boolean @default(false)
 }

@@ -8,19 +8,17 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL}
     depends_on:
-      - postgres
+      - mongodb
 
-  postgres:
-    image: postgres:13
-    container_name: postgres
+  mongodb:
+    image: mongo:4.0.16-xenial
+    container_name: mongodb
     restart: always
     ports:
-      - '5432:5432'
-    env_file:
-      - .env
+      - '27017:27017'
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - mongodb:/data/db
 
 volumes:
-  postgres:
+  mongodb:
     name: nest-db
