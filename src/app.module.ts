@@ -13,6 +13,7 @@ import { loggingMiddleware } from 'src/common/middleware/logging.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GqlConfigService } from './gql-config.service';
 import { VendorsModule } from './vendors/vendors.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { VendorsModule } from './vendors/vendors.module';
     UsersModule,
     PostsModule,
     VendorsModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
