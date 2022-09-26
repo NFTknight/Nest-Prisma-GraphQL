@@ -21,6 +21,18 @@ input CreatePostInput {
   title: String!
 }
 
+input CreateProductInput {
+  active: Boolean!
+  description: String!
+  description_ar: String!
+  minPreorderDays: Int!
+  price: Int!
+  price_ar: Int!
+  title: String!
+  title_ar: String!
+  vendorId: String!
+}
+
 input CreateVendorInput {
   accountNumber: String!
   active: Boolean!
@@ -62,11 +74,14 @@ input LoginInput {
 type Mutation {
   changePassword(data: ChangePasswordInput!): User!
   createPost(data: CreatePostInput!): Post!
+  createProduct(data: CreateProductInput!): Product!
   createVendor(data: CreateVendorInput!): Vendor!
+  deleteProduct(id: String!): Product!
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
   signup(data: SignupInput!): Auth!
+  updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: CreateVendorInput!, id: String!): Vendor!
 }
@@ -126,7 +141,29 @@ enum PostOrderField {
   updatedAt
 }
 
+type Product {
+  active: Boolean!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  description: String!
+  description_ar: String!
+  id: ID!
+  minPreorderDays: Int!
+  price: Int!
+  price_ar: Int!
+  title: String!
+  title_ar: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor
+  vendorId: Vendor!
+}
+
 type Query {
+  getProduct(id: String!): Product!
+  getProducts(vendorId: String): [Product!]!
   getVendor(id: String!): Vendor!
   getVendors: [Vendor!]!
   hello(name: String!): String!
@@ -160,6 +197,18 @@ type Token {
 
   """JWT refresh token"""
   refreshToken: JWT!
+}
+
+input UpdateProductInput {
+  active: Boolean
+  description: String
+  description_ar: String
+  minPreorderDays: Int
+  price: Int
+  price_ar: Int
+  title: String
+  title_ar: String
+  vendorId: String
 }
 
 input UpdateUserInput {
