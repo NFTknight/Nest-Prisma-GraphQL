@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { VendorsService } from './vendors.service';
 import { Vendor } from './models/vendor.model';
 import { CreateVendorInput } from './dto/createVendor.input';
+import { UpdateVendorInput } from './dto/updateVendor.input';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -9,7 +10,7 @@ export class VendorsResolver {
 
   @Query(() => [Vendor])
   async getVendors(): Promise<Vendor[]> {
-    return await this.vendorsService.getVendors();
+    return this.vendorsService.getVendors();
   }
 
   @Query(() => Vendor)
@@ -25,7 +26,7 @@ export class VendorsResolver {
   @Mutation(() => Vendor)
   async updateVendor(
     @Args('id') id: string,
-    @Args('data') data: CreateVendorInput
+    @Args('data') data: UpdateVendorInput
   ): Promise<Vendor> {
     return await this.vendorsService.updateVendor(id, data);
   }

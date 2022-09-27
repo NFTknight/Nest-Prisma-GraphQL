@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { BaseModel } from 'src/common/models/base.model';
 
 @ObjectType()
-export class Vendor {
+export class Vendor extends BaseModel {
   @Field()
   id: string;
 

@@ -63,6 +63,8 @@ model Vendor {
   isOpen         Boolean   @default(false)
   demo           Boolean   @default(false)
   Product        Product[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Product {
