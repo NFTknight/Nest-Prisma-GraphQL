@@ -6,7 +6,9 @@ import {
   Resolver,
   Parent,
 } from '@nestjs/graphql';
+import { CategoriesService } from 'src/categories/categories.service';
 import { Vendor } from 'src/vendors/models/vendor.model';
+import { Category } from 'src/categories/models/category.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
@@ -17,7 +19,8 @@ import { ProductsService } from './products.service';
 export class ProductsResolver {
   constructor(
     private readonly productService: ProductsService,
-    private readonly vendorService: VendorsService
+    private readonly vendorService: VendorsService,
+    private readonly categoriesService: CategoriesService
   ) {}
 
   @Query(() => Product)
@@ -51,5 +54,10 @@ export class ProductsResolver {
   @ResolveField('vendor')
   vendor(@Parent() product: Product): Promise<Vendor> {
     return this.vendorService.getVendor(product.vendorId);
+  }
+
+  @ResolveField('category')
+  category(@Parent() product: Product): Promise<Category> {
+    return this.categoriesService.getCategory(product.categoryId);
   }
 }

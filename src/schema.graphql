@@ -45,6 +45,7 @@ input CreatePostInput {
 
 input CreateProductInput {
   active: Boolean!
+  categoryId: String!
   description: String!
   description_ar: String!
   minPreorderDays: Int!
@@ -168,6 +169,8 @@ enum PostOrderField {
 
 type Product {
   active: Boolean!
+  category: Category
+  categoryId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -235,6 +238,7 @@ input UpdateCategoryInput {
 
 input UpdateProductInput {
   active: Boolean
+  categoryId: String
   description: String
   description_ar: String
   minPreorderDays: Int
