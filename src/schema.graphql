@@ -83,7 +83,7 @@ type Mutation {
   signup(data: SignupInput!): Auth!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateUser(data: UpdateUserInput!): User!
-  updateVendor(data: CreateVendorInput!, id: String!): Vendor!
+  updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
 }
 
 """
@@ -216,6 +216,29 @@ input UpdateUserInput {
   lastname: String
 }
 
+input UpdateVendorInput {
+  accountNumber: String
+  active: Boolean
+  address: String
+  addressUrl: String
+  bankName: String
+  beneficiary: String
+  demo: Boolean
+  description: String
+  description_ar: String
+  email: String
+  iban: String
+  isCheck: Boolean
+  isOpen: Boolean
+  name: String
+  phone: String
+  shortName: Boolean
+  slug: String
+  storeStatus: Boolean
+  terms: String
+  url: String
+}
+
 type User {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -237,6 +260,9 @@ type Vendor {
   addressUrl: String!
   bankName: String!
   beneficiary: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
   demo: Boolean!
   description: String!
   description_ar: String!
@@ -251,5 +277,8 @@ type Vendor {
   slug: String!
   storeStatus: Boolean!
   terms: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
   url: String!
 }

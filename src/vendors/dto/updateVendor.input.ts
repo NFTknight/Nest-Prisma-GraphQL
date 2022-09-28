@@ -1,65 +1,63 @@
-import { IsNotEmpty } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
 export class UpdateVendorInput {
   @Field()
-  @IsNotEmpty()
-  email: string;
+  email?: string;
 
   @Field()
-  name: string;
+  name?: string;
 
   @Field()
-  description: string;
+  description?: string;
 
   @Field()
-  storeStatus: boolean;
+  storeStatus?: boolean;
 
   @Field()
-  active: boolean;
+  active?: boolean;
 
   @Field()
-  slug: string;
+  slug?: string;
 
   @Field()
-  address: string;
+  address?: string;
 
   @Field()
-  phone: string;
+  phone?: string;
 
   @Field()
-  bankName: string;
+  bankName?: string;
 
   @Field()
-  iban: string;
+  iban?: string;
   @Field()
-  accountNumber: string;
+  accountNumber?: string;
 
   @Field()
-  beneficiary: string;
+  beneficiary?: string;
 
   @Field()
-  addressUrl: string;
+  addressUrl?: string;
 
   @Field()
-  url: string;
+  url?: string;
 
   @Field()
-  isCheck: boolean;
+  isCheck?: boolean;
 
   @Field()
-  shortName: boolean;
+  shortName?: boolean;
 
   @Field()
-  description_ar: string;
+  description_ar?: string;
 
   @Field()
-  terms: string;
+  terms?: string;
 
   @Field()
-  isOpen: boolean;
+  isOpen?: boolean;
 
   @Field()
-  demo: boolean;
+  demo?: boolean;
 }
