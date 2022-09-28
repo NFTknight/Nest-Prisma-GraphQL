@@ -14,7 +14,7 @@ import { Product } from './models/product.model';
 import { ProductsService } from './products.service';
 
 @Resolver(() => Product)
-export class ProductResolver {
+export class ProductsResolver {
   constructor(
     private readonly productService: ProductsService,
     private readonly vendorService: VendorsService

@@ -48,6 +48,19 @@ Table Vendor {
   isOpen Boolean [not null, default: false]
   demo Boolean [not null, default: false]
   Product Product [not null]
+  Category Category [not null]
+}
+
+Table Category {
+  id String [pk]
+  title String [not null]
+  title_ar String [not null]
+  vendorId String [not null]
+  vendor Vendor [not null]
+  active Boolean [not null, default: false]
+  Product Product [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
 }
 
 Table Product {
@@ -64,6 +77,8 @@ Table Product {
   price_ar Int [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  Category Category
+  categoryId String
 }
 
 Enum Role {
@@ -73,4 +88,8 @@ Enum Role {
 
 Ref: Post.authorId > User.id
 
+Ref: Category.vendorId > Vendor.id
+
 Ref: Product.vendorId > Vendor.id
+
+Ref: Product.categoryId > Category.id
