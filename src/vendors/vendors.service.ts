@@ -16,22 +16,25 @@ export class VendorsService {
     return vendor;
   }
 
-  getVendors() {
+  getVendors(): Promise<Vendor[]> {
     return this.prisma.vendor.findMany();
   }
 
-  createVendor(createVendorInput: CreateVendorInput) {
+  createVendor(createVendorInput: CreateVendorInput): Promise<Vendor> {
     return this.prisma.vendor.create({ data: createVendorInput });
   }
 
-  updateVendor(id: string, updateVendorInput: UpdateVendorInput) {
+  updateVendor(
+    id: string,
+    updateVendorInput: UpdateVendorInput
+  ): Promise<Vendor> {
     return this.prisma.vendor.update({
-      data: updateVendorInput,
+      data: { ...updateVendorInput, updatedAt: new Date() },
       where: { id },
     });
   }
 
-  deleteVendor(id: string) {
+  deleteVendor(id: string): Promise<Vendor> {
     return this.prisma.vendor.delete({ where: { id } });
   }
 }
