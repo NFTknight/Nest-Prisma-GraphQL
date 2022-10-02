@@ -48,6 +48,19 @@ Table Vendor {
   isOpen Boolean [not null, default: false]
   demo Boolean [not null, default: false]
   Product Product [not null]
+  Category Category [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Category {
+  id String [pk]
+  title String [not null]
+  title_ar String [not null]
+  vendorId String [not null]
+  vendor Vendor [not null]
+  active Boolean [not null, default: false]
+  Product Product [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -58,12 +71,17 @@ Table Product {
   title_ar String [not null]
   description String [not null]
   description_ar String [not null]
+  image String [not null]
+  type ProductType [not null]
   vendorId String [not null]
   vendor Vendor [not null]
   active Boolean [not null, default: false]
   minPreorderDays Int [not null]
   price Int [not null]
   price_ar Int [not null]
+  Category Category
+  categoryId String [not null]
+  variants ProductVariant[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -73,6 +91,16 @@ Enum Role {
   USER
 }
 
+Enum ProductType {
+  PRODUCT
+  SERVICE
+  WORKSHOP
+}
+
 Ref: Post.authorId > User.id
 
+Ref: Category.vendorId > Vendor.id
+
 Ref: Product.vendorId > Vendor.id
+
+Ref: Product.categoryId > Category.id

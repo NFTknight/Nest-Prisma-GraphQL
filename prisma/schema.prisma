@@ -41,11 +41,11 @@ enum Role {
 }
 
 model Vendor {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   description    String
   storeStatus    Boolean
-  active         Boolean   @default(false)
+  active         Boolean    @default(false)
   slug           String
   address        String
   phone          String
@@ -55,30 +55,74 @@ model Vendor {
   accountNumber  String
   beneficiary    String
   addressUrl     String
-  url            String    @unique
-  isCheck        Boolean   @default(false)
+  url            String     @unique
+  isCheck        Boolean    @default(false)
   shortName      Boolean
   description_ar String
   terms          String
-  isOpen         Boolean   @default(false)
-  demo           Boolean   @default(false)
+  isOpen         Boolean    @default(false)
+  demo           Boolean    @default(false)
   Product        Product[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  Category       Category[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  title_ar  String
+  vendorId  String
+  vendor    Vendor    @relation(fields: [vendorId], references: [id])
+  active    Boolean   @default(false)
+  Product   Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum ProductType {
+  PRODUCT
+  SERVICE
+  WORKSHOP
+}
+
+type ProductAttribute {
+  key      String
+  key_ar   String
+  value    String
+  value_ar String
+}
+
+type ProductVariant {
+  title          String
+  title_ar       String
+  description    String
+  description_ar String
+  image          String
+  type           ProductType
+  active         Boolean     @default(false)
+  price          Int
+  price_ar       Int
+  productId      String?     @db.ObjectId
 }
 
 model Product {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
   title           String
   title_ar        String
   description     String
   description_ar  String
-  vendorId        String
-  vendor          Vendor   @relation(fields: [vendorId], references: [id])
-  active          Boolean  @default(false)
+  image           String
+  type            ProductType
+  vendorId        String           @db.ObjectId
+  vendor          Vendor           @relation(fields: [vendorId], references: [id])
+  active          Boolean          @default(false)
   minPreorderDays Int
   price           Int
   price_ar        Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  Category        Category?        @relation(fields: [categoryId], references: [id])
+  categoryId      String           @db.ObjectId
+  variants        ProductVariant[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }

@@ -25,11 +25,13 @@ input CreateProductInput {
   active: Boolean!
   description: String!
   description_ar: String!
+  image: String!
   minPreorderDays: Int!
   price: Int!
   price_ar: Int!
   title: String!
   title_ar: String!
+  type: String!
   vendorId: String!
 }
 
@@ -149,6 +151,7 @@ type Product {
   description: String!
   description_ar: String!
   id: ID!
+  image: String!
   minPreorderDays: Int!
   price: Int!
   price_ar: Int!
@@ -203,11 +206,13 @@ input UpdateProductInput {
   active: Boolean
   description: String
   description_ar: String
+  image: String
   minPreorderDays: Int
   price: Int
   price_ar: Int
   title: String
   title_ar: String
+  type: String!
   vendorId: String
 }
 
