@@ -11,9 +11,31 @@ type Auth {
   user: User!
 }
 
+type Category {
+  active: Boolean!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  title: String!
+  title_ar: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor
+  vendorId: Vendor!
+}
+
 input ChangePasswordInput {
   newPassword: String!
   oldPassword: String!
+}
+
+input CreateCategoryInput {
+  active: Boolean!
+  title: String!
+  title_ar: String!
+  vendorId: String!
 }
 
 input CreatePostInput {
@@ -23,6 +45,7 @@ input CreatePostInput {
 
 input CreateProductInput {
   active: Boolean!
+  categoryId: String!
   description: String!
   description_ar: String!
   minPreorderDays: Int!
@@ -73,14 +96,17 @@ input LoginInput {
 
 type Mutation {
   changePassword(data: ChangePasswordInput!): User!
+  createCategory(data: CreateCategoryInput!): Category!
   createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!
   createVendor(data: CreateVendorInput!): Vendor!
+  deleteCategory(id: String!): Category!
   deleteProduct(id: String!): Product!
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
   signup(data: SignupInput!): Auth!
+  updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
@@ -143,6 +169,8 @@ enum PostOrderField {
 
 type Product {
   active: Boolean!
+  category: Category
+  categoryId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -162,6 +190,8 @@ type Product {
 }
 
 type Query {
+  getCategories(vendorId: String): [Category!]!
+  getCategory(id: String!): Category!
   getProduct(id: String!): Product!
   getProducts(vendorId: String): [Product!]!
   getVendor(id: String!): Vendor!
@@ -199,8 +229,16 @@ type Token {
   refreshToken: JWT!
 }
 
+input UpdateCategoryInput {
+  active: Boolean
+  title: String
+  title_ar: String
+  vendorId: String
+}
+
 input UpdateProductInput {
   active: Boolean
+  categoryId: String
   description: String
   description_ar: String
   minPreorderDays: Int
