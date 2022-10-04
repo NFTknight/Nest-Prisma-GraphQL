@@ -14,6 +14,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GqlConfigService } from './gql-config.service';
 import { VendorsModule } from './vendors/vendors.module';
 import { ProductsModule } from './products/products.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ProductsModule } from './products/products.module';
     PostsModule,
     VendorsModule,
     ProductsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

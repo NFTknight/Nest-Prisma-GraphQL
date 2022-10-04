@@ -79,7 +79,7 @@ Table Product {
   minPreorderDays Int [not null]
   price Int [not null]
   price_ar Int [not null]
-  Category Category
+  category Category
   categoryId String [not null]
   variants ProductVariant[] [not null]
   createdAt DateTime [default: `now()`, not null]

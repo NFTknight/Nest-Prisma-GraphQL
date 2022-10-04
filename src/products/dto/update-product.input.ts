@@ -26,6 +26,9 @@ export class UpdateProductInput {
   vendorId?: string;
 
   @Field()
+  categoryId?: string;
+
+  @Field()
   active?: boolean;
 
   @Field()

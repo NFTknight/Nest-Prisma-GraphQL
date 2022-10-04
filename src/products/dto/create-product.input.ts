@@ -34,6 +34,10 @@ export class CreateProductInput {
 
   @Field()
   @IsNotEmpty()
+  categoryId: string;
+
+  @Field()
+  @IsNotEmpty()
   active: boolean;
 
   @Field()

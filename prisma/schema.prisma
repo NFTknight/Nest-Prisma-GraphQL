@@ -120,7 +120,7 @@ model Product {
   minPreorderDays Int
   price           Int
   price_ar        Int
-  Category        Category?        @relation(fields: [categoryId], references: [id])
+  category        Category?        @relation(fields: [categoryId], references: [id])
   categoryId      String           @db.ObjectId
   variants        ProductVariant[]
   createdAt       DateTime         @default(now())
