@@ -31,7 +31,6 @@ Table Vendor {
   description String [not null]
   storeStatus Boolean [not null]
   active Boolean [not null, default: false]
-  slug String [not null]
   address String [not null]
   phone String [not null]
   email String [not null]
@@ -65,12 +64,31 @@ Table Category {
   updatedAt DateTime [not null]
 }
 
-Table Product {
+Table ProductVariant {
   id String [pk]
+  sku String [not null]
   title String [not null]
   title_ar String [not null]
   description String [not null]
   description_ar String [not null]
+  previewImage String [not null]
+  image String [not null]
+  active Boolean [not null, default: false]
+  price Int [not null]
+  price_ar Int [not null]
+  attributes ProductAttribute[] [not null]
+  productId String
+  Product Product
+}
+
+Table Product {
+  id String [pk]
+  sku String [not null]
+  title String [not null]
+  title_ar String [not null]
+  description String [not null]
+  description_ar String [not null]
+  previewImage String [not null]
   image String [not null]
   type ProductType [not null]
   vendorId String [not null]
@@ -81,7 +99,8 @@ Table Product {
   price_ar Int [not null]
   category Category
   categoryId String [not null]
-  variants ProductVariant[] [not null]
+  variants ProductVariant [not null]
+  attributes ProductAttribute[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -100,6 +119,8 @@ Enum ProductType {
 Ref: Post.authorId > User.id
 
 Ref: Category.vendorId > Vendor.id
+
+Ref: ProductVariant.productId > Product.id
 
 Ref: Product.vendorId > Vendor.id
 

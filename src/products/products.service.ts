@@ -27,26 +27,21 @@ export class ProductsService {
   }
 
   async createProduct(data: CreateProductInput): Promise<Product> {
-    // if the vendor does not exist, this function will throw an error.
     const { vendorId, categoryId, ...rest } = data;
+
+    // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(vendorId);
+
     // if vendor exists we can successfully create the product.
-    console.log('CREATE PROD');
-    try {
-      const prod = await this.prisma.product.create({
-        data: {
-          ...rest,
-          vendor: { connect: { id: data.vendorId } },
-          category: { connect: { id: data.vendorId } },
-        },
-      });
-      console.log('');
-      console.log('Prod => ', prod);
-      return prod;
-    } catch (err) {
-      console.log('ERRR');
-      console.log('Err =>', err);
-    }
+
+    const prod = await this.prisma.product.create({
+      data: {
+        ...rest,
+        vendor: { connect: { id: vendorId } },
+        category: { connect: { id: categoryId } },
+      },
+    });
+    return prod;
   }
 
   async updateProduct(id: string, data: UpdateProductInput): Promise<Product> {

@@ -1,8 +1,13 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { ProductType } from 'prisma/prisma-client';
+import { ProductAttributeInput } from './product-attribute.input';
 @InputType()
 export class CreateProductInput {
+  @Field()
+  @IsNotEmpty()
+  sku: string;
+
   @Field()
   @IsNotEmpty()
   title: string;
@@ -18,6 +23,10 @@ export class CreateProductInput {
   @Field()
   @IsNotEmpty()
   description_ar: string;
+
+  @Field()
+  @IsNotEmpty()
+  previewImage: string;
 
   @Field()
   @IsNotEmpty()
@@ -51,4 +60,8 @@ export class CreateProductInput {
   @Field(() => Int)
   @IsNotEmpty()
   price_ar: number;
+
+  @Field(() => [ProductAttributeInput])
+  @IsNotEmpty()
+  attributes: ProductAttributeInput[];
 }

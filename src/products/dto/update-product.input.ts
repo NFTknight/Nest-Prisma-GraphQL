@@ -1,8 +1,12 @@
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { ProductType } from 'prisma/prisma-client';
+import { ProductAttributeInput } from './product-attribute.input';
 @InputType()
 export class UpdateProductInput {
+  @Field()
+  sku?: string;
+
   @Field()
   title?: string;
 
@@ -16,11 +20,13 @@ export class UpdateProductInput {
   description_ar?: string;
 
   @Field()
+  previewImage?: string;
+
+  @Field()
   image?: string;
 
   @Field()
-  @IsEnum(ProductType)
-  type: ProductType;
+  type?: ProductType;
 
   @Field()
   vendorId?: string;
@@ -39,4 +45,7 @@ export class UpdateProductInput {
 
   @Field(() => Int)
   price_ar?: number;
+
+  @Field(() => [ProductAttributeInput])
+  attributes?: ProductAttributeInput[];
 }

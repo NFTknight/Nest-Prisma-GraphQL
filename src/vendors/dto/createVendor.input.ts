@@ -20,9 +20,6 @@ export class CreateVendorInput {
   active: boolean;
 
   @Field()
-  slug: string;
-
-  @Field()
   address: string;
 
   @Field()

@@ -45,13 +45,16 @@ input CreatePostInput {
 
 input CreateProductInput {
   active: Boolean!
+  attributes: [ProductAttributeInput!]!
   categoryId: String!
   description: String!
   description_ar: String!
   image: String!
   minPreorderDays: Int!
+  previewImage: String!
   price: Int!
   price_ar: Int!
+  sku: String!
   title: String!
   title_ar: String!
   type: String!
@@ -75,7 +78,6 @@ input CreateVendorInput {
   name: String!
   phone: String!
   shortName: Boolean!
-  slug: String!
   storeStatus: Boolean!
   terms: String!
   url: String!
@@ -171,6 +173,7 @@ enum PostOrderField {
 
 type Product {
   active: Boolean!
+  attributes: [ProductAttribute!]!
   category: Category
   categoryId: String!
 
@@ -181,8 +184,10 @@ type Product {
   id: ID!
   image: String!
   minPreorderDays: Int!
+  previewImage: String!
   price: Int!
   price_ar: Int!
+  sku: String!
   title: String!
   title_ar: String!
   type: ProductType!
@@ -191,6 +196,20 @@ type Product {
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: Vendor!
+}
+
+type ProductAttribute {
+  key: String!
+  key_ar: String!
+  value: String!
+  value_ar: String!
+}
+
+input ProductAttributeInput {
+  key: String!
+  key_ar: String!
+  value: String!
+  value_ar: String!
 }
 
 """Product Type"""
@@ -249,16 +268,19 @@ input UpdateCategoryInput {
 
 input UpdateProductInput {
   active: Boolean
+  attributes: [ProductAttributeInput!]
   categoryId: String
   description: String
   description_ar: String
   image: String
   minPreorderDays: Int
+  previewImage: String
   price: Int
   price_ar: Int
+  sku: String
   title: String
   title_ar: String
-  type: String!
+  type: String
   vendorId: String
 }
 
@@ -284,7 +306,6 @@ input UpdateVendorInput {
   name: String
   phone: String
   shortName: Boolean
-  slug: String
   storeStatus: Boolean
   terms: String
   url: String
@@ -325,7 +346,6 @@ type Vendor {
   name: String!
   phone: String!
   shortName: Boolean!
-  slug: String!
   storeStatus: Boolean!
   terms: String!
 
