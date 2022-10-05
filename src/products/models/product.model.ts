@@ -4,6 +4,7 @@ import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { ProductType } from 'prisma/prisma-client';
 import { ProductAttribute } from './product-attribute.model';
+import { ProductVariant } from './product-variant.model';
 registerEnumType(ProductType, {
   name: 'ProductType',
   description: 'Product Type',
@@ -21,13 +22,17 @@ export class Product extends BaseModel {
   type: ProductType;
   previewImage: string;
   image: string;
-  @Field(() => Vendor, { nullable: false })
   vendorId: string;
+
+  @Field(() => Vendor, { nullable: false })
   vendor?: Vendor;
   categoryId: string;
   category?: Category;
   active: boolean;
   minPreorderDays: number;
+
+  @Field(() => [ProductVariant], { nullable: false })
+  variants?: ProductVariant[];
 
   @Field(() => [ProductAttribute])
   attributes: ProductAttribute[];

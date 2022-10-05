@@ -10,17 +10,20 @@ import { CategoriesService } from 'src/categories/categories.service';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { Category } from 'src/categories/models/category.model';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateProductInput } from './dto/create-product.input';
-import { UpdateProductInput } from './dto/update-product.input';
-import { Product } from './models/product.model';
-import { ProductsService } from './products.service';
+import { CreateProductInput } from '../dto/create-product.input';
+import { UpdateProductInput } from '../dto/update-product.input';
+import { Product } from '../models/product.model';
+import { ProductsService } from '../services/products.service';
+import { ProductVariant } from '../models/product-variant.model';
+import { ProductVariantsService } from '../services/product-variants.service';
 
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(
     private readonly productService: ProductsService,
     private readonly vendorService: VendorsService,
-    private readonly categoriesService: CategoriesService
+    private readonly categoriesService: CategoriesService,
+    private readonly productVariantsService: ProductVariantsService
   ) {}
 
   @Query(() => Product)
@@ -59,5 +62,10 @@ export class ProductsResolver {
   @ResolveField('category')
   category(@Parent() product: Product): Promise<Category> {
     return this.categoriesService.getCategory(product.categoryId);
+  }
+
+  @ResolveField('variants')
+  variants(@Parent() product: Product): Promise<ProductVariant[]> {
+    return this.productVariantsService.getProductVariants(product.id);
   }
 }

@@ -1,13 +1,6 @@
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Category } from 'src/categories/models/category.model';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { BaseModel } from 'src/common/models/base.model';
-import { Vendor } from 'src/vendors/models/vendor.model';
-import { ProductType, ProductAttribute } from 'prisma/prisma-client';
-
-registerEnumType(ProductType, {
-  name: 'ProductType',
-  description: 'Product Type',
-});
+import { ProductAttribute } from './product-attribute.model';
 
 @ObjectType()
 export class ProductVariant extends BaseModel {
@@ -22,4 +15,7 @@ export class ProductVariant extends BaseModel {
   price: number;
   price_ar: number;
   productId: string;
+
+  @Field(() => [ProductAttribute])
+  attributes: ProductAttribute[];
 }

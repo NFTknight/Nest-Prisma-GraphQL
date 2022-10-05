@@ -61,6 +61,21 @@ input CreateProductInput {
   vendorId: String!
 }
 
+input CreateProductVariantInput {
+  active: Boolean!
+  attributes: [ProductAttributeInput!]!
+  description: String!
+  description_ar: String!
+  image: String!
+  previewImage: String!
+  price: Int!
+  price_ar: Int!
+  productId: String!
+  sku: String!
+  title: String!
+  title_ar: String!
+}
+
 input CreateVendorInput {
   accountNumber: String!
   active: Boolean!
@@ -103,15 +118,18 @@ type Mutation {
   createCategory(data: CreateCategoryInput!): Category!
   createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!
+  createProductVariant(data: CreateProductVariantInput!): ProductVariant!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteCategory(id: String!): Category!
   deleteProduct(id: String!): Product!
+  deleteProductVariant(id: String!): ProductVariant!
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
   signup(data: SignupInput!): Auth!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
+  updateProductVariant(data: UpdateProductVariantInput!, id: String!): ProductVariant!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
 }
@@ -194,8 +212,9 @@ type Product {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor
-  vendorId: Vendor!
+  variants: [ProductVariant!]!
+  vendor: Vendor!
+  vendorId: String!
 }
 
 type ProductAttribute {
@@ -219,10 +238,34 @@ enum ProductType {
   WORKSHOP
 }
 
+type ProductVariant {
+  active: Boolean!
+  attributes: [ProductAttribute!]!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  description: String!
+  description_ar: String!
+  id: ID!
+  image: String!
+  previewImage: String!
+  price: Int!
+  price_ar: Int!
+  productId: String!
+  sku: String!
+  title: String!
+  title_ar: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+}
+
 type Query {
   getCategories(vendorId: String): [Category!]!
   getCategory(id: String!): Category!
   getProduct(id: String!): Product!
+  getProductVariant(id: String!): ProductVariant!
+  getProductVariants(productId: String): [ProductVariant!]!
   getProducts(vendorId: String): [Product!]!
   getVendor(id: String!): Vendor!
   getVendors: [Vendor!]!
@@ -282,6 +325,21 @@ input UpdateProductInput {
   title_ar: String
   type: String
   vendorId: String
+}
+
+input UpdateProductVariantInput {
+  active: Boolean
+  attributes: [ProductAttributeInput!]
+  description: String
+  description_ar: String
+  image: String
+  previewImage: String
+  price: Int
+  price_ar: Int
+  productId: String
+  sku: String
+  title: String
+  title_ar: String
 }
 
 input UpdateUserInput {
