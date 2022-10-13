@@ -2,6 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddToCartInput {
+  appointmentTime: DateTime
+  cartId: String
+  productId: String!
+  productVariantId: String
+  quantity: Int
+  vendorId: String!
+}
+
 type Auth {
   """JWT access token"""
   accessToken: JWT!
@@ -9,6 +18,36 @@ type Auth {
   """JWT refresh token"""
   refreshToken: JWT!
   user: User!
+}
+
+type Cart {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  items: [CartItem!]
+  ordered: Boolean!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor
+  vendorId: String!
+}
+
+type CartItem {
+  appointmentTime: DateTime
+  cartId: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  product: Product
+  productId: String!
+  productVariantId: String
+  quantity: Int!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  variant: ProductVariant
 }
 
 type Category {
@@ -116,6 +155,7 @@ input LoginInput {
 }
 
 type Mutation {
+  addItemToCart(data: AddToCartInput!): CartItem!
   changePassword(data: ChangePasswordInput!): User!
   createCategory(data: CreateCategoryInput!): Category!
   createPost(data: CreatePostInput!): Post!
@@ -128,7 +168,9 @@ type Mutation {
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
+  removeItemFromCart(cartItemId: String!): CartItem!
   signup(data: SignupInput!): Auth!
+  updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateProductVariant(data: UpdateProductVariantInput!, id: String!): ProductVariant!
@@ -265,6 +307,7 @@ type ProductVariant {
 }
 
 type Query {
+  getCart(cartId: String!): Cart!
   getCategories(vendorId: String): [Category!]!
   getCategory(id: String!): Category!
   getProduct(id: String!): Product!

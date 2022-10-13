@@ -65,6 +65,7 @@ model Vendor {
   Category       Category[]
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
+  Cart           Cart[]
 }
 
 model Category {
@@ -109,6 +110,7 @@ model ProductVariant {
   Product        Product?           @relation(fields: [productId], references: [id])
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
+  CartItem       CartItem[]
 }
 
 type ServiceAvailabilities {
@@ -140,4 +142,45 @@ model Product {
   attributes      ProductAttribute[]
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
+  CartItem        CartItem[]
+}
+
+model CartItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+
+  productVariantId String?         @db.ObjectId
+  variant          ProductVariant? @relation(fields: [productVariantId], references: [id])
+
+  appointmentTime DateTime?
+
+  quantity Int @default(1)
+
+  cartId String @db.ObjectId
+  Cart   Cart   @relation(fields: [cartId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  items CartItem[]
+
+  vendorId String @db.ObjectId
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  ordered   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

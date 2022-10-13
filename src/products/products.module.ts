@@ -14,5 +14,6 @@ import { ProductVariantsResolver } from './resolvers/product-variants.resolver';
     ProductVariantsResolver,
     ProductVariantsService,
   ],
+  exports: [ProductsService, ProductVariantsService],
 })
 export class ProductsModule {}
