@@ -111,8 +111,13 @@ model ProductVariant {
   updatedAt      DateTime           @updatedAt
 }
 
+type ServiceAvailabilities {
+  startTime DateTime
+  endTime   DateTime
+}
+
 model Product {
-  id              String             @id @default(auto()) @map("_id") @db.ObjectId
+  id              String                  @id @default(auto()) @map("_id") @db.ObjectId
   sku             String
   title           String
   title_ar        String
@@ -121,16 +126,18 @@ model Product {
   previewImage    String
   image           String
   type            ProductType
-  vendorId        String             @db.ObjectId
-  vendor          Vendor             @relation(fields: [vendorId], references: [id])
-  active          Boolean            @default(false)
+  vendorId        String                  @db.ObjectId
+  vendor          Vendor                  @relation(fields: [vendorId], references: [id])
+  active          Boolean                 @default(false)
   minPreorderDays Int
   price           Int
   price_ar        Int
-  category        Category?          @relation(fields: [categoryId], references: [id])
-  categoryId      String             @db.ObjectId
+  category        Category?               @relation(fields: [categoryId], references: [id])
+  categoryId      String                  @db.ObjectId
+  noOfSeats       Int?
+  availabilities  ServiceAvailabilities[]
   variants        ProductVariant[]
   attributes      ProductAttribute[]
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
 }

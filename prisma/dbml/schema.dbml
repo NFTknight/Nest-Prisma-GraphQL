@@ -101,6 +101,8 @@ Table Product {
   price_ar Int [not null]
   category Category
   categoryId String [not null]
+  noOfSeats Int
+  availabilities ServiceAvailabilities[] [not null]
   variants ProductVariant [not null]
   attributes ProductAttribute[] [not null]
   createdAt DateTime [default: `now()`, not null]

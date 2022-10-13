@@ -1,7 +1,7 @@
-import { IsEnum, IsOptional } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { ProductType } from 'prisma/prisma-client';
 import { ProductAttributeInput } from './product-attribute.input';
+import { ServiceAvailabilitiesInput } from './service-availabilites.input';
 @InputType()
 export class UpdateProductInput {
   @Field()
@@ -48,4 +48,10 @@ export class UpdateProductInput {
 
   @Field(() => [ProductAttributeInput])
   attributes?: ProductAttributeInput[];
+
+  @Field(() => [ServiceAvailabilitiesInput])
+  availabilities?: ServiceAvailabilitiesInput[];
+
+  @Field(() => Int)
+  noOfSeats?: number;
 }

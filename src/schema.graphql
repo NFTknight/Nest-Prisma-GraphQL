@@ -46,11 +46,13 @@ input CreatePostInput {
 input CreateProductInput {
   active: Boolean!
   attributes: [ProductAttributeInput!]!
+  availabilities: [ServiceAvailabilitiesInput!]
   categoryId: String!
   description: String!
   description_ar: String!
   image: String!
   minPreorderDays: Int!
+  noOfSeats: Int
   previewImage: String!
   price: Int!
   price_ar: Int!
@@ -192,6 +194,7 @@ enum PostOrderField {
 type Product {
   active: Boolean!
   attributes: [ProductAttribute!]!
+  availabilities: [ServiceAvailabilities!]!
   category: Category
   categoryId: String!
 
@@ -202,6 +205,7 @@ type Product {
   id: ID!
   image: String!
   minPreorderDays: Int!
+  noOfSeats: Int
   previewImage: String!
   price: Int!
   price_ar: Int!
@@ -283,6 +287,16 @@ enum Role {
   USER
 }
 
+type ServiceAvailabilities {
+  endTime: DateTime!
+  startTime: DateTime!
+}
+
+input ServiceAvailabilitiesInput {
+  endTime: DateTime!
+  startTime: DateTime!
+}
+
 input SignupInput {
   email: String!
   firstname: String
@@ -312,11 +326,13 @@ input UpdateCategoryInput {
 input UpdateProductInput {
   active: Boolean
   attributes: [ProductAttributeInput!]
+  availabilities: [ServiceAvailabilitiesInput!]
   categoryId: String
   description: String
   description_ar: String
   image: String
   minPreorderDays: Int
+  noOfSeats: Int
   previewImage: String
   price: Int
   price_ar: Int
