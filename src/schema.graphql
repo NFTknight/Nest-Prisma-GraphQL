@@ -157,6 +157,7 @@ input LoginInput {
 type Mutation {
   addItemToCart(data: AddToCartInput!): CartItem!
   changePassword(data: ChangePasswordInput!): User!
+  checkout(cartId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
   createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!

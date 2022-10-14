@@ -6,6 +6,7 @@ import { ProductType } from 'prisma/prisma-client';
 import { ProductAttribute } from './product-attribute.model';
 import { ProductVariant } from './product-variant.model';
 import { ServiceAvailabilities } from './service-availabilities.model';
+
 registerEnumType(ProductType, {
   name: 'ProductType',
   description: 'Product Type',

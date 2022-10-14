@@ -66,6 +66,7 @@ model Vendor {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   Cart           Cart[]
+  Order          Order[]
 }
 
 model Category {
@@ -103,8 +104,8 @@ model ProductVariant {
   previewImage   String
   image          String
   active         Boolean            @default(false)
-  price          Int
-  price_ar       Int
+  price          Float
+  price_ar       Float
   attributes     ProductAttribute[]
   productId      String?            @db.ObjectId
   Product        Product?           @relation(fields: [productId], references: [id])
@@ -132,8 +133,8 @@ model Product {
   vendor          Vendor                  @relation(fields: [vendorId], references: [id])
   active          Boolean                 @default(false)
   minPreorderDays Int
-  price           Int
-  price_ar        Int
+  price           Float
+  price_ar        Float
   category        Category?               @relation(fields: [categoryId], references: [id])
   categoryId      String                  @db.ObjectId
   noOfSeats       Int?
@@ -173,14 +174,25 @@ model Cart {
   vendorId String @db.ObjectId
   vendor   Vendor @relation(fields: [vendorId], references: [id])
 
+  totalPrice    Float
+  totalPrice_ar Float
+
   ordered   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Order     Order[]
 }
 
 model Order {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  cartId String @db.ObjectId
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  totalPrice    Float
+  totalPrice_ar Float
+  vendorId      String   @db.ObjectId
+  vendor        Vendor   @relation(fields: [vendorId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

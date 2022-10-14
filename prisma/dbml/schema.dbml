@@ -51,6 +51,7 @@ Table Vendor {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Cart Cart [not null]
+  Order Order [not null]
 }
 
 Table Category {
@@ -75,8 +76,8 @@ Table ProductVariant {
   previewImage String [not null]
   image String [not null]
   active Boolean [not null, default: false]
-  price Int [not null]
-  price_ar Int [not null]
+  price Float [not null]
+  price_ar Float [not null]
   attributes ProductAttribute[] [not null]
   productId String
   Product Product
@@ -99,8 +100,8 @@ Table Product {
   vendor Vendor [not null]
   active Boolean [not null, default: false]
   minPreorderDays Int [not null]
-  price Int [not null]
-  price_ar Int [not null]
+  price Float [not null]
+  price_ar Float [not null]
   category Category
   categoryId String [not null]
   noOfSeats Int
@@ -131,13 +132,22 @@ Table Cart {
   items CartItem [not null]
   vendorId String [not null]
   vendor Vendor [not null]
+  totalPrice Float [not null]
+  totalPrice_ar Float [not null]
   ordered Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  Order Order [not null]
 }
 
 Table Order {
   id String [pk]
+  cartId String [not null]
+  cart Cart [not null]
+  totalPrice Float [not null]
+  totalPrice_ar Float [not null]
+  vendorId String [not null]
+  vendor Vendor [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -170,3 +180,7 @@ Ref: CartItem.productVariantId > ProductVariant.id
 Ref: CartItem.cartId > Cart.id
 
 Ref: Cart.vendorId > Vendor.id
+
+Ref: Order.cartId > Cart.id
+
+Ref: Order.vendorId > Vendor.id

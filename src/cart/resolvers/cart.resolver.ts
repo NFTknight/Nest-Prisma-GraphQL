@@ -1,4 +1,11 @@
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { CartItem } from '../models/cart-item.model';
 import { Cart } from '../models/cart.model';
 import { CartItemService } from '../services/cart-item.service';
@@ -19,5 +26,10 @@ export class CartResolver {
   @ResolveField('items')
   async items(@Parent() parent: Cart): Promise<CartItem[]> {
     return this.cartItemService.getCartItems(parent.id);
+  }
+
+  @Mutation(() => Cart)
+  checkout(@Args('cartId') cartId: string) {
+    //
   }
 }
