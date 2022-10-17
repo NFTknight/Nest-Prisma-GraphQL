@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateProductInput } from './dto/create-product.input';
-import { UpdateProductInput } from './dto/update-product.input';
-import { Product } from './models/product.model';
+import { CreateProductInput } from '../dto/create-product.input';
+import { UpdateProductInput } from '../dto/update-product.input';
+import { Product } from '../models/product.model';
+
 @Injectable()
 export class ProductsService {
   constructor(
@@ -20,17 +21,27 @@ export class ProductsService {
   }
 
   async getProducts(vendorId?: string): Promise<Product[]> {
-    const where: Partial<Product> = {};
+    const where: { vendorId?: string } = {};
     if (vendorId) where.vendorId = vendorId;
 
     return this.prisma.product.findMany({ where });
   }
 
   async createProduct(data: CreateProductInput): Promise<Product> {
+    const { vendorId, categoryId, ...rest } = data;
+
     // if the vendor does not exist, this function will throw an error.
-    await this.vendorService.getVendor(data.vendorId);
+    await this.vendorService.getVendor(vendorId);
+
     // if vendor exists we can successfully create the product.
-    return this.prisma.product.create({ data });
+    const prod = await this.prisma.product.create({
+      data: {
+        ...rest,
+        vendor: { connect: { id: vendorId } },
+        category: { connect: { id: categoryId } },
+      },
+    });
+    return prod;
   }
 
   async updateProduct(id: string, data: UpdateProductInput): Promise<Product> {

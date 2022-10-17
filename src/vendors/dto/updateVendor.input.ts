@@ -18,9 +18,6 @@ export class UpdateVendorInput {
   active?: boolean;
 
   @Field()
-  slug?: string;
-
-  @Field()
   address?: string;
 
   @Field()

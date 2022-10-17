@@ -46,7 +46,6 @@ model Vendor {
   description    String
   storeStatus    Boolean
   active         Boolean    @default(false)
-  slug           String
   address        String
   phone          String
   email          String
@@ -66,6 +65,8 @@ model Vendor {
   Category       Category[]
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
+  Cart           Cart[]
+  Order          Order[]
 }
 
 model Category {
@@ -80,20 +81,118 @@ model Category {
   updatedAt DateTime  @updatedAt
 }
 
+enum ProductType {
+  PRODUCT
+  SERVICE
+  WORKSHOP
+}
+
+type ProductAttribute {
+  key      String
+  key_ar   String
+  value    String
+  value_ar String
+}
+
+model ProductVariant {
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  sku            String
+  title          String
+  title_ar       String
+  description    String
+  description_ar String
+  previewImage   String
+  image          String
+  active         Boolean            @default(false)
+  price          Float
+  price_ar       Float
+  attributes     ProductAttribute[]
+  productId      String?            @db.ObjectId
+  Product        Product?           @relation(fields: [productId], references: [id])
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  CartItem       CartItem[]
+}
+
+type ServiceAvailabilities {
+  startTime DateTime
+  endTime   DateTime
+}
+
 model Product {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  id              String                  @id @default(auto()) @map("_id") @db.ObjectId
+  sku             String
   title           String
   title_ar        String
   description     String
   description_ar  String
-  vendorId        String    @db.ObjectId
-  vendor          Vendor    @relation(fields: [vendorId], references: [id])
-  active          Boolean   @default(false)
+  previewImage    String
+  image           String
+  type            ProductType
+  vendorId        String                  @db.ObjectId
+  vendor          Vendor                  @relation(fields: [vendorId], references: [id])
+  active          Boolean                 @default(false)
   minPreorderDays Int
-  price           Int
-  price_ar        Int
-  Category        Category? @relation(fields: [categoryId], references: [id])
-  categoryId      String    @db.ObjectId
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  price           Float
+  price_ar        Float
+  category        Category?               @relation(fields: [categoryId], references: [id])
+  categoryId      String                  @db.ObjectId
+  noOfSeats       Int?
+  availabilities  ServiceAvailabilities[]
+  variants        ProductVariant[]
+  attributes      ProductAttribute[]
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  CartItem        CartItem[]
+}
+
+model CartItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+
+  productVariantId String?         @db.ObjectId
+  variant          ProductVariant? @relation(fields: [productVariantId], references: [id])
+
+  appointmentTime DateTime?
+
+  quantity Int @default(1)
+
+  cartId String @db.ObjectId
+  Cart   Cart   @relation(fields: [cartId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  items CartItem[]
+
+  vendorId String @db.ObjectId
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  totalPrice    Float
+  totalPrice_ar Float
+
+  ordered   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Order     Order[]
+}
+
+model Order {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  cartId String @db.ObjectId
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  totalPrice    Float
+  totalPrice_ar Float
+  vendorId      String   @db.ObjectId
+  vendor        Vendor   @relation(fields: [vendorId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

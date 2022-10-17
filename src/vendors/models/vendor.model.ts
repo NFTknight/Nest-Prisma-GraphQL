@@ -22,9 +22,6 @@ export class Vendor extends BaseModel {
   active: boolean;
 
   @Field()
-  slug: string;
-
-  @Field()
   address: string;
 
   @Field()
