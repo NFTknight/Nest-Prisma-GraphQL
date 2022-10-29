@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-api
+  template:
+    metadata:
+      labels:
+        app: backend-api
+    spec:
+      containers:
+        - name: backend-api
+          image: registry.digitalocean.com/anyaa/backend-api:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: '3000'
+            - name: DATABASE_URL
+              value: 'mongodb://admin:OgTRMeDK2EKI7pwu@@mybasket-dev.7z83z.mongodb.net/anyaa'
+            - name: JWT_ACCESS_SECRET
+              value: 'anyaa'
+            - name: JWT_REFRESH_SECRET
+              value: 'anyaa'
