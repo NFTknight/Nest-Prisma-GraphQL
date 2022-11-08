@@ -1,21 +1,17 @@
 import { IsNotEmpty } from 'class-validator';
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, Float } from '@nestjs/graphql';
 
 @InputType()
 export class CreateCouponInput {
   @Field()
-  @IsNotEmpty()
-  title: string;
+  code: string;
+
+  @Field(() => Float, { nullable: false })
+  discount: number;
 
   @Field()
-  @IsNotEmpty()
-  title_ar: string;
-
-  @Field()
-  @IsNotEmpty()
   vendorId: string;
 
   @Field()
-  @IsNotEmpty()
   active: boolean;
 }

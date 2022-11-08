@@ -95,15 +95,14 @@ model Category {
 }
 
 model Coupon {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  title_ar  String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  code      String
+  discount  Float
   vendorId  String
-  vendor    Vendor    @relation(fields: [vendorId], references: [id])
-  active    Boolean   @default(false)
-  Product   Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum ProductType {
@@ -169,8 +168,6 @@ model Product {
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
   CartItem        CartItem[]
-  Coupon          Coupon?                 @relation(fields: [couponId], references: [id])
-  couponId        String?                 @db.ObjectId
 }
 
 model CartItem {

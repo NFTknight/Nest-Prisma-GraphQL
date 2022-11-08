@@ -70,10 +70,32 @@ input ChangePasswordInput {
   oldPassword: String!
 }
 
+type Coupon {
+  active: Boolean!
+  code: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  discount: Float!
+  id: ID!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor!
+  vendorId: String!
+}
+
 input CreateCategoryInput {
   active: Boolean!
   title: String!
   title_ar: String!
+  vendorId: String!
+}
+
+input CreateCouponInput {
+  active: Boolean!
+  code: String!
+  discount: Float!
   vendorId: String!
 }
 
@@ -166,12 +188,14 @@ type Mutation {
   changePassword(data: ChangePasswordInput!): User!
   checkout(cartId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
+  createCoupon(data: CreateCouponInput!): Coupon!
   createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!
   createProductVariant(data: CreateProductVariantInput!): ProductVariant!
   createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteCategory(id: String!): Category!
+  deleteCoupon(id: String!): Coupon!
   deleteProduct(id: String!): Product!
   deleteProductVariant(id: String!): ProductVariant!
   deleteVendor(id: String!): Vendor!
@@ -181,6 +205,7 @@ type Mutation {
   signup(data: SignupInput!): Auth!
   updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
+  updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateProductVariant(data: UpdateProductVariantInput!, id: String!): ProductVariant!
   updateUser(data: UpdateUserInput!): User!
@@ -319,6 +344,8 @@ type Query {
   getCart(cartId: String!): Cart!
   getCategories(vendorId: String): [Category!]!
   getCategory(id: String!): Category!
+  getCoupon(id: String!): Coupon!
+  getCoupons(vendorId: String): [Coupon!]!
   getProduct(id: String!): Product!
   getProductVariant(id: String!): ProductVariant!
   getProductVariants(productId: String): [ProductVariant!]!
@@ -414,6 +441,12 @@ input UpdateCategoryInput {
   active: Boolean
   title: String
   title_ar: String
+}
+
+input UpdateCouponInput {
+  active: Boolean
+  code: String
+  discount: Float!
 }
 
 input UpdateProductInput {

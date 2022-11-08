@@ -18,6 +18,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { TagsModule } from './tags/tags.module';
+import { CouponsModule } from './coupons/coupons.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { TagsModule } from './tags/tags.module';
     CartModule,
     OrderModule,
     TagsModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
