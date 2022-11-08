@@ -84,7 +84,7 @@ input CreatePostInput {
 
 input CreateProductInput {
   active: Boolean!
-  attributes: [ProductAttributeInput!]!
+  attributes: [ProductAttributeInput!]
   availabilities: [ServiceAvailabilitiesInput!]
   categoryId: String!
   description: String!
@@ -93,8 +93,8 @@ input CreateProductInput {
   minPreorderDays: Int!
   noOfSeats: Int
   previewImage: String!
-  price: Int!
-  price_ar: Int!
+  price: Float!
+  price_ar: Float!
   sku: String!
   title: String!
   title_ar: String!
@@ -115,6 +115,13 @@ input CreateProductVariantInput {
   sku: String!
   title: String!
   title_ar: String!
+}
+
+input CreateTagInput {
+  active: Boolean!
+  title: String!
+  title_ar: String!
+  vendorId: String!
 }
 
 input CreateVendorInput {
@@ -162,6 +169,7 @@ type Mutation {
   createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!
   createProductVariant(data: CreateProductVariantInput!): ProductVariant!
+  createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteCategory(id: String!): Category!
   deleteProduct(id: String!): Product!
@@ -236,8 +244,8 @@ enum PostOrderField {
 
 type Product {
   active: Boolean!
-  attributes: [ProductAttribute!]!
-  availabilities: [ServiceAvailabilities!]!
+  attributes: [ProductAttribute!]
+  availabilities: [ServiceAvailabilities!]
   category: Category
   categoryId: String!
 
@@ -315,6 +323,7 @@ type Query {
   getProductVariant(id: String!): ProductVariant!
   getProductVariants(productId: String): [ProductVariant!]!
   getProducts(vendorId: String): [Product!]!
+  getTags(after: String, before: String, first: Int, last: Int, orderBy: TagOrder, query: String, skip: Int): TagConnection!
   getVendor(id: String!): Vendor!
   getVendors: [Vendor!]!
   hello(name: String!): String!
@@ -352,6 +361,47 @@ type Subscription {
   postCreated: Post!
 }
 
+type Tag {
+  active: Boolean!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  title: String!
+  title_ar: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor
+  vendorId: Vendor!
+}
+
+type TagConnection {
+  edges: [TagEdge!]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type TagEdge {
+  cursor: String!
+  node: Tag!
+}
+
+input TagOrder {
+  direction: OrderDirection!
+  field: TagOrderField!
+}
+
+"""Properties by which tag connections can be ordered."""
+enum TagOrderField {
+  active
+  createdAt
+  id
+  title
+  title_ar
+  updatedAt
+}
+
 type Token {
   """JWT access token"""
   accessToken: JWT!
@@ -364,7 +414,6 @@ input UpdateCategoryInput {
   active: Boolean
   title: String
   title_ar: String
-  vendorId: String
 }
 
 input UpdateProductInput {

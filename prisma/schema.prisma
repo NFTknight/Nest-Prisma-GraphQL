@@ -67,9 +67,34 @@ model Vendor {
   updatedAt      DateTime   @updatedAt
   Cart           Cart[]
   Order          Order[]
+  Tag            Tag[]
+  Coupon         Coupon[]
+}
+
+model Tag {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  title_ar  String
+  active    Boolean
+  vendorId  String
+  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  title_ar  String
+  vendorId  String
+  vendor    Vendor    @relation(fields: [vendorId], references: [id])
+  active    Boolean   @default(false)
+  Product   Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Coupon {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   title_ar  String
@@ -144,6 +169,8 @@ model Product {
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
   CartItem        CartItem[]
+  Coupon          Coupon?                 @relation(fields: [couponId], references: [id])
+  couponId        String?                 @db.ObjectId
 }
 
 model CartItem {

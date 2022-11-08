@@ -37,10 +37,10 @@ export class Product extends BaseModel {
   variants?: ProductVariant[];
 
   @Field(() => [ProductAttribute])
-  attributes: ProductAttribute[];
+  attributes?: ProductAttribute[];
 
   @Field(() => [ServiceAvailabilities])
-  availabilities: ServiceAvailabilities[];
+  availabilities?: ServiceAvailabilities[];
 
   noOfSeats?: number;
   price: number;

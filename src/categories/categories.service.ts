@@ -38,11 +38,6 @@ export class CategoriesService {
     id: string,
     data: UpdateCategoryInput
   ): Promise<Category> {
-    if (data.vendorId) {
-      // if the vendor does not exist, this function will throw an error.
-      await this.vendorService.getVendor(data.vendorId);
-    }
-
     return this.prisma.category.update({
       where: { id },
       data: { ...data, updatedAt: new Date() },
