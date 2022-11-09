@@ -119,6 +119,7 @@ input CreateProductInput {
   minPreorderDays: Int!
   noOfSeats: Int
   price: Float!
+  tagIds: [String!]
   title: String!
   title_ar: String!
   type: String!
@@ -271,6 +272,7 @@ enum PostOrderField {
 }
 
 type Product {
+  Tags: [Tag!]!
   active: Boolean!
   attributes: [ProductAttribute!]
   availabilities: [ServiceAvailability!]
@@ -287,6 +289,7 @@ type Product {
   minPreorderDays: Int!
   noOfSeats: Int
   price: Int!
+  tagIds: [String!]!
   title: String!
   title_ar: String!
   type: ProductType!
@@ -437,11 +440,11 @@ input UpdateProductInput {
   description: String
   description_ar: String
   image: String
-  minPreorderDays: Int
+  itemsInStock: Int
+  minPreorderDays: Int!
   noOfSeats: Int
-  previewImage: String
-  price: Int
-  sku: String
+  price: Float
+  tagIds: [String!]
   title: String
   title_ar: String
   type: String

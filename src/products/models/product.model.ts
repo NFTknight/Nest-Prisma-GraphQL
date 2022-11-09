@@ -6,6 +6,7 @@ import { ProductType } from 'prisma/prisma-client';
 import { ProductAttribute } from './product-attribute.model';
 import { ProductVariant } from './product-variant.model';
 import { ServiceAvailability } from 'src/common/models/service-availability.model';
+import { Tag } from 'src/tags/models/tag.model';
 
 registerEnumType(ProductType, {
   name: 'ProductType',
@@ -42,6 +43,10 @@ export class Product extends BaseModel {
 
   @Field(() => [ServiceAvailability], { nullable: true })
   availabilities?: ServiceAvailability[];
+
+  tagIds: string[];
+  @Field(() => [Tag], { nullable: false })
+  Tags?: Tag[];
 
   noOfSeats?: number;
   itemsInStock?: number;

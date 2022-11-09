@@ -168,6 +168,7 @@ model Product {
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
   CartItem        CartItem[]
+  tagIds          String[]
 }
 
 model CartItem {
