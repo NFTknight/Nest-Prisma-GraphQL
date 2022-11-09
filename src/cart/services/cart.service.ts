@@ -12,7 +12,7 @@ export class CartService {
 
   async createNewCart(vendorId: string): Promise<Cart> {
     return await this.prisma.cart.create({
-      data: { vendorId, totalPrice: 0, totalPrice_ar: 0 },
+      data: { vendorId, totalPrice: 0 },
     });
   }
 
@@ -22,7 +22,7 @@ export class CartService {
 
   async updateCartPrice(
     cartId: string,
-    prices: { totalPrice: number; totalPrice_ar: number }
+    prices: { totalPrice: number }
   ): Promise<Cart> {
     return await this.prisma.cart.update({
       where: { id: cartId },

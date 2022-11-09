@@ -55,7 +55,6 @@ export class CartItemService {
   async updateTotalPrice(cartId: string) {
     const cartItems = await this.getCartItems(cartId);
     let totalPrice = 0;
-    let totalPrice_ar = 0;
 
     for (let i = 0; i < cartItems.length; ++i) {
       const cItem = cartItems[i];
@@ -70,12 +69,10 @@ export class CartItemService {
       }
 
       totalPrice += prodEntity.price * cItem.quantity;
-      totalPrice_ar += prodEntity.price_ar * cItem.quantity;
     }
 
     await this.cartService.updateCartPrice(cartId, {
       totalPrice,
-      totalPrice_ar,
     });
   }
 }

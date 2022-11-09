@@ -39,10 +39,6 @@ export class CreateProductVariantInput {
   @IsNotEmpty()
   price: number;
 
-  @Field(() => Int)
-  @IsNotEmpty()
-  price_ar: number;
-
   @Field()
   @IsNotEmpty()
   productId: string;

@@ -103,7 +103,6 @@ Table ProductVariant {
   image String [not null]
   active Boolean [not null, default: false]
   price Float [not null]
-  price_ar Float [not null]
   attributes ProductAttribute[] [not null]
   productId String
   Product Product
@@ -114,12 +113,10 @@ Table ProductVariant {
 
 Table Product {
   id String [pk]
-  sku String [not null]
   title String [not null]
   title_ar String [not null]
   description String [not null]
   description_ar String [not null]
-  previewImage String [not null]
   image String [not null]
   type ProductType [not null]
   vendorId String [not null]
@@ -127,10 +124,10 @@ Table Product {
   active Boolean [not null, default: false]
   minPreorderDays Int [not null]
   price Float [not null]
-  price_ar Float [not null]
   category Category
   categoryId String [not null]
   noOfSeats Int
+  itemsInStock Int
   availabilities ServiceAvailability[] [not null]
   variants ProductVariant [not null]
   attributes ProductAttribute[] [not null]
@@ -159,7 +156,6 @@ Table Cart {
   vendorId String [not null]
   vendor Vendor [not null]
   totalPrice Float [not null]
-  totalPrice_ar Float [not null]
   ordered Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
@@ -171,7 +167,6 @@ Table Order {
   cartId String [not null]
   cart Cart [not null]
   totalPrice Float [not null]
-  totalPrice_ar Float [not null]
   vendorId String [not null]
   vendor Vendor [not null]
   createdAt DateTime [default: `now()`, not null]

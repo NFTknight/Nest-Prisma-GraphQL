@@ -115,12 +115,10 @@ input CreateProductInput {
   description: String!
   description_ar: String!
   image: String!
+  itemsInStock: Int
   minPreorderDays: Int!
   noOfSeats: Int
-  previewImage: String!
   price: Float!
-  price_ar: Float!
-  sku: String!
   title: String!
   title_ar: String!
   type: String!
@@ -135,7 +133,6 @@ input CreateProductVariantInput {
   image: String!
   previewImage: String!
   price: Int!
-  price_ar: Int!
   productId: String!
   sku: String!
   title: String!
@@ -286,12 +283,10 @@ type Product {
   description_ar: String!
   id: ID!
   image: String!
+  itemsInStock: Int
   minPreorderDays: Int!
   noOfSeats: Int
-  previewImage: String!
   price: Int!
-  price_ar: Int!
-  sku: String!
   title: String!
   title_ar: String!
   type: ProductType!
@@ -336,7 +331,6 @@ type ProductVariant {
   image: String!
   previewImage: String!
   price: Int!
-  price_ar: Int!
   productId: String!
   sku: String!
   title: String!
@@ -447,7 +441,6 @@ input UpdateProductInput {
   noOfSeats: Int
   previewImage: String
   price: Int
-  price_ar: Int
   sku: String
   title: String
   title_ar: String
@@ -458,16 +451,19 @@ input UpdateProductInput {
 input UpdateProductVariantInput {
   active: Boolean
   attributes: [ProductAttributeInput!]
+  availabilities: [ServiceAvailabilityInput!]
+  categoryId: String
   description: String
   description_ar: String
   image: String
-  previewImage: String
-  price: Int
-  price_ar: Int
-  productId: String
-  sku: String
+  itemsInStock: Int
+  minPreorderDays: Int
+  noOfSeats: Int
+  price: Float
   title: String
   title_ar: String
+  type: String
+  vendorId: String
 }
 
 input UpdateTagInput {

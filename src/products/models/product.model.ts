@@ -14,7 +14,6 @@ registerEnumType(ProductType, {
 
 @ObjectType()
 export class Product extends BaseModel {
-  sku: string;
   title: string;
   title_ar: string;
   description: string;
@@ -22,14 +21,16 @@ export class Product extends BaseModel {
 
   @Field(() => ProductType)
   type: ProductType;
-  previewImage: string;
-  image: string;
-  vendorId: string;
 
+  image: string;
+
+  vendorId: string;
   @Field(() => Vendor, { nullable: false })
   vendor?: Vendor;
+
   categoryId: string;
   category?: Category;
+
   active: boolean;
   minPreorderDays: number;
 
@@ -43,6 +44,6 @@ export class Product extends BaseModel {
   availabilities?: ServiceAvailability[];
 
   noOfSeats?: number;
+  itemsInStock?: number;
   price: number;
-  price_ar: number;
 }

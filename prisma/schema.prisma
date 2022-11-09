@@ -131,7 +131,6 @@ model ProductVariant {
   image          String
   active         Boolean            @default(false)
   price          Float
-  price_ar       Float
   attributes     ProductAttribute[]
   productId      String?            @db.ObjectId
   Product        Product?           @relation(fields: [productId], references: [id])
@@ -148,12 +147,10 @@ type ServiceAvailability {
 
 model Product {
   id              String                @id @default(auto()) @map("_id") @db.ObjectId
-  sku             String
   title           String
   title_ar        String
   description     String
   description_ar  String
-  previewImage    String
   image           String
   type            ProductType
   vendorId        String                @db.ObjectId
@@ -161,10 +158,10 @@ model Product {
   active          Boolean               @default(false)
   minPreorderDays Int
   price           Float
-  price_ar        Float
   category        Category?             @relation(fields: [categoryId], references: [id])
   categoryId      String                @db.ObjectId
   noOfSeats       Int?
+  itemsInStock    Int?
   availabilities  ServiceAvailability[]
   variants        ProductVariant[]
   attributes      ProductAttribute[]
@@ -201,8 +198,7 @@ model Cart {
   vendorId String @db.ObjectId
   vendor   Vendor @relation(fields: [vendorId], references: [id])
 
-  totalPrice    Float
-  totalPrice_ar Float
+  totalPrice Float
 
   ordered   Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -216,10 +212,10 @@ model Order {
   cartId String @db.ObjectId
   cart   Cart   @relation(fields: [cartId], references: [id])
 
-  totalPrice    Float
-  totalPrice_ar Float
-  vendorId      String   @db.ObjectId
-  vendor        Vendor   @relation(fields: [vendorId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  totalPrice Float
+
+  vendorId  String   @db.ObjectId
+  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

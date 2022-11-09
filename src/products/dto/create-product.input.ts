@@ -7,10 +7,6 @@ import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.in
 export class CreateProductInput {
   @Field()
   @IsNotEmpty()
-  sku: string;
-
-  @Field()
-  @IsNotEmpty()
   title: string;
 
   @Field()
@@ -24,10 +20,6 @@ export class CreateProductInput {
   @Field()
   @IsNotEmpty()
   description_ar: string;
-
-  @Field()
-  @IsNotEmpty()
-  previewImage: string;
 
   @Field()
   @IsNotEmpty()
@@ -57,10 +49,6 @@ export class CreateProductInput {
   @IsNotEmpty()
   price: number;
 
-  @Field(() => Float)
-  @IsNotEmpty()
-  price_ar: number;
-
   @Field(() => [ProductAttributeInput])
   @IsNotEmpty()
   attributes?: ProductAttributeInput[];
@@ -70,4 +58,5 @@ export class CreateProductInput {
 
   @Field(() => Int)
   noOfSeats?: number;
+  itemsInStock?: number;
 }

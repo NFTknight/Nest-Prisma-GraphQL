@@ -43,9 +43,6 @@ export class UpdateProductInput {
   @Field(() => Int)
   price?: number;
 
-  @Field(() => Int)
-  price_ar?: number;
-
   @Field(() => [ProductAttributeInput])
   attributes?: ProductAttributeInput[];
 

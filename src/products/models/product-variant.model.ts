@@ -13,7 +13,6 @@ export class ProductVariant extends BaseModel {
   image: string;
   active: boolean;
   price: number;
-  price_ar: number;
   productId: string;
 
   @Field(() => [ProductAttribute])
