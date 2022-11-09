@@ -72,14 +72,15 @@ model Vendor {
 }
 
 model Tag {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  title_ar  String
-  active    Boolean
-  vendorId  String
-  vendor    Vendor   @relation(fields: [vendorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String                @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  title_ar       String
+  vendorId       String
+  vendor         Vendor                @relation(fields: [vendorId], references: [id])
+  active         Boolean               @default(false)
+  availabilities ServiceAvailability[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
 }
 
 model Category {
@@ -138,13 +139,14 @@ model ProductVariant {
   CartItem       CartItem[]
 }
 
-type ServiceAvailabilities {
-  startTime DateTime
-  endTime   DateTime
+type ServiceAvailability {
+  days      String[]
+  startTime String
+  endTime   String
 }
 
 model Product {
-  id              String                  @id @default(auto()) @map("_id") @db.ObjectId
+  id              String                @id @default(auto()) @map("_id") @db.ObjectId
   sku             String
   title           String
   title_ar        String
@@ -153,20 +155,20 @@ model Product {
   previewImage    String
   image           String
   type            ProductType
-  vendorId        String                  @db.ObjectId
-  vendor          Vendor                  @relation(fields: [vendorId], references: [id])
-  active          Boolean                 @default(false)
+  vendorId        String                @db.ObjectId
+  vendor          Vendor                @relation(fields: [vendorId], references: [id])
+  active          Boolean               @default(false)
   minPreorderDays Int
   price           Float
   price_ar        Float
-  category        Category?               @relation(fields: [categoryId], references: [id])
-  categoryId      String                  @db.ObjectId
+  category        Category?             @relation(fields: [categoryId], references: [id])
+  categoryId      String                @db.ObjectId
   noOfSeats       Int?
-  availabilities  ServiceAvailabilities[]
+  availabilities  ServiceAvailability[]
   variants        ProductVariant[]
   attributes      ProductAttribute[]
-  createdAt       DateTime                @default(now())
-  updatedAt       DateTime                @updatedAt
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
   CartItem        CartItem[]
 }
 

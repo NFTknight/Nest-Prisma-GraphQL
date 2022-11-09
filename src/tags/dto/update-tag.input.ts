@@ -1,23 +1,16 @@
-import { IsNotEmpty } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
 import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
+
 @InputType()
-export class CreateTagInput {
+export class UpdateTagInput {
   @Field()
-  @IsNotEmpty()
-  title: string;
+  title?: string;
 
   @Field()
-  @IsNotEmpty()
-  title_ar: string;
+  title_ar?: string;
 
   @Field()
-  @IsNotEmpty()
-  vendorId: string;
-
-  @Field()
-  @IsNotEmpty()
-  active: boolean;
+  active?: boolean;
 
   @Field(() => [ServiceAvailabilityInput])
   availabilities?: ServiceAvailabilityInput[];

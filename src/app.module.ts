@@ -17,8 +17,8 @@ import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
-import { TagsModule } from './tags/tags.module';
 import { CouponsModule } from './coupons/coupons.module';
+import { TagModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -43,8 +43,8 @@ import { CouponsModule } from './coupons/coupons.module';
     CategoriesModule,
     CartModule,
     OrderModule,
-    TagsModule,
     CouponsModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

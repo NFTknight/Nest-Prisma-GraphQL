@@ -1,7 +1,7 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { ProductType } from 'prisma/prisma-client';
 import { ProductAttributeInput } from './product-attribute.input';
-import { ServiceAvailabilitiesInput } from './service-availabilites.input';
+import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
 @InputType()
 export class UpdateProductInput {
   @Field()
@@ -49,8 +49,8 @@ export class UpdateProductInput {
   @Field(() => [ProductAttributeInput])
   attributes?: ProductAttributeInput[];
 
-  @Field(() => [ServiceAvailabilitiesInput])
-  availabilities?: ServiceAvailabilitiesInput[];
+  @Field(() => [ServiceAvailabilityInput])
+  availabilities?: ServiceAvailabilityInput[];
 
   @Field(() => Int)
   noOfSeats?: number;

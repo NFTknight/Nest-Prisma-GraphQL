@@ -6,52 +6,57 @@ import {
   Resolver,
   Parent,
 } from '@nestjs/graphql';
-import { Tag } from './models/tag.model';
-import { findManyCursorConnection } from '@devoxa/prisma-relay-cursor-connection';
+import { Vendor } from 'src/vendors/models/vendor.model';
+import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateTagInput } from './dto/create-tag.input';
-import { PrismaService } from 'nestjs-prisma';
-import { TagConnection } from './models/tag-paginated.model';
-import { PaginationArgs } from 'src/common/pagination/pagination.args';
-import { TagOrder } from './dto/tag-order.input';
+import { UpdateTagInput } from './dto/update-tag.input';
+import { Tag } from './models/tag.model';
+import { TagsService } from './tags.service';
+
 @Resolver(() => Tag)
 export class TagsResolver {
-  constructor(private readonly prisma: PrismaService) {}
-  @Mutation(() => Tag)
-  async createTag(@Args('data') data: CreateTagInput) {
-    const newTag = this.prisma.tag.create({ data });
-    // const newPost = this.prisma.post.create({
-    //   data: {
-    //     published: true,
-    //     title: data.title,
-    //     content: data.content,
-    //     authorId: user.id,
-    //   },
-    // });
-    // pubSub.publish('postCreated', { postCreated: newPost });
-    // return newPost;
-    return newTag;
+  constructor(
+    private readonly tagsService: TagsService,
+    private readonly vendorService: VendorsService
+  ) {}
+
+  @Query(() => Tag)
+  getTag(@Args('id') id: string): Promise<Tag> {
+    return this.tagsService.getTag(id);
   }
 
-  @Query(() => TagConnection)
-  async getTags(
-    @Args() { after, before, first, last }: PaginationArgs,
-    @Args({ name: 'query', type: () => String, nullable: true })
-    @Args({
-      name: 'orderBy',
-      type: () => TagOrder,
-      nullable: true,
-    })
-    orderBy: TagOrder
-  ) {
-    const a = await findManyCursorConnection(
-      (args) =>
-        this.prisma.tag.findMany({
-          orderBy: orderBy ? { [orderBy.field]: orderBy.direction } : null,
-          ...args,
-        }),
-      () => this.prisma.tag.count({}),
-      { first, last, before, after }
-    );
-    return a;
+  @Query(() => [Tag])
+  async getTags(@Args('vendorId', { nullable: true }) vendorId?: string) {
+    try {
+      const tags = this.tagsService.getTags(vendorId);
+
+      return tags;
+    } catch (err) {
+      console.log('ERRR', err);
+      return [];
+    }
+  }
+
+  @Mutation(() => Tag)
+  createTag(@Args('data') data: CreateTagInput): Promise<Tag> {
+    return this.tagsService.createTags(data);
+  }
+
+  @Mutation(() => Tag)
+  updateTag(
+    @Args('id') id: string,
+    @Args('data') data: UpdateTagInput
+  ): Promise<Tag> {
+    return this.tagsService.updateTag(id, data);
+  }
+
+  @Mutation(() => Tag)
+  deleteTag(@Args('id') id: string): Promise<Tag> {
+    return this.tagsService.deleteTag(id);
+  }
+
+  @ResolveField('vendor')
+  vendor(@Parent() tag: Tag): Promise<Vendor> {
+    return this.vendorService.getVendor(tag.vendorId);
   }
 }

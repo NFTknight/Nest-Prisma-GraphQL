@@ -107,7 +107,7 @@ input CreatePostInput {
 input CreateProductInput {
   active: Boolean!
   attributes: [ProductAttributeInput!]
-  availabilities: [ServiceAvailabilitiesInput!]
+  availabilities: [ServiceAvailabilityInput!]
   categoryId: String!
   description: String!
   description_ar: String!
@@ -141,6 +141,7 @@ input CreateProductVariantInput {
 
 input CreateTagInput {
   active: Boolean!
+  availabilities: [ServiceAvailabilityInput!]
   title: String!
   title_ar: String!
   vendorId: String!
@@ -198,6 +199,7 @@ type Mutation {
   deleteCoupon(id: String!): Coupon!
   deleteProduct(id: String!): Product!
   deleteProductVariant(id: String!): ProductVariant!
+  deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
@@ -208,6 +210,7 @@ type Mutation {
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateProductVariant(data: UpdateProductVariantInput!, id: String!): ProductVariant!
+  updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
 }
@@ -270,7 +273,7 @@ enum PostOrderField {
 type Product {
   active: Boolean!
   attributes: [ProductAttribute!]
-  availabilities: [ServiceAvailabilities!]
+  availabilities: [ServiceAvailability!]
   category: Category
   categoryId: String!
 
@@ -350,7 +353,8 @@ type Query {
   getProductVariant(id: String!): ProductVariant!
   getProductVariants(productId: String): [ProductVariant!]!
   getProducts(vendorId: String): [Product!]!
-  getTags(after: String, before: String, first: Int, last: Int, orderBy: TagOrder, query: String, skip: Int): TagConnection!
+  getTag(id: String!): Tag!
+  getTags(vendorId: String): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendors: [Vendor!]!
   hello(name: String!): String!
@@ -367,14 +371,16 @@ enum Role {
   USER
 }
 
-type ServiceAvailabilities {
-  endTime: DateTime!
-  startTime: DateTime!
+type ServiceAvailability {
+  days: [String!]
+  endTime: String!
+  startTime: String!
 }
 
-input ServiceAvailabilitiesInput {
-  endTime: DateTime!
-  startTime: DateTime!
+input ServiceAvailabilityInput {
+  days: [String!]!
+  endTime: String!
+  startTime: String!
 }
 
 input SignupInput {
@@ -390,6 +396,7 @@ type Subscription {
 
 type Tag {
   active: Boolean!
+  availabilities: [ServiceAvailability!]!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -401,32 +408,6 @@ type Tag {
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: Vendor!
-}
-
-type TagConnection {
-  edges: [TagEdge!]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type TagEdge {
-  cursor: String!
-  node: Tag!
-}
-
-input TagOrder {
-  direction: OrderDirection!
-  field: TagOrderField!
-}
-
-"""Properties by which tag connections can be ordered."""
-enum TagOrderField {
-  active
-  createdAt
-  id
-  title
-  title_ar
-  updatedAt
 }
 
 type Token {
@@ -452,7 +433,7 @@ input UpdateCouponInput {
 input UpdateProductInput {
   active: Boolean
   attributes: [ProductAttributeInput!]
-  availabilities: [ServiceAvailabilitiesInput!]
+  availabilities: [ServiceAvailabilityInput!]
   categoryId: String
   description: String
   description_ar: String
@@ -480,6 +461,13 @@ input UpdateProductVariantInput {
   price_ar: Int
   productId: String
   sku: String
+  title: String
+  title_ar: String
+}
+
+input UpdateTagInput {
+  active: Boolean
+  availabilities: [ServiceAvailabilityInput!]
   title: String
   title_ar: String
 }
