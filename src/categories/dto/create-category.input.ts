@@ -15,6 +15,9 @@ export class CreateCategoryInput {
   @IsNotEmpty()
   vendorId: string;
 
+  @Field(() => [String], { nullable: false })
+  tagIds: string[];
+
   @Field()
   @IsNotEmpty()
   active: boolean;

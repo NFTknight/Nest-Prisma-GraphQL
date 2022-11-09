@@ -93,6 +93,7 @@ model Category {
   Product   Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  tagIds    String[]
 }
 
 model Coupon {

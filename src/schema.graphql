@@ -51,18 +51,20 @@ type CartItem {
 }
 
 type Category {
+  Tags: [Tag!]!
+  Vendor: Vendor!
   active: Boolean!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  tagIds: [String!]!
   title: String!
   title_ar: String!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor
-  vendorId: Vendor!
+  vendorId: String!
 }
 
 input ChangePasswordInput {
@@ -87,6 +89,7 @@ type Coupon {
 
 input CreateCategoryInput {
   active: Boolean!
+  tagIds: [String!]!
   title: String!
   title_ar: String!
   vendorId: String!
@@ -397,6 +400,7 @@ type Subscription {
 type Tag {
   active: Boolean!
   availabilities: [ServiceAvailability!]!
+  categoryId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -420,6 +424,7 @@ type Token {
 
 input UpdateCategoryInput {
   active: Boolean
+  tagIds: [String!]
   title: String
   title_ar: String
 }

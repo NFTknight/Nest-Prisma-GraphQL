@@ -20,11 +20,12 @@ export class CategoriesService {
     return category;
   }
 
-  async getCategories(vendorId?: string): Promise<Category[]> {
-    const where: Partial<Category> = {};
-    if (vendorId) where.vendorId = vendorId;
-
-    return this.prisma.category.findMany({ where });
+  async getCategories(vendorId: string): Promise<Category[]> {
+    return this.prisma.category.findMany({
+      where: {
+        vendorId: vendorId,
+      },
+    });
   }
 
   async createCategory(data: CreateCategoryInput): Promise<Category> {

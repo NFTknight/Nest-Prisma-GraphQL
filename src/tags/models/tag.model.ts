@@ -13,4 +13,5 @@ export class Tag extends BaseModel {
   active: boolean;
   @Field(() => [ServiceAvailability])
   availabilities: ServiceAvailability[];
+  categoryId?: string;
 }

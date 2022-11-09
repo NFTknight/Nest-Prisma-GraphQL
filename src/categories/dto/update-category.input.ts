@@ -8,6 +8,9 @@ export class UpdateCategoryInput {
   @Field()
   title_ar?: string;
 
+  @Field(() => [String])
+  tagIds?: string[];
+
   @Field()
   active?: boolean;
 }
