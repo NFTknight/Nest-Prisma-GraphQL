@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-api
+  namespace: backend
 spec:
   replicas: 1
   selector:
@@ -21,8 +22,22 @@ spec:
             - name: PORT
               value: '3000'
             - name: DATABASE_URL
-              value: 'mongodb://admin:OgTRMeDK2EKI7pwu@@mybasket-dev.7z83z.mongodb.net/anyaa'
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: mongodb-url
             - name: JWT_ACCESS_SECRET
-              value: 'anyaa'
+              value: 'YW55YWEhUm9rJDEyMzQ1Ng=='
             - name: JWT_REFRESH_SECRET
-              value: 'anyaa'
+              value: 'YW55YWEhUm9rJDEyMzEyMw=='
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: backend-api
+  namespace: backend
+spec:
+  selector:
+    app: backend-api
+  ports:
+    - port: 3000
