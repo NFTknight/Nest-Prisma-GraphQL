@@ -1,0 +1,5 @@
+{
+  "yaml.schemas": {
+    "kubernetes://schema/apps/v1@deployment": "file:///Users/thaerlabs/Workspace/anyaa/backend-api/k8s/deployment.yml"
+  }
+}
