@@ -7,6 +7,7 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { Vendor } from 'src/vendors/models/vendor.model';
+
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
@@ -32,6 +33,7 @@ export class CategoriesResolver {
 
   @Mutation(() => Category)
   createCategory(@Args('data') data: CreateCategoryInput): Promise<Category> {
+    console.log(data);
     return this.categoriesService.createCategory(data);
   }
 
@@ -48,8 +50,8 @@ export class CategoriesResolver {
     return this.categoriesService.deleteCategory(id);
   }
 
-  @ResolveField('vendor')
-  vendor(@Parent() category: Category): Promise<Vendor> {
+  @ResolveField('Vendor')
+  Vendor(@Parent() category: Category): Promise<Vendor> {
     return this.vendorService.getVendor(category.vendorId);
   }
 }

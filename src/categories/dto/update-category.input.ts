@@ -8,8 +8,8 @@ export class UpdateCategoryInput {
   @Field()
   title_ar?: string;
 
-  @Field()
-  vendorId?: string;
+  @Field(() => [String])
+  tagIds?: string[];
 
   @Field()
   active?: boolean;

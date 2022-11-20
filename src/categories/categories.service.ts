@@ -20,11 +20,12 @@ export class CategoriesService {
     return category;
   }
 
-  async getCategories(vendorId?: string): Promise<Category[]> {
-    const where: Partial<Category> = {};
-    if (vendorId) where.vendorId = vendorId;
-
-    return this.prisma.category.findMany({ where });
+  async getCategories(vendorId: string): Promise<Category[]> {
+    return this.prisma.category.findMany({
+      where: {
+        vendorId: vendorId,
+      },
+    });
   }
 
   async createCategory(data: CreateCategoryInput): Promise<Category> {
@@ -38,11 +39,6 @@ export class CategoriesService {
     id: string,
     data: UpdateCategoryInput
   ): Promise<Category> {
-    if (data.vendorId) {
-      // if the vendor does not exist, this function will throw an error.
-      await this.vendorService.getVendor(data.vendorId);
-    }
-
     return this.prisma.category.update({
       where: { id },
       data: { ...data, updatedAt: new Date() },

@@ -1,14 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
-import { InputType, Field, Int } from '@nestjs/graphql';
+import { InputType, Field, Int, Float } from '@nestjs/graphql';
 import { ProductType } from 'prisma/prisma-client';
 import { ProductAttributeInput } from './product-attribute.input';
-import { ServiceAvailabilitiesInput } from './service-availabilites.input';
+import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
 @InputType()
 export class CreateProductInput {
-  @Field()
-  @IsNotEmpty()
-  sku: string;
-
   @Field()
   @IsNotEmpty()
   title: string;
@@ -24,10 +20,6 @@ export class CreateProductInput {
   @Field()
   @IsNotEmpty()
   description_ar: string;
-
-  @Field()
-  @IsNotEmpty()
-  previewImage: string;
 
   @Field()
   @IsNotEmpty()
@@ -53,21 +45,22 @@ export class CreateProductInput {
   @IsNotEmpty()
   minPreorderDays: number;
 
-  @Field(() => Int)
+  @Field(() => Float)
   @IsNotEmpty()
   price: number;
 
-  @Field(() => Int)
-  @IsNotEmpty()
-  price_ar: number;
-
   @Field(() => [ProductAttributeInput])
   @IsNotEmpty()
-  attributes: ProductAttributeInput[];
+  attributes?: ProductAttributeInput[];
 
-  @Field(() => [ServiceAvailabilitiesInput])
-  availabilities?: ServiceAvailabilitiesInput[];
+  @Field(() => [ServiceAvailabilityInput])
+  availabilities?: ServiceAvailabilityInput[];
 
   @Field(() => Int)
   noOfSeats?: number;
+
+  @Field(() => [String], { nullable: true })
+  tagIds: string[];
+
+  itemsInStock?: number;
 }

@@ -51,18 +51,20 @@ type CartItem {
 }
 
 type Category {
+  Tags: [Tag!]!
+  Vendor: Vendor!
   active: Boolean!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  tagIds: [String!]!
   title: String!
   title_ar: String!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor
-  vendorId: Vendor!
+  vendorId: String!
 }
 
 input ChangePasswordInput {
@@ -70,10 +72,33 @@ input ChangePasswordInput {
   oldPassword: String!
 }
 
+type Coupon {
+  active: Boolean!
+  code: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  discount: Float!
+  id: ID!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor!
+  vendorId: String!
+}
+
 input CreateCategoryInput {
   active: Boolean!
+  tagIds: [String!]!
   title: String!
   title_ar: String!
+  vendorId: String!
+}
+
+input CreateCouponInput {
+  active: Boolean!
+  code: String!
+  discount: Float!
   vendorId: String!
 }
 
@@ -84,18 +109,17 @@ input CreatePostInput {
 
 input CreateProductInput {
   active: Boolean!
-  attributes: [ProductAttributeInput!]!
-  availabilities: [ServiceAvailabilitiesInput!]
+  attributes: [ProductAttributeInput!]
+  availabilities: [ServiceAvailabilityInput!]
   categoryId: String!
   description: String!
   description_ar: String!
   image: String!
+  itemsInStock: Int
   minPreorderDays: Int!
   noOfSeats: Int
-  previewImage: String!
-  price: Int!
-  price_ar: Int!
-  sku: String!
+  price: Float!
+  tagIds: [String!]
   title: String!
   title_ar: String!
   type: String!
@@ -110,11 +134,18 @@ input CreateProductVariantInput {
   image: String!
   previewImage: String!
   price: Int!
-  price_ar: Int!
   productId: String!
   sku: String!
   title: String!
   title_ar: String!
+}
+
+input CreateTagInput {
+  active: Boolean!
+  availabilities: [ServiceAvailabilityInput!]
+  title: String!
+  title_ar: String!
+  vendorId: String!
 }
 
 input CreateVendorInput {
@@ -159,13 +190,17 @@ type Mutation {
   changePassword(data: ChangePasswordInput!): User!
   checkout(cartId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
+  createCoupon(data: CreateCouponInput!): Coupon!
   createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!
   createProductVariant(data: CreateProductVariantInput!): ProductVariant!
+  createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteCategory(id: String!): Category!
+  deleteCoupon(id: String!): Coupon!
   deleteProduct(id: String!): Product!
   deleteProductVariant(id: String!): ProductVariant!
+  deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
@@ -173,8 +208,10 @@ type Mutation {
   signup(data: SignupInput!): Auth!
   updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
+  updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateProductVariant(data: UpdateProductVariantInput!, id: String!): ProductVariant!
+  updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
 }
@@ -235,9 +272,10 @@ enum PostOrderField {
 }
 
 type Product {
+  Tags: [Tag!]!
   active: Boolean!
-  attributes: [ProductAttribute!]!
-  availabilities: [ServiceAvailabilities!]!
+  attributes: [ProductAttribute!]
+  availabilities: [ServiceAvailability!]
   category: Category
   categoryId: String!
 
@@ -247,12 +285,11 @@ type Product {
   description_ar: String!
   id: ID!
   image: String!
+  itemsInStock: Int
   minPreorderDays: Int!
   noOfSeats: Int
-  previewImage: String!
   price: Int!
-  price_ar: Int!
-  sku: String!
+  tagIds: [String!]!
   title: String!
   title_ar: String!
   type: ProductType!
@@ -297,7 +334,6 @@ type ProductVariant {
   image: String!
   previewImage: String!
   price: Int!
-  price_ar: Int!
   productId: String!
   sku: String!
   title: String!
@@ -311,10 +347,14 @@ type Query {
   getCart(cartId: String!): Cart!
   getCategories(vendorId: String): [Category!]!
   getCategory(id: String!): Category!
+  getCoupon(id: String!): Coupon!
+  getCoupons(vendorId: String): [Coupon!]!
   getProduct(id: String!): Product!
   getProductVariant(id: String!): ProductVariant!
   getProductVariants(productId: String): [ProductVariant!]!
   getProducts(vendorId: String): [Product!]!
+  getTag(id: String!): Tag!
+  getTags(vendorId: String): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendors: [Vendor!]!
   hello(name: String!): String!
@@ -331,14 +371,16 @@ enum Role {
   USER
 }
 
-type ServiceAvailabilities {
-  endTime: DateTime!
-  startTime: DateTime!
+type ServiceAvailability {
+  days: [String!]
+  endTime: String!
+  startTime: String!
 }
 
-input ServiceAvailabilitiesInput {
-  endTime: DateTime!
-  startTime: DateTime!
+input ServiceAvailabilityInput {
+  days: [String!]!
+  endTime: String!
+  startTime: String!
 }
 
 input SignupInput {
@@ -352,6 +394,23 @@ type Subscription {
   postCreated: Post!
 }
 
+type Tag {
+  active: Boolean!
+  availabilities: [ServiceAvailability!]!
+  categoryId: String
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  title: String!
+  title_ar: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor
+  vendorId: Vendor!
+}
+
 type Token {
   """JWT access token"""
   accessToken: JWT!
@@ -362,25 +421,30 @@ type Token {
 
 input UpdateCategoryInput {
   active: Boolean
+  tagIds: [String!]
   title: String
   title_ar: String
-  vendorId: String
+}
+
+input UpdateCouponInput {
+  active: Boolean
+  code: String
+  discount: Float!
 }
 
 input UpdateProductInput {
   active: Boolean
   attributes: [ProductAttributeInput!]
-  availabilities: [ServiceAvailabilitiesInput!]
+  availabilities: [ServiceAvailabilityInput!]
   categoryId: String
   description: String
   description_ar: String
   image: String
-  minPreorderDays: Int
+  itemsInStock: Int
+  minPreorderDays: Int!
   noOfSeats: Int
-  previewImage: String
-  price: Int
-  price_ar: Int
-  sku: String
+  price: Float
+  tagIds: [String!]
   title: String
   title_ar: String
   type: String
@@ -390,14 +454,24 @@ input UpdateProductInput {
 input UpdateProductVariantInput {
   active: Boolean
   attributes: [ProductAttributeInput!]
+  availabilities: [ServiceAvailabilityInput!]
+  categoryId: String
   description: String
   description_ar: String
   image: String
-  previewImage: String
-  price: Int
-  price_ar: Int
-  productId: String
-  sku: String
+  itemsInStock: Int
+  minPreorderDays: Int
+  noOfSeats: Int
+  price: Float
+  title: String
+  title_ar: String
+  type: String
+  vendorId: String
+}
+
+input UpdateTagInput {
+  active: Boolean
+  availabilities: [ServiceAvailabilityInput!]
   title: String
   title_ar: String
 }

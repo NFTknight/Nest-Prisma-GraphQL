@@ -52,6 +52,20 @@ Table Vendor {
   updatedAt DateTime [not null]
   Cart Cart [not null]
   Order Order [not null]
+  Tag Tag [not null]
+  Coupon Coupon [not null]
+}
+
+Table Tag {
+  id String [pk]
+  title String [not null]
+  title_ar String [not null]
+  vendorId String [not null]
+  vendor Vendor [not null]
+  active Boolean [not null, default: false]
+  availabilities ServiceAvailability[] [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
 }
 
 Table Category {
@@ -62,6 +76,18 @@ Table Category {
   vendor Vendor [not null]
   active Boolean [not null, default: false]
   Product Product [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  tagIds String[] [not null]
+}
+
+Table Coupon {
+  id String [pk]
+  code String [not null]
+  discount Float [not null]
+  vendorId String [not null]
+  vendor Vendor [not null]
+  active Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -77,7 +103,6 @@ Table ProductVariant {
   image String [not null]
   active Boolean [not null, default: false]
   price Float [not null]
-  price_ar Float [not null]
   attributes ProductAttribute[] [not null]
   productId String
   Product Product
@@ -88,12 +113,10 @@ Table ProductVariant {
 
 Table Product {
   id String [pk]
-  sku String [not null]
   title String [not null]
   title_ar String [not null]
   description String [not null]
   description_ar String [not null]
-  previewImage String [not null]
   image String [not null]
   type ProductType [not null]
   vendorId String [not null]
@@ -101,16 +124,17 @@ Table Product {
   active Boolean [not null, default: false]
   minPreorderDays Int [not null]
   price Float [not null]
-  price_ar Float [not null]
   category Category
   categoryId String [not null]
   noOfSeats Int
-  availabilities ServiceAvailabilities[] [not null]
+  itemsInStock Int
+  availabilities ServiceAvailability[] [not null]
   variants ProductVariant [not null]
   attributes ProductAttribute[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
+  tagIds String[] [not null]
 }
 
 Table CartItem {
@@ -133,7 +157,6 @@ Table Cart {
   vendorId String [not null]
   vendor Vendor [not null]
   totalPrice Float [not null]
-  totalPrice_ar Float [not null]
   ordered Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
@@ -145,7 +168,6 @@ Table Order {
   cartId String [not null]
   cart Cart [not null]
   totalPrice Float [not null]
-  totalPrice_ar Float [not null]
   vendorId String [not null]
   vendor Vendor [not null]
   createdAt DateTime [default: `now()`, not null]
@@ -165,7 +187,11 @@ Enum ProductType {
 
 Ref: Post.authorId > User.id
 
+Ref: Tag.vendorId > Vendor.id
+
 Ref: Category.vendorId > Vendor.id
+
+Ref: Coupon.vendorId > Vendor.id
 
 Ref: ProductVariant.productId > Product.id
 

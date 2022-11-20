@@ -5,7 +5,8 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { ProductType } from 'prisma/prisma-client';
 import { ProductAttribute } from './product-attribute.model';
 import { ProductVariant } from './product-variant.model';
-import { ServiceAvailabilities } from './service-availabilities.model';
+import { ServiceAvailability } from 'src/common/models/service-availability.model';
+import { Tag } from 'src/tags/models/tag.model';
 
 registerEnumType(ProductType, {
   name: 'ProductType',
@@ -14,7 +15,6 @@ registerEnumType(ProductType, {
 
 @ObjectType()
 export class Product extends BaseModel {
-  sku: string;
   title: string;
   title_ar: string;
   description: string;
@@ -22,14 +22,16 @@ export class Product extends BaseModel {
 
   @Field(() => ProductType)
   type: ProductType;
-  previewImage: string;
-  image: string;
-  vendorId: string;
 
+  image: string;
+
+  vendorId: string;
   @Field(() => Vendor, { nullable: false })
   vendor?: Vendor;
+
   categoryId: string;
   category?: Category;
+
   active: boolean;
   minPreorderDays: number;
 
@@ -37,12 +39,16 @@ export class Product extends BaseModel {
   variants?: ProductVariant[];
 
   @Field(() => [ProductAttribute])
-  attributes: ProductAttribute[];
+  attributes?: ProductAttribute[];
 
-  @Field(() => [ServiceAvailabilities])
-  availabilities: ServiceAvailabilities[];
+  @Field(() => [ServiceAvailability], { nullable: true })
+  availabilities?: ServiceAvailability[];
+
+  tagIds: string[];
+  @Field(() => [Tag], { nullable: false })
+  Tags?: Tag[];
 
   noOfSeats?: number;
+  itemsInStock?: number;
   price: number;
-  price_ar: number;
 }
