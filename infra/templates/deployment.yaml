@@ -1,26 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-api
-  namespace: backend
+  name: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: backend-api
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: backend-api
+        app: {{ .Release.Name }}
     spec:
       containers:
-        - name: backend-api
-          image: registry.digitalocean.com/anyaa/backend-api:latest
+        - name: {{ .Release.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.containerPort }}
           env:
             - name: PORT
-              value: '3000'
+              value: {{ .Values.containerPort | quote }}
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -30,14 +29,4 @@ spec:
               value: 'YW55YWEhUm9rJDEyMzQ1Ng=='
             - name: JWT_REFRESH_SECRET
               value: 'YW55YWEhUm9rJDEyMzEyMw=='
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: backend-api
-  namespace: backend
-spec:
-  selector:
-    app: backend-api
-  ports:
-    - port: 3000
+          resources: {{ toYaml .Values.resources | nindent 12 }}
