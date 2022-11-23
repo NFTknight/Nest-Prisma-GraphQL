@@ -66,7 +66,6 @@ model Vendor {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   Cart           Cart[]
-  Order          Order[]
   Tag            Tag[]
   Coupon         Coupon[]
 }
@@ -120,21 +119,6 @@ type ProductAttribute {
   value_ar String
 }
 
-model ProductVariant {
-  id         String             @id @default(auto()) @map("_id") @db.ObjectId
-  title      String
-  title_ar   String
-  sku        String
-  active     Boolean            @default(false)
-  price      Float
-  attributes ProductAttribute[]
-  productId  String?            @db.ObjectId
-  Product    Product?           @relation(fields: [productId], references: [id])
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  CartItem   CartItem[]
-}
-
 type ServiceAvailability {
   days      String[]
   startTime String
@@ -185,7 +169,6 @@ model Product {
   updatedAt        DateTime              @updatedAt
   CartItem         CartItem[]
   tagIds           String[]              @db.ObjectId
-  ProductVariant   ProductVariant[]
 }
 
 model CartItem {
@@ -194,10 +177,7 @@ model CartItem {
   productId String  @db.ObjectId
   product   Product @relation(fields: [productId], references: [id])
 
-  productVariantId String?         @db.ObjectId
-  variant          ProductVariant? @relation(fields: [productVariantId], references: [id])
-
-  appointmentTime DateTime?
+  productVariant String?
 
   quantity Int @default(1)
 
@@ -218,22 +198,10 @@ model Cart {
 
   totalPrice Float
 
-  ordered   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Order     Order[]
-}
+  appliedCoupon String?
 
-model Order {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  finalPrice Float
 
-  cartId String @db.ObjectId
-  cart   Cart   @relation(fields: [cartId], references: [id])
-
-  totalPrice Float
-
-  vendorId  String   @db.ObjectId
-  vendor    Vendor   @relation(fields: [vendorId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

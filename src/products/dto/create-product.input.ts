@@ -58,7 +58,7 @@ export class CreateProductInput {
   variationOptions: VariationOptionInput[];
 
   @Field(() => [VariantInput], { nullable: true })
-  vaiants: VariantInput[];
+  variants: VariantInput[];
 
   @Field(() => [ServiceAvailabilityInput])
   availabilities?: ServiceAvailabilityInput[];

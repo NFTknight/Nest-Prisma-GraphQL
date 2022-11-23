@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Product } from 'src/products/models/product.model';
-import { ProductsService } from 'src/products/services/products.service';
 import { AddToCartInput } from '../dto/add-to-cart.input';
 import { CartItem } from '../models/cart-item.model';
 import { CartService } from './cart.service';
@@ -10,8 +8,7 @@ import { CartService } from './cart.service';
 export class CartItemService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cartService: CartService,
-    private readonly productsService: ProductsService // private readonly productVariantsService: ProductVariantsService
+    private readonly cartService: CartService
   ) {}
 
   async getCartItems(cartId: string): Promise<CartItem[]> {
@@ -27,7 +24,7 @@ export class CartItemService {
     const item = await this.prisma.cartItem.create({
       data: { ...data, cartId },
     });
-    this.updateTotalPrice(cartId);
+    // update cart price
     return item;
   }
 
@@ -35,7 +32,7 @@ export class CartItemService {
     const removedItem = await this.prisma.cartItem.delete({
       where: { id: cartItemId },
     });
-    this.updateTotalPrice(cartItemId);
+    // update cart price
     return removedItem;
   }
 
@@ -43,33 +40,11 @@ export class CartItemService {
     cartItemId: string,
     quantity: number
   ): Promise<CartItem> {
-    return this.prisma.cartItem.update({
+    const updatedItem = await this.prisma.cartItem.update({
       where: { id: cartItemId },
       data: { quantity },
     });
-  }
-
-  async updateTotalPrice(cartId: string) {
-    const cartItems = await this.getCartItems(cartId);
-    let totalPrice = 0;
-
-    for (let i = 0; i < cartItems.length; ++i) {
-      const cItem = cartItems[i];
-
-      let prodEntity: Product;
-      if (cItem.productVariantId) {
-        // prodEntity = await this.productVariantsService.getProductVariant(
-        //   cItem.productVariantId
-        // );
-      } else {
-        prodEntity = await this.productsService.getProduct(cItem.productId);
-      }
-
-      totalPrice += prodEntity.price * cItem.quantity;
-    }
-
-    await this.cartService.updateCartPrice(cartId, {
-      totalPrice,
-    });
+    // update cart price
+    return updatedItem;
   }
 }

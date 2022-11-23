@@ -84,7 +84,7 @@ input CreateProductInput {
   title: String!
   title_ar: String!
   type: String!
-  vaiants: [VariantInput!]
+  variants: [VariantInput!]
   variationOptions: [VariationOptionInput!]
   vendorId: String!
 }
@@ -354,7 +354,7 @@ input UpdateProductInput {
   title: String
   title_ar: String
   type: String
-  vaiants: [VariantInput!]
+  variants: [VariantInput!]
   variationOptions: [VariationOptionInput!]
   vendorId: String
 }

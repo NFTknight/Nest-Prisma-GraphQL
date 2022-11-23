@@ -51,7 +51,6 @@ Table Vendor {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Cart Cart [not null]
-  Order Order [not null]
   Tag Tag [not null]
   Coupon Coupon [not null]
 }
@@ -92,21 +91,6 @@ Table Coupon {
   updatedAt DateTime [not null]
 }
 
-Table ProductVariant {
-  id String [pk]
-  title String [not null]
-  title_ar String [not null]
-  sku String [not null]
-  active Boolean [not null, default: false]
-  price Float [not null]
-  attributes ProductAttribute[] [not null]
-  productId String
-  Product Product
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  CartItem CartItem [not null]
-}
-
 Table Product {
   id String [pk]
   sku String [not null]
@@ -133,16 +117,13 @@ Table Product {
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
   tagIds String[] [not null]
-  ProductVariant ProductVariant [not null]
 }
 
 Table CartItem {
   id String [pk]
   productId String [not null]
   product Product [not null]
-  productVariantId String
-  variant ProductVariant
-  appointmentTime DateTime
+  productVariant String
   quantity Int [not null, default: 1]
   cartId String [not null]
   Cart Cart [not null]
@@ -156,19 +137,8 @@ Table Cart {
   vendorId String [not null]
   vendor Vendor [not null]
   totalPrice Float [not null]
-  ordered Boolean [not null, default: false]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  Order Order [not null]
-}
-
-Table Order {
-  id String [pk]
-  cartId String [not null]
-  cart Cart [not null]
-  totalPrice Float [not null]
-  vendorId String [not null]
-  vendor Vendor [not null]
+  appliedCoupon String
+  finalPrice Float [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -192,20 +162,12 @@ Ref: Category.vendorId > Vendor.id
 
 Ref: Coupon.vendorId > Vendor.id
 
-Ref: ProductVariant.productId > Product.id
-
 Ref: Product.vendorId > Vendor.id
 
 Ref: Product.categoryId > Category.id
 
 Ref: CartItem.productId > Product.id
 
-Ref: CartItem.productVariantId > ProductVariant.id
-
 Ref: CartItem.cartId > Cart.id
 
 Ref: Cart.vendorId > Vendor.id
-
-Ref: Order.cartId > Cart.id
-
-Ref: Order.vendorId > Vendor.id

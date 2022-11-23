@@ -38,9 +38,9 @@ export class CartItemResolver {
     return this.cartItemService.updateQuantity(cartItemId, quantity);
   }
 
-  @ResolveField('product')
-  product(@Parent() cartItem: CartItem): Promise<Product | null> {
-    if (!cartItem.productVariantId) return null;
-    return this.productService.getProduct(cartItem.productVariantId);
-  }
+  // @ResolveField('product')
+  // product(@Parent() cartItem: CartItem): Promise<Product | null> {
+  //   if (!cartItem.productVariant) return null;
+  //   return this.productService.getProduct(cartItem.productVariant);
+  // }
 }
