@@ -8,12 +8,18 @@ import { Vendor } from './models/vendor.model';
 export class VendorsService {
   constructor(private prisma: PrismaService) {}
 
-  getVendor(id: string): Promise<Vendor> {
-    const vendor = this.prisma.vendor.findFirst({ where: { id } });
+  async getVendor(id: string): Promise<Vendor> {
+    const vendor = await this.prisma.vendor.findFirst({
+      where: { id },
+    });
 
     if (!vendor) throw new NotFoundException('Vendor Not Found');
 
     return vendor;
+  }
+
+  getVendorByUrl(url: string) {
+    return this.prisma.vendor.findFirst({ where: { url } });
   }
 
   getVendors(): Promise<Vendor[]> {

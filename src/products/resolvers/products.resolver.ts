@@ -14,16 +14,15 @@ import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
 import { Product } from '../models/product.model';
 import { ProductsService } from '../services/products.service';
-import { ProductVariant } from '../models/product-variant.model';
-import { ProductVariantsService } from '../services/product-variants.service';
+// import { ProductVariant } from '../models/product-variant.model';
+// import { ProductVariantsService } from '../services/product-variants.service';
 
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(
     private readonly productService: ProductsService,
     private readonly vendorService: VendorsService,
-    private readonly categoriesService: CategoriesService,
-    private readonly productVariantsService: ProductVariantsService
+    private readonly categoriesService: CategoriesService
   ) {}
 
   @Query(() => Product)
@@ -32,7 +31,7 @@ export class ProductsResolver {
   }
 
   @Query(() => [Product])
-  getProducts(@Args('vendorId', { nullable: true }) vendorId?: string) {
+  getProducts(@Args('vendorId') vendorId: string) {
     return this.productService.getProducts(vendorId);
   }
 
@@ -64,8 +63,8 @@ export class ProductsResolver {
     return this.categoriesService.getCategory(product.categoryId);
   }
 
-  @ResolveField('variants')
-  variants(@Parent() product: Product): Promise<ProductVariant[]> {
-    return this.productVariantsService.getProductVariants(product.id);
-  }
+  // @ResolveField('variants')
+  // variants(@Parent() product: Product): Promise<ProductVariant[]> {
+  //   return this.productVariantsService.getProductVariants(product.id);
+  // }
 }

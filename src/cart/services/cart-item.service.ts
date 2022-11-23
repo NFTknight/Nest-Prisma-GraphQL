@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { ProductVariant } from 'src/products/models/product-variant.model';
 import { Product } from 'src/products/models/product.model';
-import { ProductVariantsService } from 'src/products/services/product-variants.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { AddToCartInput } from '../dto/add-to-cart.input';
 import { CartItem } from '../models/cart-item.model';
@@ -13,8 +11,7 @@ export class CartItemService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cartService: CartService,
-    private readonly productsService: ProductsService,
-    private readonly productVariantsService: ProductVariantsService
+    private readonly productsService: ProductsService // private readonly productVariantsService: ProductVariantsService
   ) {}
 
   async getCartItems(cartId: string): Promise<CartItem[]> {
@@ -59,11 +56,11 @@ export class CartItemService {
     for (let i = 0; i < cartItems.length; ++i) {
       const cItem = cartItems[i];
 
-      let prodEntity: Product | ProductVariant;
+      let prodEntity: Product;
       if (cItem.productVariantId) {
-        prodEntity = await this.productVariantsService.getProductVariant(
-          cItem.productVariantId
-        );
+        // prodEntity = await this.productVariantsService.getProductVariant(
+        //   cItem.productVariantId
+        // );
       } else {
         prodEntity = await this.productsService.getProduct(cItem.productId);
       }
