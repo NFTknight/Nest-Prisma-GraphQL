@@ -18,6 +18,11 @@ export class VendorsResolver {
     return await this.vendorsService.getVendor(id);
   }
 
+  @Query(() => Vendor)
+  getVendorByUrl(@Args('url') url: string) {
+    return this.vendorsService.getVendorByUrl(url);
+  }
+
   @Mutation(() => Vendor)
   async createVendor(@Args('data') data: CreateVendorInput): Promise<Vendor> {
     return await this.vendorsService.createVendor(data);

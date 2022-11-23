@@ -20,11 +20,12 @@ export class ProductsService {
     return product;
   }
 
-  async getProducts(vendorId?: string): Promise<Product[]> {
-    const where: { vendorId?: string } = {};
-    if (vendorId) where.vendorId = vendorId;
-
-    return this.prisma.product.findMany({ where });
+  async getProducts(vendorId: string): Promise<Product[]> {
+    try {
+      return await this.prisma.product.findMany({ where: { vendorId } });
+    } catch (err) {
+      console.log('Err => ', err);
+    }
   }
 
   async createProduct(data: CreateProductInput): Promise<Product> {

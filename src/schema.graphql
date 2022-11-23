@@ -2,15 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input AddToCartInput {
-  appointmentTime: DateTime
-  cartId: String
-  productId: String!
-  productVariantId: String
-  quantity: Int
-  vendorId: String!
-}
-
 type Auth {
   """JWT access token"""
   accessToken: JWT!
@@ -18,36 +9,6 @@ type Auth {
   """JWT refresh token"""
   refreshToken: JWT!
   user: User!
-}
-
-type Cart {
-  """Identifies the date and time when the object was created."""
-  createdAt: DateTime!
-  id: ID!
-  items: [CartItem!]
-  ordered: Boolean!
-
-  """Identifies the date and time when the object was last updated."""
-  updatedAt: DateTime!
-  vendor: Vendor
-  vendorId: String!
-}
-
-type CartItem {
-  appointmentTime: DateTime
-  cartId: String!
-
-  """Identifies the date and time when the object was created."""
-  createdAt: DateTime!
-  id: ID!
-  product: Product
-  productId: String!
-  productVariantId: String
-  quantity: Int!
-
-  """Identifies the date and time when the object was last updated."""
-  updatedAt: DateTime!
-  variant: ProductVariant
 }
 
 type Category {
@@ -109,7 +70,6 @@ input CreatePostInput {
 
 input CreateProductInput {
   active: Boolean!
-  attributes: [ProductAttributeInput!]
   availabilities: [ServiceAvailabilityInput!]
   categoryId: String!
   description: String!
@@ -119,25 +79,14 @@ input CreateProductInput {
   minPreorderDays: Int!
   noOfSeats: Int
   price: Float!
+  sku: String!
   tagIds: [String!]
   title: String!
   title_ar: String!
   type: String!
+  variants: [VariantInput!]
+  variationOptions: [VariationOptionInput!]
   vendorId: String!
-}
-
-input CreateProductVariantInput {
-  active: Boolean!
-  attributes: [ProductAttributeInput!]!
-  description: String!
-  description_ar: String!
-  image: String!
-  previewImage: String!
-  price: Int!
-  productId: String!
-  sku: String!
-  title: String!
-  title_ar: String!
 }
 
 input CreateTagInput {
@@ -186,31 +135,24 @@ input LoginInput {
 }
 
 type Mutation {
-  addItemToCart(data: AddToCartInput!): CartItem!
   changePassword(data: ChangePasswordInput!): User!
-  checkout(cartId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
   createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!
-  createProductVariant(data: CreateProductVariantInput!): ProductVariant!
   createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteCategory(id: String!): Category!
   deleteCoupon(id: String!): Coupon!
   deleteProduct(id: String!): Product!
-  deleteProductVariant(id: String!): ProductVariant!
   deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
-  removeItemFromCart(cartItemId: String!): CartItem!
   signup(data: SignupInput!): Auth!
-  updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
-  updateProductVariant(data: UpdateProductVariantInput!, id: String!): ProductVariant!
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
@@ -274,7 +216,6 @@ enum PostOrderField {
 type Product {
   Tags: [Tag!]!
   active: Boolean!
-  attributes: [ProductAttribute!]
   availabilities: [ServiceAvailability!]
   category: Category
   categoryId: String!
@@ -289,6 +230,7 @@ type Product {
   minPreorderDays: Int!
   noOfSeats: Int
   price: Int!
+  sku: String!
   tagIds: [String!]!
   title: String!
   title_ar: String!
@@ -296,23 +238,10 @@ type Product {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  variants: [ProductVariant!]!
+  variants: [Variant!]
+  variationOptions: [VariationOption!]
   vendor: Vendor!
   vendorId: String!
-}
-
-type ProductAttribute {
-  key: String!
-  key_ar: String!
-  value: String!
-  value_ar: String!
-}
-
-input ProductAttributeInput {
-  key: String!
-  key_ar: String!
-  value: String!
-  value_ar: String!
 }
 
 """Product Type"""
@@ -322,40 +251,17 @@ enum ProductType {
   WORKSHOP
 }
 
-type ProductVariant {
-  active: Boolean!
-  attributes: [ProductAttribute!]!
-
-  """Identifies the date and time when the object was created."""
-  createdAt: DateTime!
-  description: String!
-  description_ar: String!
-  id: ID!
-  image: String!
-  previewImage: String!
-  price: Int!
-  productId: String!
-  sku: String!
-  title: String!
-  title_ar: String!
-
-  """Identifies the date and time when the object was last updated."""
-  updatedAt: DateTime!
-}
-
 type Query {
-  getCart(cartId: String!): Cart!
   getCategories(vendorId: String): [Category!]!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(vendorId: String): [Coupon!]!
   getProduct(id: String!): Product!
-  getProductVariant(id: String!): ProductVariant!
-  getProductVariants(productId: String): [ProductVariant!]!
-  getProducts(vendorId: String): [Product!]!
+  getProducts(vendorId: String!): [Product!]!
   getTag(id: String!): Tag!
   getTags(vendorId: String): [Tag!]!
   getVendor(id: String!): Vendor!
+  getVendorByUrl(url: String!): Vendor!
   getVendors: [Vendor!]!
   hello(name: String!): String!
   helloWorld: String!
@@ -434,7 +340,6 @@ input UpdateCouponInput {
 
 input UpdateProductInput {
   active: Boolean
-  attributes: [ProductAttributeInput!]
   availabilities: [ServiceAvailabilityInput!]
   categoryId: String
   description: String
@@ -444,28 +349,13 @@ input UpdateProductInput {
   minPreorderDays: Int!
   noOfSeats: Int
   price: Float
+  sku: String
   tagIds: [String!]
   title: String
   title_ar: String
   type: String
-  vendorId: String
-}
-
-input UpdateProductVariantInput {
-  active: Boolean
-  attributes: [ProductAttributeInput!]
-  availabilities: [ServiceAvailabilityInput!]
-  categoryId: String
-  description: String
-  description_ar: String
-  image: String
-  itemsInStock: Int
-  minPreorderDays: Int
-  noOfSeats: Int
-  price: Float
-  title: String
-  title_ar: String
-  type: String
+  variants: [VariantInput!]
+  variationOptions: [VariationOptionInput!]
   vendorId: String
 }
 
@@ -515,6 +405,42 @@ type User {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+}
+
+type Variant {
+  identifier: String!
+  price: Float!
+  quantity: Int!
+  sku: String!
+}
+
+input VariantInput {
+  identifier: String!
+  price: Float!
+  quantity: Int!
+  sku: String!
+}
+
+type VariationOption {
+  key: String!
+  key_ar: String!
+  values: [VariationValue!]
+}
+
+input VariationOptionInput {
+  key: String!
+  key_ar: String!
+  values: [VariationValueInput!]!
+}
+
+type VariationValue {
+  value: String!
+  value_ar: String!
+}
+
+input VariationValueInput {
+  value: String!
+  value_ar: String!
 }
 
 type Vendor {

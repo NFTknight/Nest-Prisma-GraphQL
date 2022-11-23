@@ -8,10 +8,7 @@ export class AddToCartInput {
   productId: string;
 
   @Field()
-  productVariantId?: string;
-
-  @Field()
-  appointmentTime?: Date;
+  productVariant?: string;
 
   @Field()
   cartId?: string;

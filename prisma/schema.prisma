@@ -66,7 +66,6 @@ model Vendor {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   Cart           Cart[]
-  Order          Order[]
   Tag            Tag[]
   Coupon         Coupon[]
 }
@@ -75,7 +74,7 @@ model Tag {
   id             String                @id @default(auto()) @map("_id") @db.ObjectId
   title          String
   title_ar       String
-  vendorId       String
+  vendorId       String                @db.ObjectId
   vendor         Vendor                @relation(fields: [vendorId], references: [id])
   active         Boolean               @default(false)
   availabilities ServiceAvailability[]
@@ -87,20 +86,20 @@ model Category {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   title_ar  String
-  vendorId  String
-  vendor    Vendor    @relation(fields: [vendorId], references: [id])
+  vendorId  String    @db.ObjectId
+  Vendor    Vendor    @relation(fields: [vendorId], references: [id])
+  tagIds    String[]
   active    Boolean   @default(false)
-  Product   Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  tagIds    String[]
+  Product   Product[]
 }
 
 model Coupon {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   code      String
   discount  Float
-  vendorId  String
+  vendorId  String   @db.ObjectId
   vendor    Vendor   @relation(fields: [vendorId], references: [id])
   active    Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -120,55 +119,56 @@ type ProductAttribute {
   value_ar String
 }
 
-model ProductVariant {
-  id             String             @id @default(auto()) @map("_id") @db.ObjectId
-  sku            String
-  title          String
-  title_ar       String
-  description    String
-  description_ar String
-  previewImage   String
-  image          String
-  active         Boolean            @default(false)
-  price          Float
-  attributes     ProductAttribute[]
-  productId      String?            @db.ObjectId
-  Product        Product?           @relation(fields: [productId], references: [id])
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-  CartItem       CartItem[]
-}
-
 type ServiceAvailability {
   days      String[]
   startTime String
   endTime   String
 }
 
+type VariationValue {
+  value    String
+  value_ar String
+}
+
+type VariationOption {
+  key    String
+  key_ar String
+  values VariationValue[]
+}
+
+type Variant {
+  identifier String
+  sku        String
+  price      Float
+  quantity   Int
+}
+
 model Product {
-  id              String                @id @default(auto()) @map("_id") @db.ObjectId
-  title           String
-  title_ar        String
-  description     String
-  description_ar  String
-  image           String
-  type            ProductType
-  vendorId        String                @db.ObjectId
-  vendor          Vendor                @relation(fields: [vendorId], references: [id])
-  active          Boolean               @default(false)
-  minPreorderDays Int
-  price           Float
-  category        Category?             @relation(fields: [categoryId], references: [id])
-  categoryId      String                @db.ObjectId
-  noOfSeats       Int?
-  itemsInStock    Int?
-  availabilities  ServiceAvailability[]
-  variants        ProductVariant[]
-  attributes      ProductAttribute[]
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
-  CartItem        CartItem[]
-  tagIds          String[]
+  id               String                @id @default(auto()) @map("_id") @db.ObjectId
+  sku              String
+  title            String
+  title_ar         String
+  description      String
+  description_ar   String
+  image            String
+  type             ProductType
+  vendorId         String                @db.ObjectId
+  vendor           Vendor                @relation(fields: [vendorId], references: [id])
+  active           Boolean               @default(false)
+  minPreorderDays  Int
+  price            Float
+  category         Category?             @relation(fields: [categoryId], references: [id])
+  categoryId       String                @db.ObjectId
+  noOfSeats        Int?
+  itemsInStock     Int?
+  availabilities   ServiceAvailability[]
+  variationOptions VariationOption[]
+  variants         Variant[]
+  attributes       ProductAttribute[]
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  CartItem         CartItem[]
+  tagIds           String[]              @db.ObjectId
 }
 
 model CartItem {
@@ -177,10 +177,7 @@ model CartItem {
   productId String  @db.ObjectId
   product   Product @relation(fields: [productId], references: [id])
 
-  productVariantId String?         @db.ObjectId
-  variant          ProductVariant? @relation(fields: [productVariantId], references: [id])
-
-  appointmentTime DateTime?
+  productVariant String?
 
   quantity Int @default(1)
 
@@ -201,22 +198,10 @@ model Cart {
 
   totalPrice Float
 
-  ordered   Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Order     Order[]
-}
+  appliedCoupon String?
 
-model Order {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  finalPrice Float
 
-  cartId String @db.ObjectId
-  cart   Cart   @relation(fields: [cartId], references: [id])
-
-  totalPrice Float
-
-  vendorId  String   @db.ObjectId
-  vendor    Vendor   @relation(fields: [vendorId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
