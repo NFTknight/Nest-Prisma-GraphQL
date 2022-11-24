@@ -7,7 +7,6 @@ import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
-import { PostsModule } from 'src/posts/posts.module';
 import config from 'src/common/configs/config';
 import { loggingMiddleware } from 'src/common/middleware/logging.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -37,7 +36,6 @@ import { TagModule } from './tags/tags.module';
 
     AuthModule,
     UsersModule,
-    PostsModule,
     VendorsModule,
     ProductsModule,
     CategoriesModule,

@@ -10,19 +10,7 @@ Table User {
   password String [not null]
   firstname String
   lastname String
-  posts Post [not null]
   role Role [not null]
-}
-
-Table Post {
-  id String [pk]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  published Boolean [not null]
-  title String [not null]
-  content String
-  author User
-  authorId String
 }
 
 Table Vendor {
@@ -153,8 +141,6 @@ Enum ProductType {
   SERVICE
   WORKSHOP
 }
-
-Ref: Post.authorId > User.id
 
 Ref: Tag.vendorId > Vendor.id
 
