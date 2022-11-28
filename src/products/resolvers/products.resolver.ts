@@ -21,7 +21,7 @@ import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { PrismaService } from 'nestjs-prisma';
 import makePrismaSelection from 'src/common/helpers/makePrismaSelection';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
-import getPaginationArgs from 'src/common/helpers/getPaginationargs';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { FilterInput } from 'src/common/filter/filter.input';
 
 @Resolver(() => Product)
