@@ -4,6 +4,7 @@ import { ProductType } from 'prisma/prisma-client';
 import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
 import { VariantInput } from './variant.input';
 import { VariationOptionInput } from './variation-option.input';
+
 @InputType()
 export class CreateProductInput {
   @Field()
@@ -70,4 +71,7 @@ export class CreateProductInput {
   tagIds: string[];
 
   itemsInStock?: number;
+
+  @Field(() => Int)
+  sortOrder: number;
 }

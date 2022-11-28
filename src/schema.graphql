@@ -2,6 +2,14 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddToCartInput {
+  cartId: String
+  productId: String!
+  productVariant: String
+  quantity: Int
+  vendorId: String!
+}
+
 type Auth {
   """JWT access token"""
   accessToken: JWT!
@@ -9,6 +17,38 @@ type Auth {
   """JWT refresh token"""
   refreshToken: JWT!
   user: User!
+}
+
+type Cart {
+  appliedCoupon: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  finalPrice: Float!
+  id: ID!
+  items: [CartItem!]
+  totalPrice: Float!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor
+  vendorId: String!
+}
+
+type CartItem {
+  Product: Product
+  Variant: Variant
+  cartId: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  productId: String!
+  productVariant: String
+  quantity: Int!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
 }
 
 type Category {
@@ -19,6 +59,7 @@ type Category {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  sortOrder: Int!
   tagIds: [String!]!
   title: String!
   title_ar: String!
@@ -50,6 +91,7 @@ type Coupon {
 
 input CreateCategoryInput {
   active: Boolean!
+  sortOrder: Int!
   tagIds: [String!]!
   title: String!
   title_ar: String!
@@ -61,11 +103,6 @@ input CreateCouponInput {
   code: String!
   discount: Float!
   vendorId: String!
-}
-
-input CreatePostInput {
-  content: String!
-  title: String!
 }
 
 input CreateProductInput {
@@ -80,6 +117,7 @@ input CreateProductInput {
   noOfSeats: Int
   price: Float!
   sku: String!
+  sortOrder: Int!
   tagIds: [String!]
   title: String!
   title_ar: String!
@@ -124,6 +162,11 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input FilterInput {
+  field: String!
+  value: String!
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -135,10 +178,11 @@ input LoginInput {
 }
 
 type Mutation {
+  addItemToCart(data: AddToCartInput!): CartItem!
   changePassword(data: ChangePasswordInput!): User!
+  checkout(cartId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
-  createPost(data: CreatePostInput!): Post!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
@@ -149,7 +193,9 @@ type Mutation {
   deleteVendor(id: String!): Vendor!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
+  removeItemFromCart(cartItemId: String!): CartItem!
   signup(data: SignupInput!): Auth!
+  updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
@@ -166,51 +212,14 @@ enum OrderDirection {
   desc
 }
 
-type PageInfo {
-  endCursor: String
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-}
-
-type Post {
-  author: User!
-  content: String!
-
-  """Identifies the date and time when the object was created."""
-  createdAt: DateTime!
-  id: ID!
-  published: Boolean!
-  title: String!
-
-  """Identifies the date and time when the object was last updated."""
-  updatedAt: DateTime!
-}
-
-type PostConnection {
-  edges: [PostEdge!]
-  pageInfo: PageInfo!
+type PaginatedProducts {
+  list: [Product!]
   totalCount: Int!
 }
 
-type PostEdge {
-  cursor: String!
-  node: Post!
-}
-
-input PostOrder {
-  direction: OrderDirection!
-  field: PostOrderField!
-}
-
-"""Properties by which post connections can be ordered."""
-enum PostOrderField {
-  content
-  createdAt
-  id
-  published
-  title
-  updatedAt
+input PaginationArgs {
+  page: Int
+  pageSize: Int
 }
 
 type Product {
@@ -224,13 +233,16 @@ type Product {
   createdAt: DateTime!
   description: String!
   description_ar: String!
+  endDate: DateTime!
   id: ID!
   image: String!
   itemsInStock: Int
   minPreorderDays: Int!
   noOfSeats: Int
-  price: Int!
+  price: Float!
   sku: String!
+  sortOrder: Int!
+  startDate: DateTime!
   tagIds: [String!]!
   title: String!
   title_ar: String!
@@ -252,12 +264,13 @@ enum ProductType {
 }
 
 type Query {
-  getCategories(vendorId: String): [Category!]!
+  getCart(cartId: String!): Cart!
+  getCategories(active: Boolean, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(vendorId: String): [Coupon!]!
   getProduct(id: String!): Product!
-  getProducts(vendorId: String!): [Product!]!
+  getProducts(categoryId: String, filter: FilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTags(vendorId: String): [Tag!]!
   getVendor(id: String!): Vendor!
@@ -266,9 +279,6 @@ type Query {
   hello(name: String!): String!
   helloWorld: String!
   me: User!
-  post(postId: String!): Post!
-  publishedPosts(after: String, before: String, first: Int, last: Int, orderBy: PostOrder, query: String, skip: Int): PostConnection!
-  userPosts(userId: String!): [Post!]!
 }
 
 """User role"""
@@ -296,8 +306,9 @@ input SignupInput {
   password: String!
 }
 
-type Subscription {
-  postCreated: Post!
+input SortOrder {
+  direction: OrderDirection!
+  field: String!
 }
 
 type Tag {
@@ -327,6 +338,7 @@ type Token {
 
 input UpdateCategoryInput {
   active: Boolean
+  sortOrder: Int
   tagIds: [String!]
   title: String
   title_ar: String
@@ -350,6 +362,7 @@ input UpdateProductInput {
   noOfSeats: Int
   price: Float
   sku: String
+  sortOrder: Int
   tagIds: [String!]
   title: String
   title_ar: String
@@ -400,7 +413,6 @@ type User {
   firstname: String
   id: ID!
   lastname: String
-  posts: [Post!]!
   role: Role!
 
   """Identifies the date and time when the object was last updated."""

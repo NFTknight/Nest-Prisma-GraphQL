@@ -8,5 +8,6 @@ import { CartService } from './services/cart.service';
 @Module({
   imports: [ProductsModule],
   providers: [CartItemService, CartService, CartResolver, CartItemResolver],
+  exports: [CartService],
 })
 export class CartModule {}

@@ -2,10 +2,12 @@ import {
   Args,
   Mutation,
   Query,
+  Info,
   ResolveField,
   Resolver,
   Parent,
 } from '@nestjs/graphql';
+import { fieldsMap } from 'graphql-fields-list';
 import { CategoriesService } from 'src/categories/categories.service';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { Category } from 'src/categories/models/category.model';
@@ -14,12 +16,18 @@ import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
 import { Product } from '../models/product.model';
 import { ProductsService } from '../services/products.service';
-// import { ProductVariant } from '../models/product-variant.model';
-// import { ProductVariantsService } from '../services/product-variants.service';
+import { PaginatedProducts } from '../models/paginated-products.model';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { PrismaService } from 'nestjs-prisma';
+import makePrismaSelection from 'src/common/helpers/makePrismaSelection';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import getPaginationArgs from 'src/common/helpers/getPaginationargs';
+import { FilterInput } from 'src/common/filter/filter.input';
 
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(
+    private readonly prismaService: PrismaService,
     private readonly productService: ProductsService,
     private readonly vendorService: VendorsService,
     private readonly categoriesService: CategoriesService
@@ -30,9 +38,63 @@ export class ProductsResolver {
     return this.productService.getProduct(id);
   }
 
-  @Query(() => [Product])
-  getProducts(@Args('vendorId') vendorId: string) {
-    return this.productService.getProducts(vendorId);
+  @Query(() => PaginatedProducts)
+  async getProducts(
+    @Args('vendorId') vendorId: string,
+    @Args('categoryId', { nullable: true }) categoryId: string,
+    @Args('pagination', { nullable: true }) pg: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder: SortOrder,
+    @Args('filter', { nullable: true }) filter: FilterInput,
+    @Info()
+    info
+  ): Promise<PaginatedProducts> {
+    const { skip, take } = getPaginationArgs(pg);
+
+    let orderBy = {};
+    if (sortOrder) {
+      orderBy[sortOrder.field] = sortOrder.direction;
+    } else {
+      orderBy = {
+        sortOrder: 'asc',
+      };
+    }
+
+    const where = {
+      vendorId,
+    };
+
+    if (categoryId) {
+      where['categoryId'] = categoryId;
+    }
+
+    if (filter && filter?.field && filter?.value) {
+      where[filter.field] = {
+        contains: filter.value.trim(),
+        mode: 'insensitive',
+      };
+    }
+
+    const selectedFields = fieldsMap(info, {
+      path: 'list',
+      skip: ['vendor', 'category'],
+    });
+
+    const select = makePrismaSelection(selectedFields);
+
+    const list = await this.prismaService.product.findMany({
+      where,
+      skip,
+      take,
+      select,
+      orderBy,
+    });
+
+    const totalCount = await this.prismaService.product.count({ where });
+
+    return {
+      list: list,
+      totalCount: totalCount,
+    };
   }
 
   @Mutation(() => Product)

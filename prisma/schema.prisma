@@ -20,19 +20,7 @@ model User {
   password  String
   firstname String?
   lastname  String?
-  posts     Post[]
   role      Role
-}
-
-model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean
-  title     String
-  content   String?
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  String?
 }
 
 enum Role {
@@ -68,6 +56,7 @@ model Vendor {
   Cart           Cart[]
   Tag            Tag[]
   Coupon         Coupon[]
+  Order          Order[]
 }
 
 model Tag {
@@ -90,6 +79,7 @@ model Category {
   Vendor    Vendor    @relation(fields: [vendorId], references: [id])
   tagIds    String[]
   active    Boolean   @default(false)
+  sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Product   Product[]
@@ -165,10 +155,13 @@ model Product {
   variationOptions VariationOption[]
   variants         Variant[]
   attributes       ProductAttribute[]
+  sortOrder        Int                   @default(0)
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
   CartItem         CartItem[]
   tagIds           String[]              @db.ObjectId
+  startDate        DateTime              @default(now())
+  endDate          DateTime              @default(now())
 }
 
 model CartItem {
@@ -201,6 +194,24 @@ model Cart {
   appliedCoupon String?
 
   finalPrice Float
+
+  checkedOut Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Order     Order[]
+}
+
+model Order {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  cartId String @db.ObjectId
+  Cart   Cart   @relation(fields: [cartId], references: [id])
+
+  totalAmount Float
+  finalAmount Float
+  vendorId    String @db.ObjectId
+  Vendor      Vendor @relation(fields: [vendorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

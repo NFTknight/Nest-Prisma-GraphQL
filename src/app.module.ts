@@ -7,7 +7,6 @@ import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
-import { PostsModule } from 'src/posts/posts.module';
 import config from 'src/common/configs/config';
 import { loggingMiddleware } from 'src/common/middleware/logging.middleware';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -15,10 +14,10 @@ import { GqlConfigService } from './gql-config.service';
 import { VendorsModule } from './vendors/vendors.module';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
-// import { CartModule } from './cart/cart.module';
-import { OrderModule } from './order/order.module';
+import { CartModule } from './cart/cart.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { TagModule } from './tags/tags.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -37,14 +36,13 @@ import { TagModule } from './tags/tags.module';
 
     AuthModule,
     UsersModule,
-    PostsModule,
     VendorsModule,
     ProductsModule,
     CategoriesModule,
-    // CartModule,
-    OrderModule,
+    CartModule,
     CouponsModule,
     TagModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

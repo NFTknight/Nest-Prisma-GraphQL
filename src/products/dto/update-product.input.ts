@@ -58,4 +58,7 @@ export class UpdateProductInput {
   tagIds?: string[];
 
   itemsInStock?: number;
+
+  @Field(() => Int)
+  sortOrder?: number;
 }

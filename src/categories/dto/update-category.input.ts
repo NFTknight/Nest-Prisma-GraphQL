@@ -1,4 +1,4 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, Int } from '@nestjs/graphql';
 
 @InputType()
 export class UpdateCategoryInput {
@@ -13,4 +13,7 @@ export class UpdateCategoryInput {
 
   @Field()
   active?: boolean;
+
+  @Field(() => Int)
+  sortOrder?: number;
 }

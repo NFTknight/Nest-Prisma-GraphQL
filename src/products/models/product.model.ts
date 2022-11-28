@@ -1,4 +1,10 @@
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  Field,
+  ObjectType,
+  registerEnumType,
+  Int,
+  Float,
+} from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
@@ -52,10 +58,18 @@ export class Product extends BaseModel {
 
   @Field(() => [Tag], { nullable: false })
   Tags?: Tag[];
-
+  @Field(() => Int)
   noOfSeats?: number;
 
+  @Field(() => Int)
   itemsInStock?: number;
 
+  @Field(() => Float)
   price: number;
+
+  @Field(() => Int)
+  sortOrder: number;
+
+  startDate: Date;
+  endDate: Date;
 }

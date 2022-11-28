@@ -5,7 +5,6 @@ import {
   Resolver,
   Parent,
 } from '@nestjs/graphql';
-import { Variant } from 'src/products/models/variant.model';
 import { Product } from 'src/products/models/product.model';
 import { ProductsService } from 'src/products/services/products.service';
 import { AddToCartInput } from '../dto/add-to-cart.input';
@@ -38,9 +37,8 @@ export class CartItemResolver {
     return this.cartItemService.updateQuantity(cartItemId, quantity);
   }
 
-  // @ResolveField('product')
-  // product(@Parent() cartItem: CartItem): Promise<Product | null> {
-  //   if (!cartItem.productVariant) return null;
-  //   return this.productService.getProduct(cartItem.productVariant);
-  // }
+  @ResolveField('Product')
+  Product(@Parent() cartItem: CartItem): Promise<Product | null> {
+    return this.productService.getProduct(cartItem.productId);
+  }
 }

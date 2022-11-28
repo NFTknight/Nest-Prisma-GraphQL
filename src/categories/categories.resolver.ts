@@ -27,13 +27,15 @@ export class CategoriesResolver {
   }
 
   @Query(() => [Category])
-  getCategories(@Args('vendorId', { nullable: true }) vendorId?: string) {
-    return this.categoriesService.getCategories(vendorId);
+  getCategories(
+    @Args('vendorId') vendorId: string,
+    @Args('active', { nullable: true }) active: boolean | null
+  ) {
+    return this.categoriesService.getCategories(vendorId, active);
   }
 
   @Mutation(() => Category)
   createCategory(@Args('data') data: CreateCategoryInput): Promise<Category> {
-    console.log(data);
     return this.categoriesService.createCategory(data);
   }
 

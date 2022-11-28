@@ -1,5 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, Int } from '@nestjs/graphql';
 
 @InputType()
 export class CreateCategoryInput {
@@ -21,4 +21,7 @@ export class CreateCategoryInput {
   @Field()
   @IsNotEmpty()
   active: boolean;
+
+  @Field(() => Int)
+  sortOrder: number;
 }
