@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { Tag } from 'src/tags/models/tag.model';
@@ -15,4 +15,7 @@ export class Category extends BaseModel {
   tagIds: string[];
   @Field(() => [Tag], { nullable: false })
   Tags?: Tag[];
+
+  @Field(() => Int, { nullable: false })
+  sortOrder: number;
 }

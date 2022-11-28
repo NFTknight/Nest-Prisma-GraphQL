@@ -17,12 +17,14 @@ export class CartItemService {
 
   async addItemToCart(data: AddToCartInput): Promise<CartItem> {
     let { cartId } = data;
+    const { productId, productVariant, quantity } = data;
     if (!cartId) {
       const cart = await this.cartService.createNewCart(data.vendorId);
       cartId = cart.id;
     }
+
     const item = await this.prisma.cartItem.create({
-      data: { ...data, cartId },
+      data: { productId, productVariant, quantity, cartId },
     });
     // update cart price
     return item;

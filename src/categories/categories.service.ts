@@ -20,10 +20,20 @@ export class CategoriesService {
     return category;
   }
 
-  async getCategories(vendorId: string): Promise<Category[]> {
+  async getCategories(
+    vendorId: string,
+    active: boolean | null
+  ): Promise<Category[]> {
+    const where = {
+      vendorId,
+    };
+    if (typeof active === 'boolean') {
+      where['active'] = active;
+    }
     return this.prisma.category.findMany({
-      where: {
-        vendorId: vendorId,
+      where,
+      orderBy: {
+        sortOrder: 'asc',
       },
     });
   }
@@ -32,6 +42,7 @@ export class CategoriesService {
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(data.vendorId);
     // if vendor exists we can successfully create the category.
+
     return this.prisma.category.create({ data });
   }
 

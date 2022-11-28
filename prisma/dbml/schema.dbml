@@ -41,6 +41,7 @@ Table Vendor {
   Cart Cart [not null]
   Tag Tag [not null]
   Coupon Coupon [not null]
+  Order Order [not null]
 }
 
 Table Tag {
@@ -63,6 +64,7 @@ Table Category {
   Vendor Vendor [not null]
   tagIds String[] [not null]
   active Boolean [not null, default: false]
+  sortOrder Int [not null, default: 0]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Product Product [not null]
@@ -101,10 +103,13 @@ Table Product {
   variationOptions VariationOption[] [not null]
   variants Variant[] [not null]
   attributes ProductAttribute[] [not null]
+  sortOrder Int [not null, default: 0]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
   tagIds String[] [not null]
+  startDate DateTime [default: `now()`, not null]
+  endDate DateTime [default: `now()`, not null]
 }
 
 Table CartItem {
@@ -127,6 +132,20 @@ Table Cart {
   totalPrice Float [not null]
   appliedCoupon String
   finalPrice Float [not null]
+  checkedOut Boolean [not null, default: false]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  Order Order [not null]
+}
+
+Table Order {
+  id String [pk]
+  cartId String [not null]
+  Cart Cart [not null]
+  totalAmount Float [not null]
+  finalAmount Float [not null]
+  vendorId String [not null]
+  Vendor Vendor [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -157,3 +176,7 @@ Ref: CartItem.productId > Product.id
 Ref: CartItem.cartId > Cart.id
 
 Ref: Cart.vendorId > Vendor.id
+
+Ref: Order.cartId > Cart.id
+
+Ref: Order.vendorId > Vendor.id
