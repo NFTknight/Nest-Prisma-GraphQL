@@ -38,6 +38,11 @@ export class ProductsResolver {
     return this.productService.getProduct(id);
   }
 
+  @Query(() => Product)
+  getProductBySlug(@Args('slug') slug: string): Promise<Product> {
+    return this.productService.getProductBySlug(slug);
+  }
+
   @Query(() => PaginatedProducts)
   async getProducts(
     @Args('vendorId') vendorId: string,

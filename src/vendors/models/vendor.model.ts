@@ -42,7 +42,7 @@ export class Vendor extends BaseModel {
   addressUrl: string;
 
   @Field()
-  url: string;
+  slug: string;
 
   @Field()
   isCheck: boolean;
