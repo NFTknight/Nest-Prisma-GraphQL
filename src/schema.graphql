@@ -117,6 +117,7 @@ input CreateProductInput {
   noOfSeats: Int
   price: Float!
   sku: String!
+  slug: String!
   sortOrder: Int!
   tagIds: [String!]
   title: String!
@@ -152,9 +153,9 @@ input CreateVendorInput {
   name: String!
   phone: String!
   shortName: Boolean!
+  slug: String!
   storeStatus: Boolean!
   terms: String!
-  url: String!
 }
 
 """
@@ -241,6 +242,7 @@ type Product {
   noOfSeats: Int
   price: Float!
   sku: String!
+  slug: String!
   sortOrder: Int!
   startDate: DateTime!
   tagIds: [String!]!
@@ -270,11 +272,12 @@ type Query {
   getCoupon(id: String!): Coupon!
   getCoupons(vendorId: String): [Coupon!]!
   getProduct(id: String!): Product!
+  getProductBySlug(slug: String!): Product!
   getProducts(categoryId: String, filter: FilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTags(vendorId: String): [Tag!]!
   getVendor(id: String!): Vendor!
-  getVendorByUrl(url: String!): Vendor!
+  getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
   hello(name: String!): String!
   helloWorld: String!
@@ -362,6 +365,7 @@ input UpdateProductInput {
   noOfSeats: Int
   price: Float
   sku: String
+  slug: String
   sortOrder: Int
   tagIds: [String!]
   title: String
@@ -476,10 +480,10 @@ type Vendor {
   name: String!
   phone: String!
   shortName: Boolean!
+  slug: String!
   storeStatus: Boolean!
   terms: String!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  url: String!
 }

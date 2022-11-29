@@ -19,8 +19,8 @@ export class VendorsResolver {
   }
 
   @Query(() => Vendor)
-  getVendorByUrl(@Args('url') url: string) {
-    return this.vendorsService.getVendorByUrl(url);
+  getVendorBySlug(@Args('slug') slug: string) {
+    return this.vendorsService.getVendorBySlug(slug);
   }
 
   @Mutation(() => Vendor)

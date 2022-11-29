@@ -42,7 +42,7 @@ model Vendor {
   accountNumber  String
   beneficiary    String
   addressUrl     String
-  url            String     @unique
+  slug           String     @unique
   isCheck        Boolean    @default(false)
   shortName      Boolean
   description_ar String
@@ -135,6 +135,7 @@ type Variant {
 
 model Product {
   id               String                @id @default(auto()) @map("_id") @db.ObjectId
+  slug             String                @unique
   sku              String
   title            String
   title_ar         String

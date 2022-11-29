@@ -9,6 +9,10 @@ import { VariationOptionInput } from './variation-option.input';
 export class CreateProductInput {
   @Field()
   @IsNotEmpty()
+  slug: string;
+
+  @Field()
+  @IsNotEmpty()
   sku: string;
 
   @Field()

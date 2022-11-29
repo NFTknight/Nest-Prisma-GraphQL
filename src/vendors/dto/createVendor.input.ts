@@ -40,7 +40,7 @@ export class CreateVendorInput {
   addressUrl: string;
 
   @Field()
-  url: string;
+  slug: string;
 
   @Field()
   isCheck: boolean;

@@ -27,7 +27,7 @@ Table Vendor {
   accountNumber String [not null]
   beneficiary String [not null]
   addressUrl String [not null]
-  url String [unique, not null]
+  slug String [unique, not null]
   isCheck Boolean [not null, default: false]
   shortName Boolean [not null]
   description_ar String [not null]
@@ -83,6 +83,7 @@ Table Coupon {
 
 Table Product {
   id String [pk]
+  slug String [unique, not null]
   sku String [not null]
   title String [not null]
   title_ar String [not null]

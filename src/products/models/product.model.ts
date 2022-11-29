@@ -21,6 +21,7 @@ registerEnumType(ProductType, {
 
 @ObjectType()
 export class Product extends BaseModel {
+  slug: string;
   sku: string;
   title: string;
   title_ar: string;

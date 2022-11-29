@@ -18,8 +18,8 @@ export class VendorsService {
     return vendor;
   }
 
-  getVendorByUrl(url: string) {
-    return this.prisma.vendor.findFirst({ where: { url } });
+  getVendorBySlug(slug: string) {
+    return this.prisma.vendor.findFirst({ where: { slug } });
   }
 
   getVendors(): Promise<Vendor[]> {
