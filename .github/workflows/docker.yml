@@ -35,7 +35,7 @@ jobs:
             docker build . --file Dockerfile
           fi
   #Push to Digital Ocean private Registry
-  pushToDORegistry:
+  build:
     # Ensure test job passes before pushing image.
     needs: test
 
@@ -56,3 +56,16 @@ jobs:
           doctl registry login
           docker tag $IMAGE_NAME registry.digitalocean.com/anyaa/$IMAGE_NAME
           docker push registry.digitalocean.com/anyaa/$IMAGE_NAME
+
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up kubectl
+        uses: matootie/dokube@v1.4.0
+        with:
+          personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          clusterName: anyaa-k8s
+
+      - name: Deploy to Kubernetes
+        run: kubectl rollout restart deployment $IMAGE_NAME -n dev
