@@ -58,7 +58,7 @@ jobs:
           docker push registry.digitalocean.com/anyaa/$IMAGE_NAME
 
   deploy:
-    needs: docker
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Set up kubectl
