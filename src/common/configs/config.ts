@@ -7,13 +7,6 @@ const config: Config = {
   cors: {
     enabled: true,
   },
-  swagger: {
-    enabled: true,
-    title: 'Nestjs FTW',
-    description: 'The nestjs API description',
-    version: '1.5',
-    path: 'api',
-  },
   graphql: {
     playgroundEnabled: true,
     debug: true,
