@@ -279,8 +279,6 @@ type Query {
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
-  hello(name: String!): String!
-  helloWorld: String!
   me: User!
 }
 
@@ -304,8 +302,8 @@ input ServiceAvailabilityInput {
 
 input SignupInput {
   email: String!
-  firstname: String
-  lastname: String
+  firstName: String
+  lastName: String
   password: String!
 }
 
@@ -414,13 +412,14 @@ type User {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   email: String!
-  firstname: String
+  firstName: String
   id: ID!
-  lastname: String
+  lastName: String
   role: Role!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  verified: Boolean!
 }
 
 type Variant {

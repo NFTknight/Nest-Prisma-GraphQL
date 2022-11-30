@@ -13,8 +13,8 @@ export class SignupInput {
   password: string;
 
   @Field({ nullable: true })
-  firstname?: string;
+  firstName?: string;
 
   @Field({ nullable: true })
-  lastname?: string;
+  lastName?: string;
 }

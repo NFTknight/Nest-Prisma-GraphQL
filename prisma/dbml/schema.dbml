@@ -8,8 +8,9 @@ Table User {
   updatedAt DateTime [not null]
   email String [unique, not null]
   password String [not null]
-  firstname String
-  lastname String
+  firstName String
+  lastName String
+  verified Boolean [not null, default: false]
   role Role [not null]
 }
 
