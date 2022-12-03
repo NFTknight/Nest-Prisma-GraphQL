@@ -29,4 +29,16 @@ spec:
               value: 'YW55YWEhUm9rJDEyMzQ1Ng=='
             - name: JWT_REFRESH_SECRET
               value: 'YW55YWEhUm9rJDEyMzEyMw=='
+            - name: UNIFONIC_AUTHENTICATE_URL
+              value: 'https://authenticate.cloud.api.unifonic.com'
+            - name: UNIFONIC_AUTHENTICATE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: unifonic
+                  key: token
+            - name: UNIFONIC_AUTHENTICATE_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: unifonic
+                  key: app-id
           resources: {{ toYaml .Values.resources | nindent 12 }}
