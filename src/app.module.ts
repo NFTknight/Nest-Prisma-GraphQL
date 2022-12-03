@@ -2,9 +2,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'nestjs-prisma';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AppResolver } from './app.resolver';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import config from 'src/common/configs/config';
@@ -18,6 +15,7 @@ import { CartModule } from './cart/cart.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { TagModule } from './tags/tags.module';
 import { OrdersModule } from './orders/orders.module';
+import { SmsModule } from './sms/sms.module';
 
 @Module({
   imports: [
@@ -43,8 +41,7 @@ import { OrdersModule } from './orders/orders.module';
     CouponsModule,
     TagModule,
     OrdersModule,
+    SmsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AppResolver],
 })
 export class AppModule {}

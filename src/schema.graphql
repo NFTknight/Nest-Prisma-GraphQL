@@ -74,6 +74,17 @@ input ChangePasswordInput {
   oldPassword: String!
 }
 
+input CheckOtpInput {
+  code: String!
+  phone: String!
+}
+
+type CheckOtpResponse {
+  id: String!
+  status: OtpStatusCode!
+  to: String!
+}
+
 type Coupon {
   active: Boolean!
   code: String!
@@ -195,6 +206,7 @@ type Mutation {
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
   removeItemFromCart(cartItemId: String!): CartItem!
+  sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
   updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
@@ -203,6 +215,7 @@ type Mutation {
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
+  verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
 }
 
 """
@@ -211,6 +224,20 @@ Possible directions in which to order a list of items when provided an `orderBy`
 enum OrderDirection {
   asc
   desc
+}
+
+type OtpResponse {
+  id: String!
+  to: String!
+}
+
+"""OTP status code"""
+enum OtpStatusCode {
+  ALREADY_VERIFIED
+  ATTEMPTS_EXCEEDED
+  CODE_EXPIRED
+  CORRECT
+  INCORRECT
 }
 
 type PaginatedProducts {
@@ -279,8 +306,6 @@ type Query {
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
-  hello(name: String!): String!
-  helloWorld: String!
   me: User!
 }
 
@@ -288,6 +313,10 @@ type Query {
 enum Role {
   ADMIN
   USER
+}
+
+input SendOtpInput {
+  phone: String!
 }
 
 type ServiceAvailability {
@@ -304,8 +333,8 @@ input ServiceAvailabilityInput {
 
 input SignupInput {
   email: String!
-  firstname: String
-  lastname: String
+  firstName: String
+  lastName: String
   password: String!
 }
 
@@ -414,13 +443,14 @@ type User {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   email: String!
-  firstname: String
+  firstName: String
   id: ID!
-  lastname: String
+  lastName: String
   role: Role!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  verified: Boolean!
 }
 
 type Variant {

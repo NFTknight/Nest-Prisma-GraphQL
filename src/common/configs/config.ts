@@ -7,13 +7,6 @@ const config: Config = {
   cors: {
     enabled: true,
   },
-  swagger: {
-    enabled: true,
-    title: 'Nestjs FTW',
-    description: 'The nestjs API description',
-    version: '1.5',
-    path: 'api',
-  },
   graphql: {
     playgroundEnabled: true,
     debug: true,
@@ -21,9 +14,17 @@ const config: Config = {
     sortSchema: true,
   },
   security: {
-    expiresIn: '2m',
+    expiresIn: '1d',
     refreshIn: '7d',
     bcryptSaltOrRound: 10,
+  },
+  sms: {
+    otpUrl: process.env.UNIFONIC_AUTHENTICATE_URL as string,
+    otpAppId: process.env.UNIFONIC_AUTHENTICATE_APP_ID as string,
+    otpToken: process.env.UNIFONIC_AUTHENTICATE_TOKEN as string,
+    defaultLocale: 'ar',
+    defaultChannel: 'sms',
+    defaultLength: 4,
   },
 };
 

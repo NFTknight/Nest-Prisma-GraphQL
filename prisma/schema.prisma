@@ -17,9 +17,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email     String   @unique
+  phone     String?   @unique
   password  String
-  firstname String?
-  lastname  String?
+  firstName String?
+  lastName  String?
+  verified  Boolean  @default(false)
   role      Role
 }
 
