@@ -54,6 +54,7 @@
   "dependencies": {
     "@devoxa/prisma-relay-cursor-connection": "2.2.2",
     "@nestjs/apollo": "10.0.19",
+    "@nestjs/axios": "^1.0.0",
     "@nestjs/common": "9.0.5",
     "@nestjs/config": "2.2.0",
     "@nestjs/core": "9.0.5",
@@ -63,6 +64,7 @@
     "@nestjs/platform-express": "9.0.5",
     "@prisma/client": "4.1.0",
     "apollo-server-express": "3.10.0",
+    "axios": "^1.2.0",
     "bcrypt": "5.0.1",
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
