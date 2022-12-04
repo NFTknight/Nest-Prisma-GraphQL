@@ -51,4 +51,4 @@ jobs:
       - name: Helm deploy
         uses: hiberbee/github-action-helm@latest
         with:
-          helm: upgrade --install --atomic --timeout 1m backend-api ./infra/ -f ./infra/values-dev.yaml --namespace dev --create-namespace
+          helm: upgrade --install --atomic --timeout 1m backend-api ${{ env.GITHUB_WORKSPACE }}/infra/ -f ${{ env.GITHUB_WORKSPACE }}/infra/values-dev.yaml --namespace dev --create-namespace
