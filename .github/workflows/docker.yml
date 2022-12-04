@@ -16,7 +16,7 @@ env:
 
 jobs:
   #Push to Digital Ocean private Registry
-  build:
+  CD:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
@@ -54,11 +54,8 @@ jobs:
       - name: Upgrade deployment
         run: |
           helm upgrade --install --atomic --timeout 1m backend-api ./infra/ -f ./infra/values-dev.yaml \
-          --namespace dev --create-namespace
-
-      - name: Restart deployment
-        run: |
-          kubectl rollout restart deployment backend-api -n dev
+          --namespace dev --create-namespace \
+          --set-string sha=${{ github.sha }}
 
   # deploy:
   #   needs: build
