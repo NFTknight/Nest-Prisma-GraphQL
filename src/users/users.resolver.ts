@@ -1,5 +1,5 @@
 import { PrismaService } from 'nestjs-prisma';
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ResolveField } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { UserEntity } from 'src/common/decorators/user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
@@ -62,5 +62,15 @@ export class UsersResolver {
     @Args('data') { phone, code }: CheckOtpInput
   ) {
     return this.usersService.verifyOtp(phone, code, user.id);
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @ResolveField('vendor')
+  vendor(@UserEntity() user: User) {
+    return this.prisma.vendor.findUnique({
+      where: {
+        ownerId: user.id,
+      },
+    });
   }
 }

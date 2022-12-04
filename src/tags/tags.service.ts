@@ -21,9 +21,7 @@ export class TagsService {
   }
 
   getTags(vendorId?: string): Promise<Tag[]> {
-    const where: Partial<Tag> = {};
-    if (vendorId) where.vendorId = vendorId;
-    return this.prisma.tag.findMany({ where });
+    return this.prisma.tag.findMany({ where: vendorId ? { vendorId } : {} });
   }
 
   async createTags(data: CreateTagInput): Promise<Tag> {

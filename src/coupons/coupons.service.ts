@@ -21,10 +21,7 @@ export class CouponsService {
   }
 
   async getCoupons(vendorId?: string): Promise<Coupon[]> {
-    const where: Partial<Coupon> = {};
-    if (vendorId) where.vendorId = vendorId;
-
-    return this.prisma.coupon.findMany({ where });
+    return this.prisma.coupon.findMany({ where: vendorId ? { vendorId } : {} });
   }
 
   async createCoupon(data: CreateCouponInput): Promise<Coupon> {

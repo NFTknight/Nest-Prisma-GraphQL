@@ -30,6 +30,10 @@ const config: Config = {
     url: process.env.SMSA_API_URL as string,
     token: process.env.SMSA_API_KEY as string,
   },
+  payment: {
+    url: process.env.MYFATOORAH_API_URL as string,
+    token: process.env.MYFATOORAH_API_TOKEN as string,
+  },
 };
 
 export default (): Config => config;

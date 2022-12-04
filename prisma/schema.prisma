@@ -5,7 +5,6 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  // previewFeatures = []
 }
 
 generator dbml {
@@ -23,6 +22,7 @@ model User {
   lastName  String?
   verified  Boolean  @default(false)
   role      Role
+  vendor    Vendor?
 }
 
 enum Role {
@@ -33,32 +33,47 @@ enum Role {
 model Vendor {
   id             String     @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  description    String
-  storeStatus    Boolean
+  slug           String     @unique
   active         Boolean    @default(false)
+  
+  info           VendorInfo?
+  bank           VendorBankInfo?
+  settings       VendorSettings?
+
+  products       Product[]
+  categories     Category[]
+  carts          Cart[]
+  tags           Tag[]
+  coupons        Coupon[]
+  orders         Order[]
+  
+  ownerId        String     @db.ObjectId @unique
+  owner          User       @relation(fields: [ownerId], references: [id])
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+type VendorInfo {
   address        String
   phone          String
   email          String
-  bankName       String
-  iban           String
-  accountNumber  String
-  beneficiary    String
   addressUrl     String
-  slug           String     @unique
-  isCheck        Boolean    @default(false)
-  shortName      Boolean
+  description    String
   description_ar String
-  terms          String
-  isOpen         Boolean    @default(false)
-  demo           Boolean    @default(false)
-  Product        Product[]
-  Category       Category[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  Cart           Cart[]
-  Tag            Tag[]
-  Coupon         Coupon[]
-  Order          Order[]
+}
+
+type VendorSettings {
+  paymentMethods  String[]
+  deliveryMethods String[]
+  terms           String
+}
+
+type VendorBankInfo {
+  bankName      String
+  iban          String
+  accountNumber String
+  beneficiary   String
 }
 
 model Tag {

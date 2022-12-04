@@ -13,37 +13,27 @@ Table User {
   lastName String
   verified Boolean [not null, default: false]
   role Role [not null]
+  vendor Vendor
 }
 
 Table Vendor {
   id String [pk]
   name String [not null]
-  description String [not null]
-  storeStatus Boolean [not null]
-  active Boolean [not null, default: false]
-  address String [not null]
-  phone String [not null]
-  email String [not null]
-  bankName String [not null]
-  iban String [not null]
-  accountNumber String [not null]
-  beneficiary String [not null]
-  addressUrl String [not null]
   slug String [unique, not null]
-  isCheck Boolean [not null, default: false]
-  shortName Boolean [not null]
-  description_ar String [not null]
-  terms String [not null]
-  isOpen Boolean [not null, default: false]
-  demo Boolean [not null, default: false]
-  Product Product [not null]
-  Category Category [not null]
+  active Boolean [not null, default: false]
+  info VendorInfo
+  bank VendorBankInfo
+  settings VendorSettings
+  products Product [not null]
+  categories Category [not null]
+  carts Cart [not null]
+  tags Tag [not null]
+  coupons Coupon [not null]
+  orders Order [not null]
+  ownerId String [unique, not null]
+  owner User [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  Cart Cart [not null]
-  Tag Tag [not null]
-  Coupon Coupon [not null]
-  Order Order [not null]
 }
 
 Table Tag {
@@ -163,6 +153,8 @@ Enum ProductType {
   SERVICE
   WORKSHOP
 }
+
+Ref: Vendor.ownerId - User.id
 
 Ref: Tag.vendorId > Vendor.id
 

@@ -153,25 +153,8 @@ input CreateTagInput {
 }
 
 input CreateVendorInput {
-  accountNumber: String!
-  active: Boolean!
-  address: String!
-  addressUrl: String!
-  bankName: String!
-  beneficiary: String!
-  demo: Boolean!
-  description: String!
-  description_ar: String!
-  email: String!
-  iban: String!
-  isCheck: Boolean!
-  isOpen: Boolean!
   name: String!
-  phone: String!
-  shortName: Boolean!
   slug: String!
-  storeStatus: Boolean!
-  terms: String!
 }
 
 """
@@ -208,6 +191,7 @@ type Mutation {
   deleteProduct(id: String!): Product!
   deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
+  initiatePaymentSession: PaymentSession!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
   removeItemFromCart(cartItemId: String!): CartItem!
@@ -253,6 +237,11 @@ type PaginatedProducts {
 input PaginationArgs {
   page: Int
   pageSize: Int
+}
+
+type PaymentSession {
+  CountryCode: String!
+  SessionId: String!
 }
 
 type Product {
@@ -436,25 +425,8 @@ input UpdateUserInput {
 }
 
 input UpdateVendorInput {
-  accountNumber: String
   active: Boolean
-  address: String
-  addressUrl: String
-  bankName: String
-  beneficiary: String
-  demo: Boolean
-  description: String
-  description_ar: String
-  email: String
-  iban: String
-  isCheck: Boolean
-  isOpen: Boolean
   name: String
-  phone: String
-  shortName: Boolean
-  storeStatus: Boolean
-  terms: String
-  url: String
 }
 
 type User {
@@ -469,6 +441,7 @@ type User {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendor: Vendor
   verified: Boolean!
 }
 
@@ -509,29 +482,13 @@ input VariationValueInput {
 }
 
 type Vendor {
-  accountNumber: String!
   active: Boolean!
-  address: String!
-  addressUrl: String!
-  bankName: String!
-  beneficiary: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
-  demo: Boolean!
-  description: String!
-  description_ar: String!
-  email: String!
-  iban: String!
-  id: String!
-  isCheck: Boolean!
-  isOpen: Boolean!
+  id: ID!
   name: String!
-  phone: String!
-  shortName: Boolean!
   slug: String!
-  storeStatus: Boolean!
-  terms: String!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!

@@ -1,12 +1,36 @@
 import { PrismaService } from 'nestjs-prisma';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateVendorInput } from './dto/createVendor.input';
-import { UpdateVendorInput } from './dto/updateVendor.input';
+import { CreateVendorInput } from './dto/create-vendor.input';
+import { UpdateVendorInput } from './dto/update-vendor.input';
 import { Vendor } from './models/vendor.model';
+import { User } from 'src/users/models/user.model';
 
 @Injectable()
 export class VendorsService {
   constructor(private prisma: PrismaService) {}
+
+  createVendor(
+    createVendorInput: CreateVendorInput,
+    user: User
+  ): Promise<Vendor> {
+    return this.prisma.vendor.create({
+      data: { ...createVendorInput, ownerId: user.id },
+    });
+  }
+
+  updateVendor(
+    id: string,
+    updateVendorInput: UpdateVendorInput
+  ): Promise<Vendor> {
+    return this.prisma.vendor.update({
+      data: { ...updateVendorInput, updatedAt: new Date() },
+      where: { id },
+    });
+  }
+
+  deleteVendor(id: string): Promise<Vendor> {
+    return this.prisma.vendor.delete({ where: { id } });
+  }
 
   async getVendor(id: string): Promise<Vendor> {
     const vendor = await this.prisma.vendor.findFirst({
@@ -24,23 +48,5 @@ export class VendorsService {
 
   getVendors(): Promise<Vendor[]> {
     return this.prisma.vendor.findMany();
-  }
-
-  createVendor(createVendorInput: CreateVendorInput): Promise<Vendor> {
-    return this.prisma.vendor.create({ data: createVendorInput });
-  }
-
-  updateVendor(
-    id: string,
-    updateVendorInput: UpdateVendorInput
-  ): Promise<Vendor> {
-    return this.prisma.vendor.update({
-      data: { ...updateVendorInput, updatedAt: new Date() },
-      where: { id },
-    });
-  }
-
-  deleteVendor(id: string): Promise<Vendor> {
-    return this.prisma.vendor.delete({ where: { id } });
   }
 }
