@@ -41,4 +41,14 @@ spec:
                 secretKeyRef:
                   name: unifonic
                   key: app-id
+            - name: SMSA_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: smsa
+                  key: url
+            - name: SMSA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: smsa
+                  key: token
           resources: {{ toYaml .Values.resources | nindent 12 }}

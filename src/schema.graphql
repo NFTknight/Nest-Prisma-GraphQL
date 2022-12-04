@@ -85,6 +85,11 @@ type CheckOtpResponse {
   to: String!
 }
 
+type Coordinates {
+  lat: Float!
+  lng: Float!
+}
+
 type Coupon {
   active: Boolean!
   code: String!
@@ -307,6 +312,8 @@ type Query {
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
   me: User!
+  shippingOffices(city: String): [ShippingOffice!]!
+  trackShipment(trackingNumber: String!): WayBill!
 }
 
 """User role"""
@@ -329,6 +336,17 @@ input ServiceAvailabilityInput {
   days: [String!]!
   endTime: String!
   startTime: String!
+}
+
+type ShippingOffice {
+  address: String!
+  addressAR: String!
+  cityName: String!
+  code: String!
+  coordinates: Coordinates!
+  firstShift: String!
+  secondShift: String!
+  weekendShift: String!
 }
 
 input SignupInput {
@@ -516,4 +534,16 @@ type Vendor {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+}
+
+type WayBill {
+  createDate: String!
+  sawb: String!
+  shipmentParcelsCount: Int!
+  waybills: [WayBillItem!]!
+}
+
+type WayBillItem {
+  awb: String!
+  awbFile: String!
 }
