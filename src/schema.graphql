@@ -313,6 +313,7 @@ type Query {
   getVendors: [Vendor!]!
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
+  trackShipment(trackingNumber: String!): WayBill!
 }
 
 """User role"""
@@ -533,4 +534,16 @@ type Vendor {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+}
+
+type WayBill {
+  createDate: String!
+  sawb: String!
+  shipmentParcelsCount: Int!
+  waybills: [WayBillItem!]!
+}
+
+type WayBillItem {
+  awb: String!
+  awbFile: String!
 }

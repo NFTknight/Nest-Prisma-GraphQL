@@ -6,6 +6,7 @@ import { ShippingConfig } from 'src/common/configs/config.interface';
 import { Coordinates } from 'src/common/models/coordinates.model';
 import { ShippingOfficesResponseItem } from './dto/offices.dto';
 import { ShippingOffice } from './models/offices.model';
+import { WayBill, WayBillItem } from './models/waybill.model';
 
 @Injectable()
 export class ShippingService {
@@ -62,6 +63,35 @@ export class ShippingService {
               });
 
             return locations;
+          })
+        )
+    );
+  }
+
+  async trackShipment(trackingNumber: string) {
+    const url = `${this.shippingConfig.url}/api/shipment/b2c/query/${trackingNumber}`;
+    return firstValueFrom(
+      this.httpService
+        .get<WayBill>(url, {
+          headers: {
+            apikey: this.shippingConfig.token,
+          },
+        })
+        .pipe(
+          map((res) => {
+            const wayBill = new WayBill();
+            wayBill.sawb = res.data.sawb;
+            wayBill.createDate = res.data.createDate;
+            wayBill.shipmentParcelsCount = res.data.shipmentParcelsCount;
+            wayBill.waybills = res.data.waybills.map((item) => {
+              const wayBillItem = new WayBillItem();
+              wayBillItem.awb = item.awb;
+              wayBillItem.awbFile = item.awbFile;
+
+              return wayBillItem;
+            });
+
+            return wayBill;
           })
         )
     );
