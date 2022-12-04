@@ -1,10 +1,4 @@
-import {
-  Field,
-  ObjectType,
-  registerEnumType,
-  Int,
-  Float,
-} from '@nestjs/graphql';
+import { Field, ObjectType, Int, Float } from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
@@ -13,11 +7,7 @@ import { VariationOption } from './variation-option.model';
 import { Variant } from './variant.model';
 import { ServiceAvailability } from 'src/common/models/service-availability.model';
 import { Tag } from 'src/tags/models/tag.model';
-
-registerEnumType(ProductType, {
-  name: 'ProductType',
-  description: 'Product Type',
-});
+import './product-type.enum';
 
 @ObjectType()
 export class Product extends BaseModel {

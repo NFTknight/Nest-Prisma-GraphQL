@@ -1,9 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int, Float } from '@nestjs/graphql';
-import { ProductType } from 'prisma/prisma-client';
 import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
 import { VariantInput } from './variant.input';
 import { VariationOptionInput } from './variation-option.input';
+import { ProductType } from '@prisma/client';
 
 @InputType()
 export class CreateProductInput {
@@ -35,7 +35,7 @@ export class CreateProductInput {
   @IsNotEmpty()
   image: string;
 
-  @Field()
+  @Field(() => ProductType)
   @IsNotEmpty()
   type: ProductType;
 

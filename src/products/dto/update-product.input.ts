@@ -27,7 +27,7 @@ export class UpdateProductInput {
   @Field()
   image?: string;
 
-  @Field()
+  @Field(() => ProductType)
   type?: ProductType;
 
   @Field()
