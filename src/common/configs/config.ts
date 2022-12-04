@@ -26,6 +26,10 @@ const config: Config = {
     defaultChannel: 'sms',
     defaultLength: 4,
   },
+  shipping: {
+    url: process.env.SMSA_API_URL as string,
+    token: process.env.SMSA_API_KEY as string,
+  },
 };
 
 export default (): Config => config;

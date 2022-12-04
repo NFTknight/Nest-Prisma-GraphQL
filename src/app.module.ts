@@ -16,6 +16,7 @@ import { CouponsModule } from './coupons/coupons.module';
 import { TagModule } from './tags/tags.module';
 import { OrdersModule } from './orders/orders.module';
 import { SmsModule } from './sms/sms.module';
+import { ShippingModule } from './shipping/shipping.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { SmsModule } from './sms/sms.module';
     TagModule,
     OrdersModule,
     SmsModule,
+    ShippingModule,
   ],
 })
 export class AppModule {}

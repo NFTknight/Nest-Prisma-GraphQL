@@ -4,6 +4,7 @@ export interface Config {
   graphql: GraphqlConfig;
   security: SecurityConfig;
   sms: SmsConfig;
+  shipping: ShippingConfig;
 }
 
 export interface NestConfig {
@@ -34,4 +35,9 @@ export interface SmsConfig {
   defaultLocale: string;
   defaultChannel: string;
   defaultLength: number;
+}
+
+export interface ShippingConfig {
+  url: string;
+  token: string;
 }

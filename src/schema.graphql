@@ -85,6 +85,11 @@ type CheckOtpResponse {
   to: String!
 }
 
+type Coordinates {
+  lat: Float!
+  lng: Float!
+}
+
 type Coupon {
   active: Boolean!
   code: String!
@@ -307,6 +312,7 @@ type Query {
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
   me: User!
+  shippingOffices(city: String): [ShippingOffice!]!
 }
 
 """User role"""
@@ -329,6 +335,17 @@ input ServiceAvailabilityInput {
   days: [String!]!
   endTime: String!
   startTime: String!
+}
+
+type ShippingOffice {
+  address: String!
+  addressAR: String!
+  cityName: String!
+  code: String!
+  coordinates: Coordinates!
+  firstShift: String!
+  secondShift: String!
+  weekendShift: String!
 }
 
 input SignupInput {
