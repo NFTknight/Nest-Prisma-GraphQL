@@ -51,10 +51,14 @@ jobs:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           clusterName: anyaa-k8s
 
-      - name: Deploy to Kubernetes
+      - name: Upgrade deployment
         run: |
           helm upgrade --install --atomic --timeout 1m backend-api ./infra/ -f ./infra/values-dev.yaml \
           --namespace dev --create-namespace
+
+      - name: Restart deployment
+        run: |
+          kubectl rollout restart deployment backend-api -n dev
 
   # deploy:
   #   needs: build
