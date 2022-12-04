@@ -53,7 +53,7 @@ jobs:
 
       - name: Upgrade deployment
         run: |
-          helm upgrade --install --atomic --timeout 1m backend-api ./infra/ -f ./infra/values-dev.yaml \
+          helm upgrade --install --atomic --timeout 5m backend-api ./infra/ -f ./infra/values-dev.yaml \
           --namespace dev --create-namespace \
           --set-string sha=${{ github.sha }}
 
