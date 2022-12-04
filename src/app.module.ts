@@ -1,5 +1,5 @@
 import { GraphQLModule } from '@nestjs/graphql';
-import { Logger, Module } from '@nestjs/common';
+import { Controller, Get, Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'nestjs-prisma';
 import { AuthModule } from 'src/auth/auth.module';
@@ -17,6 +17,7 @@ import { TagModule } from './tags/tags.module';
 import { OrdersModule } from './orders/orders.module';
 import { SmsModule } from './sms/sms.module';
 import { ShippingModule } from './shipping/shipping.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -45,5 +46,6 @@ import { ShippingModule } from './shipping/shipping.module';
     SmsModule,
     ShippingModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

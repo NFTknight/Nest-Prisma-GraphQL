@@ -54,3 +54,11 @@ spec:
                   name: smsa
                   key: token
           resources: {{ toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.containerPort }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.containerPort }}
