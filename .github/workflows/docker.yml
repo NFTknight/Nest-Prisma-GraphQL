@@ -48,8 +48,8 @@ jobs:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           clusterName: anyaa-k8s
 
-      - name: Deploy to Kubernetes
-        run: kubectl rollout restart deployment $IMAGE_NAME -n dev
-
-      - name: Test helm
-        run: helm version
+      - name: Helm upgrade
+        run: |
+          helm upgrade --install --atomic --timeout 1m backend-api ./infra/ \
+            -f ./infra/values-dev.yaml \
+            --namespace dev --create-namespace
