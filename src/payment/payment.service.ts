@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
-import { PaymentMethod } from './models/payment-method.model';
+import { PaymentSession } from './models/payment-session.model';
 
 @Injectable()
 export class PaymentService {
@@ -16,27 +16,23 @@ export class PaymentService {
     this.paymentConfig = this.config.get<PaymentConfig>('payment');
   }
 
-  initiatePayment(amount: number, currency: string) {
-    const url = `${this.paymentConfig.url}/v2/InitiatePayment`;
+  initiateSession() {
+    const url = `${this.paymentConfig.url}/v2/InitiateSession`;
+    console.log(this.paymentConfig);
     return firstValueFrom(
       this.httpService
         .post<{
-          Data: {
-            PaymentMethods: PaymentMethod[];
-          };
+          Data: PaymentSession;
         }>(
           url,
-          {
-            InvoiceAmount: amount,
-            CurrencyIso: currency,
-          },
+          {},
           {
             headers: {
               Authorization: `Bearer ${this.paymentConfig.token}`,
             },
           }
         )
-        .pipe(map((res) => res.data.Data.PaymentMethods))
+        .pipe(map((res) => res.data.Data))
     );
   }
 }
