@@ -56,6 +56,12 @@ jobs:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           clusterName: anyaa-k8s
 
+      - name: Check path
+        run: |
+          echo $GITHUB_WORKSPACE
+          pwd
+          ls -la
+
       - name: Deploy to Kubernetes
         run: |
           helm upgrade --install --atomic --timeout 1m backend-api $GITHUB_WORKSPACE/infra/ -f $GITHUB_WORKSPACE/infra/values-dev.yaml \
