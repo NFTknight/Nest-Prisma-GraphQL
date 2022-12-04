@@ -35,11 +35,11 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       - name: Build image
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.app == 'true'
         run: docker build . --file Dockerfile.alpine --tag $IMAGE_NAME
 
       - name: push image to digitalocean
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.app == 'true'
         run: |
           doctl registry login
           docker tag $IMAGE_NAME registry.digitalocean.com/anyaa/$IMAGE_NAME

@@ -18,12 +18,11 @@ export class User extends BaseModel {
   firstName?: string;
   lastName?: string;
   verified: boolean;
+  phone?: string;
 
   @Field(() => Role)
   role: Role;
 
   @HideField()
   password: string;
-
-  phone?: string;
 }
