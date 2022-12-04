@@ -184,6 +184,11 @@ input FilterInput {
   value: String!
 }
 
+input InitiatePaymentInput {
+  amount: Int!
+  currency: String!
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -208,6 +213,7 @@ type Mutation {
   deleteProduct(id: String!): Product!
   deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
+  initiatePayment(data: InitiatePaymentInput!): [PaymentMethod!]!
   login(data: LoginInput!): Auth!
   refreshToken(token: JWT!): Token!
   removeItemFromCart(cartItemId: String!): CartItem!
@@ -253,6 +259,20 @@ type PaginatedProducts {
 input PaginationArgs {
   page: Int
   pageSize: Int
+}
+
+type PaymentMethod {
+  CurrencyIso: String!
+  ImageUrl: String!
+  IsDirectPayment: Boolean!
+  IsEmbeddedSupported: Boolean!
+  PaymentCurrencyIso: String!
+  PaymentMethodAr: String!
+  PaymentMethodCode: String!
+  PaymentMethodEn: String!
+  PaymentMethodId: Int!
+  ServiceCharge: Float!
+  TotalAmount: Float!
 }
 
 type Product {

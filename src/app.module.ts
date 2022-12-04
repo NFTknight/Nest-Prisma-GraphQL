@@ -18,6 +18,7 @@ import { OrdersModule } from './orders/orders.module';
 import { SmsModule } from './sms/sms.module';
 import { ShippingModule } from './shipping/shipping.module';
 import { HealthController } from './health.controller';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { HealthController } from './health.controller';
     OrdersModule,
     SmsModule,
     ShippingModule,
+    PaymentModule,
   ],
   controllers: [HealthController],
 })
