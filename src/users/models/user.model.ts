@@ -24,4 +24,6 @@ export class User extends BaseModel {
 
   @HideField()
   password: string;
+
+  phone?: string;
 }

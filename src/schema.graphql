@@ -464,6 +464,7 @@ type User {
   firstName: String
   id: ID!
   lastName: String
+  phone: String
   role: Role!
 
   """Identifies the date and time when the object was last updated."""
