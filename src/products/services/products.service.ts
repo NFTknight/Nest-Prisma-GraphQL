@@ -20,13 +20,13 @@ export class ProductsService {
     return product;
   }
 
-  async getProductBySlug(slug: string): Promise<Product> {
-    const product = await this.prisma.product.findUnique({ where: { slug } });
+  // async getProductBySlug(slug: string): Promise<Product> {
+  //   const product = await this.prisma.product.findUnique({ where: { slug } });
 
-    if (!product) throw new NotFoundException('Product Not Found.');
+  //   if (!product) throw new NotFoundException('Product Not Found.');
 
-    return product;
-  }
+  //   return product;
+  // }
 
   async getProducts(vendorId: string): Promise<Product[]> {
     try {
