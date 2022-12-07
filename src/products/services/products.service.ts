@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+import { CreateProductValidator } from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
@@ -29,6 +34,9 @@ export class ProductsService {
   }
 
   async createProduct(data: CreateProductInput): Promise<Product> {
+    const error = CreateProductValidator(data);
+    if (error) throw new BadRequestException(error);
+
     const { vendorId, categoryId, ...rest } = data;
 
     // if the vendor does not exist, this function will throw an error.
