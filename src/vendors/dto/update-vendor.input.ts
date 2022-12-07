@@ -1,5 +1,16 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, registerEnumType } from '@nestjs/graphql';
+import { DeliveryMethods, PaymentMethods } from '@prisma/client';
 import { IsEmail } from 'class-validator';
+
+registerEnumType(DeliveryMethods, {
+  name: 'DeliveryMethods',
+  description: 'Delivery Methods',
+});
+
+registerEnumType(PaymentMethods, {
+  name: 'PaymentMethods',
+  description: 'Payment Methods',
+});
 
 @InputType()
 class UpdateVendorInfoInput {
@@ -21,6 +32,33 @@ class UpdateVendorInfoInput {
 
   @Field()
   description_ar?: string;
+
+  @Field()
+  terms?: string;
+}
+
+@InputType()
+class UpdateVendorBankInput {
+  @Field()
+  bankName: string;
+
+  @Field()
+  iban: string;
+
+  @Field()
+  accountNumber: string;
+
+  @Field()
+  beneficiary: string;
+}
+
+@InputType()
+class UpdateVendorSettingsInput {
+  @Field(() => [PaymentMethods])
+  paymentMethods: PaymentMethods[];
+
+  @Field(() => [DeliveryMethods])
+  deliveryMethods: DeliveryMethods[];
 }
 
 @InputType()
@@ -31,8 +69,12 @@ export class UpdateVendorInput {
   @Field()
   active?: boolean;
 
-  // @Field(() => UpdateVendorInfoInput, {
-  //   nullable: true,
-  // })
-  // info?: UpdateVendorInfoInput;
+  @Field()
+  info?: UpdateVendorInfoInput;
+
+  @Field()
+  bank?: UpdateVendorBankInput;
+
+  @Field()
+  settings?: UpdateVendorSettingsInput;
 }

@@ -19,4 +19,7 @@ export class VendorInfo {
 
   @Field()
   description_ar?: string;
+
+  @Field()
+  terms?: string;
 }
