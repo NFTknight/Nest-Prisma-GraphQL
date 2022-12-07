@@ -142,7 +142,7 @@ input CreateProductInput {
   itemsInStock: Int
   location: String
   meetingLink: String
-  minPreorderDays: Float
+  minPreorderDays: Int
   noOfSeats: Int
   price: Float!
   sku: String
