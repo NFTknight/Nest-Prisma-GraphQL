@@ -162,6 +162,13 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""Delivery Methods"""
+enum DeliveryMethods {
+  MANDOOB
+  PICKUP
+  SMSA
+}
+
 input FilterInput {
   field: String!
   value: String!
@@ -237,6 +244,14 @@ type PaginatedProducts {
 input PaginationArgs {
   page: Int
   pageSize: Int
+}
+
+"""Payment Methods"""
+enum PaymentMethods {
+  BANK_TRANSFER
+  CASH
+  ONLINE
+  STORE
 }
 
 type PaymentSession {
@@ -424,9 +439,34 @@ input UpdateUserInput {
   lastname: String
 }
 
+input UpdateVendorBankInput {
+  accountNumber: String!
+  bankName: String!
+  beneficiary: String!
+  iban: String!
+}
+
+input UpdateVendorInfoInput {
+  address: String
+  addressUrl: String
+  description: String
+  description_ar: String
+  email: String
+  phone: String
+  terms: String
+}
+
 input UpdateVendorInput {
   active: Boolean
+  bank: UpdateVendorBankInput
+  info: UpdateVendorInfoInput
   name: String
+  settings: UpdateVendorSettingsInput
+}
+
+input UpdateVendorSettingsInput {
+  deliveryMethods: [DeliveryMethods!]!
+  paymentMethods: [PaymentMethods!]!
 }
 
 type User {
@@ -483,15 +523,40 @@ input VariationValueInput {
 
 type Vendor {
   active: Boolean!
+  bank: VendorBank!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  info: VendorInfo
   name: String!
+  settings: VendorSettings!
   slug: String!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+}
+
+type VendorBank {
+  accountNumber: String!
+  bankName: String!
+  beneficiary: String!
+  iban: String!
+}
+
+type VendorInfo {
+  address: String
+  addressUrl: String
+  description: String
+  description_ar: String
+  email: String
+  phone: String
+  terms: String
+}
+
+type VendorSettings {
+  deliveryMethods: [DeliveryMethods!]!
+  paymentMethods: [PaymentMethods!]!
 }
 
 type WayBill {

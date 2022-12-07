@@ -16,7 +16,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email     String   @unique
-  phone     String?  @unique
+  phone     String?  
   password  String
   firstName String?
   lastName  String?
@@ -55,18 +55,31 @@ model Vendor {
 }
 
 type VendorInfo {
-  address        String
-  phone          String
-  email          String
-  addressUrl     String
-  description    String
-  description_ar String
+  address        String?
+  phone          String?
+  email          String?
+  addressUrl     String?
+  description    String?
+  description_ar String?
+  terms          String?
+}
+
+enum DeliveryMethods {
+  MANDOOB
+  SMSA
+  PICKUP
+}
+
+enum PaymentMethods {
+  CASH
+  ONLINE
+  BANK_TRANSFER
+  STORE
 }
 
 type VendorSettings {
-  paymentMethods  String[]
-  deliveryMethods String[]
-  terms           String
+  paymentMethods  PaymentMethods[]
+  deliveryMethods DeliveryMethods[]
 }
 
 type VendorBankInfo {
