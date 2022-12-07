@@ -10,6 +10,12 @@ input AddToCartInput {
   vendorId: String!
 }
 
+"""Attendance Type"""
+enum AttendanceType {
+  ONLINE
+  PHYSICAL
+}
+
 type Auth {
   """JWT access token"""
   accessToken: JWT!
@@ -123,18 +129,25 @@ input CreateCouponInput {
 
 input CreateProductInput {
   active: Boolean!
+  attendanceType: AttendanceType
   availabilities: [ServiceAvailabilityInput!]
-  categoryId: String!
+  categoryId: String
+  customerLocation: Boolean
   description: String!
   description_ar: String!
+  duration: Int
+  endDate: DateTime
+  endTime: Boolean
   image: String!
   itemsInStock: Int
-  minPreorderDays: Int!
+  location: String
+  meetingLink: String
+  minPreorderDays: Int
   noOfSeats: Int
   price: Float!
-  sku: String!
-  slug: String!
-  sortOrder: Int!
+  sku: String
+  sortOrder: Int
+  startDate: DateTime
   tagIds: [String!]
   title: String!
   title_ar: String!
@@ -260,26 +273,31 @@ type PaymentSession {
 }
 
 type Product {
-  Tags: [Tag!]!
+  Tags: [Tag!]
   active: Boolean!
+  attendanceType: AttendanceType
   availabilities: [ServiceAvailability!]
   category: Category
-  categoryId: String!
+  categoryId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
+  customerLocation: Boolean
   description: String!
   description_ar: String!
+  duration: Int
   endDate: DateTime!
+  endTime: Boolean
   id: ID!
   image: String!
   itemsInStock: Int
-  minPreorderDays: Int!
+  location: String
+  meetingLink: String
+  minPreorderDays: Int
   noOfSeats: Int
   price: Float!
-  sku: String!
-  slug: String!
-  sortOrder: Int!
+  sku: String
+  sortOrder: Int
   startDate: DateTime!
   tagIds: [String!]!
   title: String!
@@ -308,7 +326,6 @@ type Query {
   getCoupon(id: String!): Coupon!
   getCoupons(vendorId: String): [Coupon!]!
   getProduct(id: String!): Product!
-  getProductBySlug(slug: String!): Product!
   getProducts(categoryId: String, filter: FilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTags(vendorId: String): [Tag!]!
@@ -406,18 +423,25 @@ input UpdateCouponInput {
 
 input UpdateProductInput {
   active: Boolean
+  attendanceType: AttendanceType
   availabilities: [ServiceAvailabilityInput!]
   categoryId: String
+  customerLocation: Boolean
   description: String
   description_ar: String
+  duration: Int
+  endDate: DateTime
+  endTime: Boolean
   image: String
   itemsInStock: Int
-  minPreorderDays: Int!
+  location: String
+  meetingLink: String
+  minPreorderDays: Int
   noOfSeats: Int
   price: Float
   sku: String
-  slug: String
   sortOrder: Int
+  startDate: DateTime
   tagIds: [String!]
   title: String
   title_ar: String

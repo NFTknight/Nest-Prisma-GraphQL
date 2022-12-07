@@ -132,6 +132,11 @@ enum ProductType {
   WORKSHOP
 }
 
+enum AttendanceType {
+  ONLINE
+  PHYSICAL
+}
+
 type ProductAttribute {
   key      String
   key_ar   String
@@ -165,8 +170,7 @@ type Variant {
 
 model Product {
   id               String                @id @default(auto()) @map("_id") @db.ObjectId
-  slug             String                @unique
-  sku              String
+  sku              String?
   title            String
   title_ar         String
   description      String
@@ -175,22 +179,28 @@ model Product {
   type             ProductType
   vendorId         String                @db.ObjectId
   vendor           Vendor                @relation(fields: [vendorId], references: [id])
-  active           Boolean               @default(false)
-  minPreorderDays  Int
+  active           Boolean               @default(true)
+  minPreorderDays  Int?
   price            Float
   category         Category?             @relation(fields: [categoryId], references: [id])
-  categoryId       String                @db.ObjectId
+  categoryId       String?                @db.ObjectId
   noOfSeats        Int?
   itemsInStock     Int?
   availabilities   ServiceAvailability[]
   variationOptions VariationOption[]
   variants         Variant[]
   attributes       ProductAttribute[]
-  sortOrder        Int                   @default(0)
+  sortOrder        Int?                  @default(0)
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
   CartItem         CartItem[]
   tagIds           String[]              @db.ObjectId
+  attendanceType   AttendanceType?
+  meetingLink      String?
+  location         String?
+  endTime          Boolean?             @default(false)
+  customerLocation Boolean?             @default(false)
+  duration         Int? 
   startDate        DateTime              @default(now())
   endDate          DateTime              @default(now())
 }

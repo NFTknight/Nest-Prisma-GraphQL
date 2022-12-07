@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+import { CreateProductValidator } from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
@@ -20,14 +25,6 @@ export class ProductsService {
     return product;
   }
 
-  async getProductBySlug(slug: string): Promise<Product> {
-    const product = await this.prisma.product.findUnique({ where: { slug } });
-
-    if (!product) throw new NotFoundException('Product Not Found.');
-
-    return product;
-  }
-
   async getProducts(vendorId: string): Promise<Product[]> {
     try {
       return await this.prisma.product.findMany({ where: { vendorId } });
@@ -37,6 +34,9 @@ export class ProductsService {
   }
 
   async createProduct(data: CreateProductInput): Promise<Product> {
+    const error = CreateProductValidator(data);
+    if (error) throw new BadRequestException(error);
+
     const { vendorId, categoryId, ...rest } = data;
 
     // if the vendor does not exist, this function will throw an error.
@@ -47,7 +47,7 @@ export class ProductsService {
       data: {
         ...rest,
         vendor: { connect: { id: vendorId } },
-        category: { connect: { id: categoryId } },
+        category: categoryId ? { connect: { id: categoryId } } : undefined,
       },
     });
     return prod;

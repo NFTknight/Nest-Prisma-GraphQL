@@ -3,17 +3,11 @@ import { InputType, Field, Int, Float } from '@nestjs/graphql';
 import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
 import { VariantInput } from './variant.input';
 import { VariationOptionInput } from './variation-option.input';
-import { ProductType } from '@prisma/client';
+import { ProductType, AttendanceType } from '@prisma/client';
 
 @InputType()
 export class CreateProductInput {
-  @Field()
-  @IsNotEmpty()
-  slug: string;
-
-  @Field()
-  @IsNotEmpty()
-  sku: string;
+  sku?: string;
 
   @Field()
   @IsNotEmpty()
@@ -43,17 +37,15 @@ export class CreateProductInput {
   @IsNotEmpty()
   vendorId: string;
 
-  @Field()
-  @IsNotEmpty()
-  categoryId: string;
+  @Field(() => String, { nullable: true })
+  categoryId?: string;
 
   @Field()
   @IsNotEmpty()
   active: boolean;
 
-  @Field()
-  @IsNotEmpty()
-  minPreorderDays: number;
+  @Field(() => Int)
+  minPreorderDays?: number;
 
   @Field(() => Float)
   @IsNotEmpty()
@@ -74,8 +66,26 @@ export class CreateProductInput {
   @Field(() => [String], { nullable: true })
   tagIds: string[];
 
+  @Field(() => Int)
   itemsInStock?: number;
 
   @Field(() => Int)
-  sortOrder: number;
+  sortOrder?: number;
+
+  @Field(() => AttendanceType, { nullable: true })
+  attendanceType?: AttendanceType;
+
+  meetingLink?: string;
+
+  location?: string;
+
+  endTime?: boolean;
+
+  customerLocation?: boolean;
+
+  @Field(() => Int)
+  duration?: number;
+
+  startDate?: Date;
+  endDate?: Date;
 }

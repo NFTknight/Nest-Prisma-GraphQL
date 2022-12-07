@@ -75,8 +75,7 @@ Table Coupon {
 
 Table Product {
   id String [pk]
-  slug String [unique, not null]
-  sku String [not null]
+  sku String
   title String [not null]
   title_ar String [not null]
   description String [not null]
@@ -85,22 +84,28 @@ Table Product {
   type ProductType [not null]
   vendorId String [not null]
   vendor Vendor [not null]
-  active Boolean [not null, default: false]
-  minPreorderDays Int [not null]
+  active Boolean [not null, default: true]
+  minPreorderDays Int
   price Float [not null]
   category Category
-  categoryId String [not null]
+  categoryId String
   noOfSeats Int
   itemsInStock Int
   availabilities ServiceAvailability[] [not null]
   variationOptions VariationOption[] [not null]
   variants Variant[] [not null]
   attributes ProductAttribute[] [not null]
-  sortOrder Int [not null, default: 0]
+  sortOrder Int [default: 0]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
   tagIds String[] [not null]
+  attendanceType AttendanceType
+  meetingLink String
+  location String
+  endTime Boolean [default: false]
+  customerLocation Boolean [default: false]
+  duration Int
   startDate DateTime [default: `now()`, not null]
   endDate DateTime [default: `now()`, not null]
 }
@@ -165,6 +170,11 @@ Enum ProductType {
   PRODUCT
   SERVICE
   WORKSHOP
+}
+
+Enum AttendanceType {
+  ONLINE
+  PHYSICAL
 }
 
 Ref: Vendor.ownerId - User.id

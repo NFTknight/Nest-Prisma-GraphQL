@@ -22,7 +22,7 @@ export class CategoriesResolver {
   ) {}
 
   @Query(() => Category)
-  getCategory(@Args('id') id: string): Promise<Category> {
+  getCategory(@Args('id') id: string): Promise<Category | null> {
     return this.categoriesService.getCategory(id);
   }
 
