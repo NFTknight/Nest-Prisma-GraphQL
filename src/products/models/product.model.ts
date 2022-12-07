@@ -29,6 +29,7 @@ export class Product extends BaseModel {
 
   categoryId?: string;
 
+  @Field(() => Category, { nullable: true })
   category?: Category;
 
   active: boolean;
@@ -46,7 +47,7 @@ export class Product extends BaseModel {
 
   tagIds: string[];
 
-  @Field(() => [Tag], { nullable: false })
+  @Field(() => [Tag], { nullable: true })
   Tags?: Tag[];
   @Field(() => Int)
   noOfSeats?: number;

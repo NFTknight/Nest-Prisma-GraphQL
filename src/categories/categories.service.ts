@@ -13,6 +13,7 @@ export class CategoriesService {
   ) {}
 
   async getCategory(id: string): Promise<Category> {
+    if (!id) return null;
     const category = await this.prisma.category.findUnique({ where: { id } });
 
     if (!category) throw new NotFoundException('Category Not Found.');

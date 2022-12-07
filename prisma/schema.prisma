@@ -166,7 +166,7 @@ model Product {
   type             ProductType
   vendorId         String                @db.ObjectId
   vendor           Vendor                @relation(fields: [vendorId], references: [id])
-  active           Boolean               @default(True)
+  active           Boolean               @default(true)
   minPreorderDays  Int?
   price            Float
   category         Category?             @relation(fields: [categoryId], references: [id])

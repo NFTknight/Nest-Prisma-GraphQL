@@ -37,7 +37,7 @@ export class CreateProductInput {
   @IsNotEmpty()
   vendorId: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   categoryId?: string;
 
   @Field()
@@ -85,4 +85,7 @@ export class CreateProductInput {
 
   @Field(() => Int)
   duration?: number;
+
+  startDate?: Date;
+  endDate?: Date;
 }

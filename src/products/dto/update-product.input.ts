@@ -76,4 +76,7 @@ export class UpdateProductInput {
 
   @Field(() => Int)
   duration?: number;
+
+  startDate?: Date;
+  endDate?: Date;
 }

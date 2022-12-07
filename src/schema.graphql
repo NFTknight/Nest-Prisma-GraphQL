@@ -136,6 +136,7 @@ input CreateProductInput {
   description: String!
   description_ar: String!
   duration: Int
+  endDate: DateTime
   endTime: Boolean
   image: String!
   itemsInStock: Int
@@ -146,6 +147,7 @@ input CreateProductInput {
   price: Float!
   sku: String
   sortOrder: Int
+  startDate: DateTime
   tagIds: [String!]
   title: String!
   title_ar: String!
@@ -256,7 +258,7 @@ type PaymentSession {
 }
 
 type Product {
-  Tags: [Tag!]!
+  Tags: [Tag!]
   active: Boolean!
   attendanceType: AttendanceType
   availabilities: [ServiceAvailability!]
@@ -413,6 +415,7 @@ input UpdateProductInput {
   description: String
   description_ar: String
   duration: Int
+  endDate: DateTime
   endTime: Boolean
   image: String
   itemsInStock: Int
@@ -423,6 +426,7 @@ input UpdateProductInput {
   price: Float
   sku: String
   sortOrder: Int
+  startDate: DateTime
   tagIds: [String!]
   title: String
   title_ar: String

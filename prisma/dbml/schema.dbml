@@ -84,7 +84,7 @@ Table Product {
   type ProductType [not null]
   vendorId String [not null]
   vendor Vendor [not null]
-  active Boolean [not null, default: false]
+  active Boolean [not null, default: true]
   minPreorderDays Int
   price Float [not null]
   category Category
