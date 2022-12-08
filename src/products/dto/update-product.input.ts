@@ -7,6 +7,9 @@ import { VariationOptionInput } from './variation-option.input';
 @InputType()
 export class UpdateProductInput {
   @Field()
+  slug?: string;
+
+  @Field()
   sku?: string;
 
   @Field()

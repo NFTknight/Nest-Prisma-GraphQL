@@ -7,6 +7,10 @@ import { ProductType, AttendanceType } from '@prisma/client';
 
 @InputType()
 export class CreateProductInput {
+  @Field()
+  @IsNotEmpty()
+  slug: string;
+
   sku?: string;
 
   @Field()
