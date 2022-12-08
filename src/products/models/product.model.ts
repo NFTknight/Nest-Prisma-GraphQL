@@ -11,6 +11,7 @@ import './product-type.enum';
 
 @ObjectType()
 export class Product extends BaseModel {
+  slug: string;
   sku?: string;
   title: string;
   title_ar: string;
