@@ -140,8 +140,10 @@ Table Order {
   id String [pk]
   cartId String [not null]
   Cart Cart [not null]
-  totalAmount Float [not null]
-  finalAmount Float [not null]
+  customerInfo CustomerInfo [not null]
+  deliverMethod DeliveryMethods
+  paymentMethod PaymentMethods
+  status OrderStatus [not null]
   vendorId String [not null]
   Vendor Vendor [not null]
   createdAt DateTime [default: `now()`, not null]
@@ -175,6 +177,12 @@ Enum ProductType {
 Enum AttendanceType {
   ONLINE
   PHYSICAL
+}
+
+Enum OrderStatus {
+  PENDING
+  FAILED
+  COMPLETE
 }
 
 Ref: Vendor.ownerId - User.id
