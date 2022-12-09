@@ -33,7 +33,7 @@ enum Role {
 model Vendor {
   id             String     @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  slug           String     @unique
+  slug           String     
   active         Boolean    @default(false)
   
   info           VendorInfo?

@@ -19,7 +19,7 @@ Table User {
 Table Vendor {
   id String [pk]
   name String [not null]
-  slug String [unique, not null]
+  slug String [not null]
   active Boolean [not null, default: false]
   info VendorInfo
   bank VendorBankInfo
