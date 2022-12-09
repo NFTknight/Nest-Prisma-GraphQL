@@ -8,7 +8,7 @@ import { CustomerInfo } from './customer-info.model';
 
 @ObjectType()
 export class Order extends BaseModel {
-  @Field(() => CustomerInfo)
+  @Field(() => CustomerInfo, { nullable: true })
   customerInfo: CustomerInfo;
 
   @IsString()
@@ -25,8 +25,8 @@ export class Order extends BaseModel {
   status: OrderStatus;
 
   @Field(() => DeliveryMethods)
-  deliveryInfo?: DeliveryMethods;
+  deliveryMethod?: DeliveryMethods;
 
   @Field(() => PaymentMethods)
-  paymentInfo?: PaymentMethods;
+  paymentMethod?: PaymentMethods;
 }

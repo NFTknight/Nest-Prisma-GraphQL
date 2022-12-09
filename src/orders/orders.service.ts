@@ -51,7 +51,7 @@ export class OrdersService {
 
     return this.prisma.order.update({
       where: { id },
-      data: { ...data, updatedAt: new Date() } as any,
+      data: { ...data, updatedAt: new Date() },
     });
   }
 

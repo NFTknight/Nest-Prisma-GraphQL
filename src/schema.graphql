@@ -264,10 +264,10 @@ type Order {
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
-  customerInfo: CustomerInfo!
-  deliveryInfo: DeliveryMethods
+  customerInfo: CustomerInfo
+  deliveryMethod: DeliveryMethods
   id: ID!
-  paymentInfo: PaymentMethods
+  paymentMethod: PaymentMethods
   status: OrderStatus!
 
   """Identifies the date and time when the object was last updated."""
@@ -479,18 +479,8 @@ input UpdateCouponInput {
   discount: Float!
 }
 
-input UpdateCustomerInput {
-  address: String
-  city: String
-  email: String
-  firstName: String
-  lastName: String
-  phone: String
-}
-
 input UpdateOrderInput {
   cartId: String
-  customerInfo: UpdateCustomerInput
   deliveryMethod: DeliveryMethods
   paymentMethod: PaymentMethods
   status: OrderStatus

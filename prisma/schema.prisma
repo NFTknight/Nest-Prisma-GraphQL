@@ -250,7 +250,7 @@ model Order {
   Cart   Cart   @relation(fields: [cartId], references: [id])
 
   customerInfo CustomerInfo
-  deliverMethod  DeliveryMethods?
+  deliveryMethod  DeliveryMethods?
   paymentMethod  PaymentMethods?
   status       OrderStatus 
   vendorId    String @db.ObjectId

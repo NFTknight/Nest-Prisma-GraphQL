@@ -4,39 +4,39 @@ import { IsEmail } from 'class-validator';
 
 @InputType()
 class UpdateCustomerInput {
-  @Field(() => String)
+  @Field()
   firstName?: string;
 
-  @Field(() => String)
+  @Field()
   lastName?: string;
 
-  @Field(() => String)
+  @Field()
   address?: string;
 
-  @Field(() => String)
+  @Field()
   phone?: string;
 
-  @Field(() => String)
+  @Field()
   @IsEmail()
   email?: string;
 
-  @Field(() => String)
+  @Field()
   city?: string;
 }
 
 @InputType()
 export class UpdateOrderInput {
-  @Field()
-  customerInfo?: UpdateCustomerInput;
-
   @Field(() => OrderStatus)
   status?: OrderStatus;
 
-  @Field(() => String)
+  @Field()
   vendorId?: string;
 
-  @Field(() => String)
+  @Field()
   cartId?: string;
+
+  // @Field()
+  // customerInfo?: UpdateCustomerInput;
 
   @Field(() => PaymentMethods)
   paymentMethod?: PaymentMethods;

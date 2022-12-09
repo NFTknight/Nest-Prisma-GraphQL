@@ -141,7 +141,7 @@ Table Order {
   cartId String [not null]
   Cart Cart [not null]
   customerInfo CustomerInfo [not null]
-  deliverMethod DeliveryMethods
+  deliveryMethod DeliveryMethods
   paymentMethod PaymentMethods
   status OrderStatus [not null]
   vendorId String [not null]
