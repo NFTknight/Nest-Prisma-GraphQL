@@ -11,8 +11,6 @@ export class CreateProductInput {
   @IsNotEmpty()
   slug: string;
 
-  sku?: string;
-
   @Field()
   @IsNotEmpty()
   title: string;
@@ -51,15 +49,8 @@ export class CreateProductInput {
   @Field(() => Int)
   minPreorderDays?: number;
 
-  @Field(() => Float)
-  @IsNotEmpty()
-  price: number;
-
-  @Field(() => [VariationOptionInput], { nullable: true })
-  variationOptions: VariationOptionInput[];
-
   @Field(() => [VariantInput], { nullable: true })
-  variants: VariantInput[];
+  variants?: VariantInput[];
 
   @Field(() => [ServiceAvailabilityInput])
   availabilities?: ServiceAvailabilityInput[];

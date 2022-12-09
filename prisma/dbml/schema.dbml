@@ -76,7 +76,6 @@ Table Coupon {
 Table Product {
   id String [pk]
   slug String [not null]
-  sku String
   title String [not null]
   title_ar String [not null]
   description String [not null]
@@ -87,13 +86,11 @@ Table Product {
   vendor Vendor [not null]
   active Boolean [not null, default: true]
   minPreorderDays Int
-  price Float [not null]
   category Category
   categoryId String
   noOfSeats Int
   itemsInStock Int
   availabilities ServiceAvailability[] [not null]
-  variationOptions VariationOption[] [not null]
   variants Variant[] [not null]
   attributes ProductAttribute[] [not null]
   sortOrder Int [default: 0]
