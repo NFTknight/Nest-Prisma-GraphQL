@@ -165,6 +165,7 @@ input CreateProductInput {
   noOfSeats: Int
   price: Float!
   sku: String
+  slug: String!
   sortOrder: Int
   startDate: DateTime
   tagIds: [String!]
@@ -353,6 +354,7 @@ type Product {
   noOfSeats: Int
   price: Float!
   sku: String
+  slug: String!
   sortOrder: Int
   startDate: DateTime!
   tagIds: [String!]!
@@ -506,6 +508,7 @@ input UpdateProductInput {
   noOfSeats: Int
   price: Float
   sku: String
+  slug: String
   sortOrder: Int
   startDate: DateTime
   tagIds: [String!]

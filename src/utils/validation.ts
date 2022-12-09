@@ -2,7 +2,7 @@ import { ProductType, AttendanceType } from '@prisma/client';
 import { CreateProductInput } from 'src/products/dto/create-product.input';
 
 export const CreateProductValidator = (input: CreateProductInput) => {
-  let error = '';
+  let error = null;
   const { type, minPreorderDays, sku, attendanceType, meetingLink, location } =
     input;
   if (type === ProductType.PRODUCT) {
