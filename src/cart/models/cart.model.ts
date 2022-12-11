@@ -18,4 +18,6 @@ export class Cart extends BaseModel {
 
   @Field(() => Float)
   finalPrice: number;
+
+  checkedOut: boolean;
 }

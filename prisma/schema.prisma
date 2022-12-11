@@ -250,11 +250,28 @@ model Order {
   cartId String @db.ObjectId
   Cart   Cart   @relation(fields: [cartId], references: [id])
 
-  totalAmount Float
-  finalAmount Float
+  customerInfo CustomerInfo
+  deliveryMethod  DeliveryMethods?
+  paymentMethod  PaymentMethods?
+  status       OrderStatus 
   vendorId    String @db.ObjectId
   Vendor      Vendor @relation(fields: [vendorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+type CustomerInfo {
+  firstName   String
+  lastName    String
+  phone       String
+  email       String
+  address     String?
+  city        String?
+}
+
+enum OrderStatus {
+  PENDING
+  FAILED
+  COMPLETE
 }

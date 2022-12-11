@@ -27,6 +27,7 @@ type Auth {
 
 type Cart {
   appliedCoupon: String!
+  checkedOut: Boolean!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -127,6 +128,24 @@ input CreateCouponInput {
   vendorId: String!
 }
 
+input CreateCustomerInput {
+  address: String
+  city: String
+  email: String!
+  firstName: String!
+  lastName: String!
+  phone: String!
+}
+
+input CreateOrderInput {
+  cartId: String!
+  customerInfo: CreateCustomerInput!
+  deliveryMethod: DeliveryMethods
+  paymentMethod: PaymentMethods
+  status: OrderStatus!
+  vendorId: String!
+}
+
 input CreateProductInput {
   active: Boolean!
   attendanceType: AttendanceType
@@ -171,6 +190,15 @@ input CreateVendorInput {
   slug: String!
 }
 
+type CustomerInfo {
+  address: String
+  city: String
+  email: String!
+  firstName: String!
+  lastName: String!
+  phone: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -204,11 +232,13 @@ type Mutation {
   checkout(cartId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
+  createOrder(data: CreateOrderInput!): Order!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteCategory(id: String!): Category!
   deleteCoupon(id: String!): Coupon!
+  deleteOrder(id: String!): Order!
   deleteProduct(id: String!): Product!
   deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
@@ -221,11 +251,30 @@ type Mutation {
   updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
+  updateOrder(data: UpdateOrderInput!, id: String!): Order!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
+}
+
+type Order {
+  cart: Cart!
+  cartId: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  customerInfo: CustomerInfo
+  deliveryMethod: DeliveryMethods
+  id: ID!
+  paymentMethod: PaymentMethods
+  status: OrderStatus!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor!
+  vendorId: String!
 }
 
 """
@@ -234,6 +283,13 @@ Possible directions in which to order a list of items when provided an `orderBy`
 enum OrderDirection {
   asc
   desc
+}
+
+"""Order Status"""
+enum OrderStatus {
+  COMPLETE
+  FAILED
+  PENDING
 }
 
 type OtpResponse {
@@ -327,6 +383,8 @@ type Query {
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(vendorId: String): [Coupon!]!
+  getOrder(id: String!): Order!
+  getOrders(vendorId: String): [Order!]!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: FilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
@@ -421,6 +479,14 @@ input UpdateCouponInput {
   active: Boolean
   code: String
   discount: Float!
+}
+
+input UpdateOrderInput {
+  cartId: String
+  deliveryMethod: DeliveryMethods
+  paymentMethod: PaymentMethods
+  status: OrderStatus
+  vendorId: String
 }
 
 input UpdateProductInput {
