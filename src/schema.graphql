@@ -7,6 +7,8 @@ input AddToCartInput {
   productId: String!
   productVariant: String
   quantity: Int
+  slots: [Time!]
+  tagId: String
   vendorId: String!
 }
 
@@ -43,7 +45,6 @@ type Cart {
 
 type CartItem {
   Product: Product
-  Variant: Variant
   cartId: String!
 
   """Identifies the date and time when the object was created."""
@@ -52,6 +53,8 @@ type CartItem {
   productId: String!
   productVariant: String
   quantity: Int!
+  slots: [TimeSlot!]
+  tagId: String
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
@@ -199,9 +202,12 @@ input LoginInput {
 }
 
 type Mutation {
-  addItemToCart(data: AddToCartInput!): CartItem!
+  addProductToCart(data: AddToCartInput!): CartItem!
+  addServiceToCart(data: AddToCartInput!): CartItem!
+  addWorkshopToCart(data: AddToCartInput!): CartItem!
   changePassword(data: ChangePasswordInput!): User!
   checkout(cartId: String!): Cart!
+  createCart(vendorId: String!): CartItem!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
   createProduct(data: CreateProductInput!): Product!
@@ -399,6 +405,16 @@ type Tag {
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: Vendor!
+}
+
+input Time {
+  endTime: DateTime!
+  startTime: DateTime!
+}
+
+type TimeSlot {
+  endTime: DateTime!
+  startTime: DateTime!
 }
 
 type Token {

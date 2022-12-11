@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { DeliveryMethods, PaymentMethods } from '@prisma/client';
+import { DeliveryMethods, PaymentMethods, DeliveryAreas } from '@prisma/client';
 
 @ObjectType()
 export class VendorSettings {
@@ -8,4 +8,7 @@ export class VendorSettings {
 
   @Field(() => [DeliveryMethods])
   deliveryMethods: DeliveryMethods[];
+
+  // @Field(() => [DeliveryAreas])
+  // deliveryAreas: DeliveryAreas[];
 }
