@@ -7,6 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserEntity } from 'src/common/decorators/user.decorator';
 import { User } from 'src/users/models/user.model';
+import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -49,5 +50,14 @@ export class VendorsResolver {
   @Mutation(() => Vendor)
   async deleteVendor(@Args('id') id: string): Promise<Vendor> {
     return await this.vendorsService.deleteVendor(id);
+  }
+
+  @Mutation(() => Vendor)
+  async addDeliveryAreas(
+    @Args('id') id: string,
+    @Args('areas', { type: () => [AddDeliveryAreasInput] })
+    areas: AddDeliveryAreasInput[]
+  ): Promise<Vendor> {
+    return await this.vendorsService.addDeliveryAreas(id, areas);
   }
 }

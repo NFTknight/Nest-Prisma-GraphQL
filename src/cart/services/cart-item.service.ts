@@ -11,7 +11,7 @@ export class CartItemService {
     private readonly prisma: PrismaService,
     private readonly cartService: CartService,
     private readonly productService: ProductsService
-  ) { }
+  ) {}
 
   async getCartItems(cartId: string): Promise<CartItem[]> {
     return this.prisma.cartItem.findMany({ where: { cartId } });
