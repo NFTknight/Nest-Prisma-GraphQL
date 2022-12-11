@@ -5,7 +5,6 @@ import { UpdateVendorInput } from './dto/update-vendor.input';
 import { Vendor } from './models/vendor.model';
 import { User } from 'src/users/models/user.model';
 import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
-import { SettingsContainer } from 'ts-morph';
 
 @Injectable()
 export class VendorsService {
