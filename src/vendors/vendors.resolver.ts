@@ -52,6 +52,7 @@ export class VendorsResolver {
     return await this.vendorsService.deleteVendor(id);
   }
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Vendor)
   async addDeliveryAreas(
     @Args('id') id: string,
