@@ -15,7 +15,7 @@ export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly vendorService: VendorsService
-  ) {}
+  ) { }
 
   async getProduct(id: string): Promise<Product> {
     const product = await this.prisma.product.findUnique({ where: { id } });

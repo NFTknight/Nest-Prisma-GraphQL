@@ -80,9 +80,17 @@ enum PaymentMethods {
   STORE
 }
 
+type DeliveryAreas {
+  label    String
+  label_ar String
+  active   Boolean
+  charge   Int
+}
+
 type VendorSettings {
   paymentMethods  PaymentMethods[]
   deliveryMethods DeliveryMethods[]
+  deliveryAreas   DeliveryAreas[]
 }
 
 type VendorBankInfo {
@@ -102,6 +110,7 @@ model Tag {
   availabilities ServiceAvailability[]
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
+  CartItem       CartItem[]
 }
 
 model Category {
@@ -171,6 +180,11 @@ type Variant {
   quantity   Int
 }
 
+type TimeSlot {
+  startTime DateTime
+  endTime   DateTime
+}
+
 model Product {
   id               String                @id @default(auto()) @map("_id") @db.ObjectId
   slug             String
@@ -212,15 +226,19 @@ model Product {
 model CartItem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  productId String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id])
-
+  productId      String  @db.ObjectId
+  product        Product @relation(fields: [productId], references: [id])
   productVariant String?
 
-  quantity Int @default(1)
+  Variant Variant[]
 
-  cartId String @db.ObjectId
-  Cart   Cart   @relation(fields: [cartId], references: [id])
+  quantity Int        @default(1)
+  tagId    String?    @db.ObjectId
+  tag      Tag?       @relation(fields: [tagId], references: [id])
+  slots    TimeSlot[]
+
+  cartId String? @db.ObjectId
+  Cart   Cart?   @relation(fields: [cartId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -253,11 +271,28 @@ model Order {
   cartId String @db.ObjectId
   Cart   Cart   @relation(fields: [cartId], references: [id])
 
-  totalAmount Float
-  finalAmount Float
+  customerInfo CustomerInfo
+  deliveryMethod  DeliveryMethods?
+  paymentMethod  PaymentMethods?
+  status       OrderStatus 
   vendorId    String @db.ObjectId
   Vendor      Vendor @relation(fields: [vendorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+type CustomerInfo {
+  firstName   String
+  lastName    String
+  phone       String
+  email       String
+  address     String?
+  city        String?
+}
+
+enum OrderStatus {
+  PENDING
+  FAILED
+  COMPLETE
 }

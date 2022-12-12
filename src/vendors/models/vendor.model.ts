@@ -20,7 +20,7 @@ export class Vendor extends BaseModel {
   })
   info?: VendorInfo;
 
-  @Field(() => VendorSettings)
+  @Field(() => VendorSettings, { nullable: true })
   settings: VendorSettings;
 
   @Field(() => VendorBank)
