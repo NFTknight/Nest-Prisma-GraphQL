@@ -2,6 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddDeliveryAreasInput {
+  active: Boolean!
+  charge: Int!
+  label: String!
+  label_ar: String!
+}
+
 input AddToCartInput {
   cartId: String
   productId: String!
@@ -207,6 +214,13 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DeliveryAreas {
+  active: Boolean!
+  charge: Int!
+  label: String!
+  label_ar: String!
+}
+
 """Delivery Methods"""
 enum DeliveryMethods {
   MANDOOB
@@ -230,6 +244,7 @@ input LoginInput {
 }
 
 type Mutation {
+  addDeliveryAreas(areas: [AddDeliveryAreasInput!]!, id: String!): Vendor!
   addProductToCart(data: AddToCartInput!): CartItem!
   addServiceToCart(data: AddToCartInput!): CartItem!
   addWorkshopToCart(data: AddToCartInput!): CartItem!
@@ -639,7 +654,7 @@ type Vendor {
   id: ID!
   info: VendorInfo
   name: String!
-  settings: VendorSettings!
+  settings: VendorSettings
   slug: String!
 
   """Identifies the date and time when the object was last updated."""
@@ -664,6 +679,7 @@ type VendorInfo {
 }
 
 type VendorSettings {
+  deliveryAreas: [DeliveryAreas!]!
   deliveryMethods: [DeliveryMethods!]!
   paymentMethods: [PaymentMethods!]!
 }
