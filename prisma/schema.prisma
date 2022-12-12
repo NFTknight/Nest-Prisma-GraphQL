@@ -16,7 +16,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email     String   @unique
-  phone     String?  
+  phone     String?
   password  String
   firstName String?
   lastName  String?
@@ -31,27 +31,27 @@ enum Role {
 }
 
 model Vendor {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  slug           String     
-  active         Boolean    @default(false)
-  
-  info           VendorInfo?
-  bank           VendorBankInfo?
-  settings       VendorSettings?
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  slug   String
+  active Boolean @default(false)
 
-  products       Product[]
-  categories     Category[]
-  carts          Cart[]
-  tags           Tag[]
-  coupons        Coupon[]
-  orders         Order[]
-  
-  ownerId        String     @db.ObjectId @unique
-  owner          User       @relation(fields: [ownerId], references: [id])
+  info     VendorInfo?
+  bank     VendorBankInfo?
+  settings VendorSettings?
 
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  products   Product[]
+  categories Category[]
+  carts      Cart[]
+  tags       Tag[]
+  coupons    Coupon[]
+  orders     Order[]
+
+  ownerId String @unique @db.ObjectId
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 type VendorInfo {
@@ -109,7 +109,7 @@ model Category {
   Vendor    Vendor    @relation(fields: [vendorId], references: [id])
   tagIds    String[]
   active    Boolean   @default(false)
-  sortOrder Int       @default(0)
+  sortOrder Int?      @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Product   Product[]
@@ -170,7 +170,7 @@ type Variant {
 
 model Product {
   id               String                @id @default(auto()) @map("_id") @db.ObjectId
-  slug             String          
+  slug             String
   sku              String?
   title            String
   title_ar         String
@@ -184,14 +184,14 @@ model Product {
   minPreorderDays  Int?
   price            Float
   category         Category?             @relation(fields: [categoryId], references: [id])
-  categoryId       String?                @db.ObjectId
+  categoryId       String?               @db.ObjectId
   noOfSeats        Int?
   itemsInStock     Int?
   availabilities   ServiceAvailability[]
   variationOptions VariationOption[]
   variants         Variant[]
   attributes       ProductAttribute[]
-  sortOrder        Int?                  @default(0)
+  sortOrder        Int                   @default(0)
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
   CartItem         CartItem[]
@@ -199,9 +199,9 @@ model Product {
   attendanceType   AttendanceType?
   meetingLink      String?
   location         String?
-  endTime          Boolean?             @default(false)
-  customerLocation Boolean?             @default(false)
-  duration         Int? 
+  endTime          Boolean?              @default(false)
+  customerLocation Boolean?              @default(false)
+  duration         Int?
   startDate        DateTime              @default(now())
   endDate          DateTime              @default(now())
 }
