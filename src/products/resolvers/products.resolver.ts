@@ -22,7 +22,7 @@ import { PrismaService } from 'nestjs-prisma';
 import makePrismaSelection from 'src/common/helpers/makePrismaSelection';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
-import { FilterInput } from 'src/common/filter/filter.input';
+import { ProductFilterInput } from 'src/common/filter/filter.input';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -44,7 +44,7 @@ export class ProductsResolver {
     @Args('categoryId', { nullable: true }) categoryId: string,
     @Args('pagination', { nullable: true }) pg: PaginationArgs,
     @Args('sortOrder', { nullable: true }) sortOrder: SortOrder,
-    @Args('filter', { nullable: true }) filter: FilterInput,
+    @Args('filter', { nullable: true }) filter: ProductFilterInput,
     @Info()
     info
   ): Promise<PaginatedProducts> {
@@ -67,11 +67,22 @@ export class ProductsResolver {
       where['categoryId'] = categoryId;
     }
 
-    if (filter && filter?.field && filter?.value) {
-      where[filter.field] = {
-        contains: filter.value.trim(),
-        mode: 'insensitive',
-      };
+    if (filter && filter?.field) {
+      if (filter.field === 'titie') {
+        where[filter.field] = {
+          contains: filter.title.trim(),
+          mode: 'insensitive',
+        };
+      } else if (filter.field === 'type') {
+        where[filter.field] = filter.type;
+      } else if (filter.field === 'price') {
+        where[filter.field] = {
+          gte: filter.priceUpperLimit,
+          lte: filter.priceLowerLimit,
+        };
+      } else if (filter.field === 'attendanceType') {
+        where[filter.field] = filter.attendanceType;
+      }
     }
 
     const selectedFields = fieldsMap(info, {
