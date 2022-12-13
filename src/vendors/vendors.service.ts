@@ -6,7 +6,6 @@ import { Vendor } from './models/vendor.model';
 import { User } from 'src/users/models/user.model';
 import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
-import { SettingsContainer } from 'ts-morph';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 
 @Injectable()

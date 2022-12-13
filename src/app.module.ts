@@ -20,6 +20,7 @@ import { ShippingModule } from './shipping/shipping.module';
 import { HealthController } from './health.controller';
 import { PaymentModule } from './payment/payment.module';
 import { SendgridService } from './sendgrid/sendgrid.service';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { SendgridService } from './sendgrid/sendgrid.service';
     SmsModule,
     ShippingModule,
     PaymentModule,
+    BookingsModule,
   ],
   controllers: [HealthController],
   providers: [SendgridService],
