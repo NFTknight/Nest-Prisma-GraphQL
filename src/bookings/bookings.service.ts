@@ -37,26 +37,20 @@ export class BookingsService {
   }
 
   async updateBooking(id: string, data: UpdateBookingInput): Promise<Booking> {
-    const payload = {
-      ...data,
-      updatedAt: new Date(),
-    };
     if (data.status !== BookingStatus.HOLD) {
-      const res = await this.prisma.$runCommandRaw({
+      await this.prisma.$runCommandRaw({
         update: 'Booking',
         updates: [
           {
-            q: { _id: id },
+            q: { _id: { $eq: { $oid: id } } },
             u: { $unset: { holdTimestamp: '' } },
           },
         ],
       });
-
-      console.log('my res', res);
     }
     return this.prisma.booking.update({
       where: { id },
-      data: { ...payload },
+      data: { ...data, updatedAt: new Date() },
     });
   }
 

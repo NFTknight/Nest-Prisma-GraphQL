@@ -316,7 +316,7 @@ model Booking {
   productId     String        @db.ObjectId
   Product       Product       @relation(fields: [productId], references: [id])
   status        BookingStatus 
-  holdTimestamp DateTime      @default(now())
+  holdTimestamp DateTime?     @default(now())
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }

@@ -26,4 +26,7 @@ export class Booking extends BaseModel {
 
   startDate: Date;
   endDate: Date;
+
+  @Field(() => Date, { nullable: true })
+  holdTimestamp?: Date;
 }
