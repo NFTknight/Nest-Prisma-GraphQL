@@ -22,4 +22,10 @@ export class VendorInfo {
 
   @Field()
   terms?: string;
+
+  @Field()
+  heroImage?: string;
+
+  @Field()
+  logo?: string;
 }
