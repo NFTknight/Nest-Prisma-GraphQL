@@ -16,7 +16,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email     String   @unique
-  phone     String?  
+  phone     String?
   password  String
   firstName String?
   lastName  String?
@@ -31,27 +31,32 @@ enum Role {
 }
 
 model Vendor {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  slug           String     
-  active         Boolean    @default(false)
-  
-  info           VendorInfo?
-  bank           VendorBankInfo?
-  settings       VendorSettings?
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  slug   String
+  active Boolean @default(false)
 
-  products       Product[]
-  categories     Category[]
-  carts          Cart[]
-  tags           Tag[]
-  coupons        Coupon[]
-  orders         Order[]
-  
-  ownerId        String     @db.ObjectId @unique
-  owner          User       @relation(fields: [ownerId], references: [id])
+  info     VendorInfo?
+  bank     VendorBankInfo?
+  settings VendorSettings?
 
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  products   Product[]
+  categories Category[]
+  carts      Cart[]
+  tags       Tag[]
+  coupons    Coupon[]
+  orders     Order[]
+
+  ownerId String @unique @db.ObjectId
+  owner   User?  @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type Certificate {
+  title String
+  image String
 }
 
 type VendorInfo {
@@ -62,6 +67,15 @@ type VendorInfo {
   description    String?
   description_ar String?
   terms          String?
+  location       String?
+  instagram      String?
+  facebook       String?
+  snapchat       String?
+  whatsapp       String?
+  vat_num        String?
+  cr_num         String?
+  certificates   Certificate[]
+  iban           String?
 }
 
 enum DeliveryMethods {
@@ -77,9 +91,17 @@ enum PaymentMethods {
   STORE
 }
 
+type DeliveryAreas {
+  label    String
+  label_ar String
+  active   Boolean
+  charge   Int
+}
+
 type VendorSettings {
   paymentMethods  PaymentMethods[]
   deliveryMethods DeliveryMethods[]
+  deliveryAreas   DeliveryAreas[]
 }
 
 type VendorBankInfo {
@@ -99,6 +121,7 @@ model Tag {
   availabilities ServiceAvailability[]
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
+  CartItem       CartItem[]
 }
 
 model Category {
@@ -161,9 +184,15 @@ type Variant {
   title_ar   String?
 }
 
+type TimeSlot {
+  startTime DateTime
+  endTime   DateTime
+}
+
 model Product {
   id               String                @id @default(auto()) @map("_id") @db.ObjectId
-  slug             String          
+  slug             String
+  sku              String?
   title            String
   title_ar         String
   description      String
@@ -176,7 +205,7 @@ model Product {
   minPreorderDays  Int?
   
   category         Category?             @relation(fields: [categoryId], references: [id])
-  categoryId       String?                @db.ObjectId
+  categoryId       String?               @db.ObjectId
   noOfSeats        Int?
   itemsInStock     Int?
   availabilities   ServiceAvailability[]
@@ -190,25 +219,31 @@ model Product {
   attendanceType   AttendanceType?
   meetingLink      String?
   location         String?
-  endTime          Boolean?             @default(false)
-  customerLocation Boolean?             @default(false)
-  duration         Int? 
+  endTime          Boolean?              @default(false)
+  customerLocation Boolean?              @default(false)
+  duration         Int?
   startDate        DateTime              @default(now())
   endDate          DateTime              @default(now())
+
+  booking         Booking[]
 }
 
 model CartItem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  productId String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id])
-
+  productId      String  @db.ObjectId
+  product        Product @relation(fields: [productId], references: [id])
   productVariant String?
 
-  quantity Int @default(1)
+  Variant Variant[]
 
-  cartId String @db.ObjectId
-  Cart   Cart   @relation(fields: [cartId], references: [id])
+  quantity Int        @default(1)
+  tagId    String?    @db.ObjectId
+  tag      Tag?       @relation(fields: [tagId], references: [id])
+  slots    TimeSlot[]
+
+  cartId String? @db.ObjectId
+  Cart   Cart?   @relation(fields: [cartId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -233,6 +268,7 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Order     Order[]
+  booking   Booking[]
 }
 
 model Order {
@@ -241,11 +277,52 @@ model Order {
   cartId String @db.ObjectId
   Cart   Cart   @relation(fields: [cartId], references: [id])
 
-  totalAmount Float
-  finalAmount Float
+  customerInfo CustomerInfo
+  deliveryMethod  DeliveryMethods?
+  paymentMethod  PaymentMethods?
+  status       OrderStatus 
   vendorId    String @db.ObjectId
   Vendor      Vendor @relation(fields: [vendorId], references: [id])
+  booking     Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+type CustomerInfo {
+  firstName   String
+  lastName    String
+  phone       String
+  email       String
+  address     String?
+  city        String?
+}
+
+enum OrderStatus {
+  PENDING
+  FAILED
+  COMPLETE
+}
+
+enum BookingStatus {
+  HOLD  
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+model Booking {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  startDate     DateTime      @default(now())
+  endDate       DateTime      @default(now())
+  cartId        String        @db.ObjectId
+  Cart          Cart          @relation(fields: [cartId], references: [id])
+  orderId       String        @db.ObjectId
+  Order         Order         @relation(fields: [orderId], references: [id])
+  productId     String        @db.ObjectId
+  Product       Product       @relation(fields: [productId], references: [id])
+  status        BookingStatus 
+  holdTimestamp DateTime?     @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
