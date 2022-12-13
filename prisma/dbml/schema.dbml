@@ -187,8 +187,9 @@ Enum AttendanceType {
 
 Enum OrderStatus {
   PENDING
-  FAILED
-  COMPLETE
+  COMPLETED
+  CONFIRMED
+  REJECTED
 }
 
 Ref: Vendor.ownerId - User.id

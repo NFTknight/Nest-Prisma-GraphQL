@@ -308,9 +308,10 @@ enum OrderDirection {
 
 """Order Status"""
 enum OrderStatus {
-  COMPLETE
-  FAILED
+  COMPLETED
+  CONFIRMED
   PENDING
+  REJECTED
 }
 
 type OtpResponse {
