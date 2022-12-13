@@ -232,6 +232,8 @@ model Product {
   duration         Int?
   startDate        DateTime              @default(now())
   endDate          DateTime              @default(now())
+
+  booking         Booking[]
 }
 
 model CartItem {
@@ -274,6 +276,7 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Order     Order[]
+  booking   Booking[]
 }
 
 model Order {
@@ -288,6 +291,7 @@ model Order {
   status       OrderStatus 
   vendorId    String @db.ObjectId
   Vendor      Vendor @relation(fields: [vendorId], references: [id])
+  booking     Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -306,4 +310,27 @@ enum OrderStatus {
   PENDING
   FAILED
   COMPLETE
+}
+
+enum BookingStatus {
+  HOLD  
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+model Booking {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  startDate     DateTime      @default(now())
+  endDate       DateTime      @default(now())
+  cartId        String        @db.ObjectId
+  Cart          Cart          @relation(fields: [cartId], references: [id])
+  orderId       String        @db.ObjectId
+  Order         Order         @relation(fields: [orderId], references: [id])
+  productId     String        @db.ObjectId
+  Product       Product       @relation(fields: [productId], references: [id])
+  status        BookingStatus 
+  holdTimestamp DateTime?     @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }

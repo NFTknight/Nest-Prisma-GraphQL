@@ -34,6 +34,34 @@ type Auth {
   user: User!
 }
 
+type Booking {
+  Cart: Cart
+  Order: Order
+  Product: Product
+  cartId: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  endDate: DateTime!
+  holdTimestamp: DateTime
+  id: ID!
+  orderId: String!
+  productId: String!
+  startDate: DateTime!
+  status: BookingStatus!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+}
+
+"""Booking Status"""
+enum BookingStatus {
+  CONFIRMED
+  HOLD
+  PENDING
+  REJECTED
+}
+
 type Cart {
   appliedCoupon: String!
   checkedOut: Boolean!
@@ -125,6 +153,15 @@ type Coupon {
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
+}
+
+input CreateBookingInput {
+  cartId: String!
+  endDate: DateTime
+  orderId: String!
+  productId: String!
+  startDate: DateTime
+  status: BookingStatus!
 }
 
 input CreateCategoryInput {
@@ -255,6 +292,7 @@ type Mutation {
   addWorkshopToCart(data: AddToCartInput!): CartItem!
   changePassword(data: ChangePasswordInput!): User!
   checkout(cartId: String!): Cart!
+  createBooking(data: CreateBookingInput!): Booking!
   createCart(vendorId: String!): CartItem!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
@@ -262,6 +300,7 @@ type Mutation {
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
+  deleteBooking(id: String!): Booking!
   deleteCategory(id: String!): Category!
   deleteCoupon(id: String!): Coupon!
   deleteOrder(id: String!): Order!
@@ -274,6 +313,7 @@ type Mutation {
   removeItemFromCart(cartItemId: String!): CartItem!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
+  updateBooking(data: UpdateBookingInput!, id: String!): Booking!
   updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
@@ -404,6 +444,7 @@ enum ProductType {
 }
 
 type Query {
+  getBooking(id: String!): Booking!
   getCart(cartId: String!): Cart!
   getCategories(active: Boolean, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
@@ -501,6 +542,15 @@ type Token {
 
   """JWT refresh token"""
   refreshToken: JWT!
+}
+
+input UpdateBookingInput {
+  cartId: String
+  endDate: DateTime
+  orderId: String
+  productId: String
+  startDate: DateTime
+  status: BookingStatus
 }
 
 input UpdateCategoryInput {

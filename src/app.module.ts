@@ -19,6 +19,7 @@ import { SmsModule } from './sms/sms.module';
 import { ShippingModule } from './shipping/shipping.module';
 import { HealthController } from './health.controller';
 import { PaymentModule } from './payment/payment.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { PaymentModule } from './payment/payment.module';
     SmsModule,
     ShippingModule,
     PaymentModule,
+    BookingsModule,
   ],
   controllers: [HealthController],
 })
