@@ -1,5 +1,12 @@
 import { PrismaService } from 'nestjs-prisma';
-import { Resolver, Query, Mutation, Args, ResolveField } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { UserEntity } from 'src/common/decorators/user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
@@ -12,6 +19,8 @@ import { SendOtpInput } from './dto/send-otp.input';
 import { CheckOtpInput } from './dto/check-otp.input';
 import { OtpResponse } from 'src/sms/models/otp.model';
 import { CheckOtpResponse } from 'src/sms/models/check-otp.model';
+import { Vendor } from 'src/vendors/models/vendor.model';
+import { VendorsService } from 'src/vendors/vendors.service';
 
 @Resolver(() => User)
 @UseGuards(GqlAuthGuard)
@@ -19,7 +28,8 @@ export class UsersResolver {
   constructor(
     private usersService: UsersService,
     private readonly sms: SmsService,
-    private prisma: PrismaService
+    private prisma: PrismaService,
+    private readonly vendorService: VendorsService
   ) {}
 
   @Query(() => User)
@@ -66,11 +76,7 @@ export class UsersResolver {
 
   @UseGuards(GqlAuthGuard)
   @ResolveField('vendor')
-  vendor(@UserEntity() user: User) {
-    return this.prisma.vendor.findUnique({
-      where: {
-        ownerId: user.id,
-      },
-    });
+  vendor(@Parent() user: User): Promise<Vendor> {
+    return this.vendorService.getVendor(user.vendorId);
   }
 }

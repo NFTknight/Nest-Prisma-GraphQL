@@ -27,6 +27,7 @@ export class User extends BaseModel {
   @HideField()
   password: string;
 
-  @Field(() => Vendor)
+  vendorId: string;
+  @Field(() => Vendor, { nullable: true })
   vendor?: Vendor;
 }
