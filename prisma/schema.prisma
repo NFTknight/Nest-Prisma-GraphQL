@@ -48,10 +48,15 @@ model Vendor {
   orders     Order[]
 
   ownerId String @unique @db.ObjectId
-  owner   User   @relation(fields: [ownerId], references: [id])
+  owner   User?  @relation(fields: [ownerId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+type Certificate {
+  title String
+  image String
 }
 
 type VendorInfo {
@@ -62,6 +67,15 @@ type VendorInfo {
   description    String?
   description_ar String?
   terms          String?
+  location       String?
+  instagram      String?
+  facebook       String?
+  snapchat       String?
+  whatsapp       String?
+  vat_num        String?
+  cr_num         String?
+  certificates   Certificate[]
+  iban           String?
 }
 
 enum DeliveryMethods {

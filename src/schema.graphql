@@ -86,6 +86,11 @@ type Category {
   vendorId: String!
 }
 
+type Certificate {
+  image: String!
+  title: String!
+}
+
 input ChangePasswordInput {
   newPassword: String!
   oldPassword: String!
@@ -647,13 +652,15 @@ input VariationValueInput {
 
 type Vendor {
   active: Boolean!
-  bank: VendorBank!
+  bank: VendorBank
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
   info: VendorInfo
   name: String!
+  owner: User
+  ownerId: String!
   settings: VendorSettings
   slug: String!
 
@@ -671,11 +678,20 @@ type VendorBank {
 type VendorInfo {
   address: String
   addressUrl: String
+  certificates: [Certificate!]
+  cr_num: String
   description: String
   description_ar: String
   email: String
+  facebook: String
+  iban: String
+  instagram: String
+  location: String
   phone: String
+  snapchat: String
   terms: String
+  vat_num: String
+  whatsapp: String
 }
 
 type VendorSettings {
