@@ -22,6 +22,7 @@ model User {
   lastName  String?
   verified  Boolean  @default(false)
   role      Role
+  vendorId  String?
   vendor    Vendor?
 }
 
@@ -31,13 +32,12 @@ enum Role {
 }
 
 model Vendor {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  name   String
-  slug   String
-  active Boolean @default(false)
-
-  logo      String?
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String
+  active    Boolean @default(true)
   heroImage String?
+  logo      String?
 
   info     VendorInfo?
   bank     VendorBankInfo?
@@ -69,6 +69,8 @@ type VendorInfo {
   addressUrl     String?
   description    String?
   description_ar String?
+  heroImage      String?
+  logo           String?
   terms          String?
   location       String?
   instagram      String?
@@ -120,7 +122,7 @@ model Tag {
   title_ar       String
   vendorId       String                @db.ObjectId
   vendor         Vendor                @relation(fields: [vendorId], references: [id])
-  active         Boolean               @default(false)
+  active         Boolean               @default(true)
   availabilities ServiceAvailability[]
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
@@ -134,8 +136,8 @@ model Category {
   vendorId  String    @db.ObjectId
   Vendor    Vendor    @relation(fields: [vendorId], references: [id])
   tagIds    String[]
-  active    Boolean   @default(false)
-  sortOrder Int?      @default(0)
+  active    Boolean   @default(true)
+  sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Product   Product[]
@@ -147,7 +149,7 @@ model Coupon {
   discount  Float
   vendorId  String   @db.ObjectId
   vendor    Vendor   @relation(fields: [vendorId], references: [id])
-  active    Boolean  @default(false)
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -193,20 +195,20 @@ type TimeSlot {
 }
 
 model Product {
-  id               String                @id @default(auto()) @map("_id") @db.ObjectId
-  slug             String
-  sku              String?
-  title            String
-  title_ar         String
-  description      String
-  description_ar   String
-  image            String
-  type             ProductType
-  vendorId         String                @db.ObjectId
-  vendor           Vendor                @relation(fields: [vendorId], references: [id])
-  active           Boolean               @default(true)
-  minPreorderDays  Int?
-  
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  slug            String
+  sku             String?
+  title           String
+  title_ar        String
+  description     String
+  description_ar  String
+  image           String
+  type            ProductType
+  vendorId        String      @db.ObjectId
+  vendor          Vendor      @relation(fields: [vendorId], references: [id])
+  active          Boolean     @default(true)
+  minPreorderDays Int?
+
   category         Category?             @relation(fields: [categoryId], references: [id])
   categoryId       String?               @db.ObjectId
   noOfSeats        Int?
@@ -228,7 +230,7 @@ model Product {
   startDate        DateTime              @default(now())
   endDate          DateTime              @default(now())
 
-  booking         Booking[]
+  booking Booking[]
 }
 
 model CartItem {
@@ -268,8 +270,8 @@ model Cart {
 
   checkedOut Boolean @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Order     Order[]
   booking   Booking[]
 }
@@ -280,25 +282,25 @@ model Order {
   cartId String @db.ObjectId
   Cart   Cart   @relation(fields: [cartId], references: [id])
 
-  customerInfo CustomerInfo
-  deliveryMethod  DeliveryMethods?
+  customerInfo   CustomerInfo
+  deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
-  status       OrderStatus 
-  vendorId    String @db.ObjectId
-  Vendor      Vendor @relation(fields: [vendorId], references: [id])
-  booking     Booking[]
+  status         OrderStatus
+  vendorId       String           @db.ObjectId
+  Vendor         Vendor           @relation(fields: [vendorId], references: [id])
+  booking        Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 type CustomerInfo {
-  firstName   String
-  lastName    String
-  phone       String
-  email       String
-  address     String?
-  city        String?
+  firstName String
+  lastName  String
+  phone     String
+  email     String
+  address   String?
+  city      String?
 }
 
 enum OrderStatus {
@@ -309,7 +311,7 @@ enum OrderStatus {
 }
 
 enum BookingStatus {
-  HOLD  
+  HOLD
   PENDING
   CONFIRMED
   REJECTED
@@ -325,7 +327,7 @@ model Booking {
   Order         Order         @relation(fields: [orderId], references: [id])
   productId     String        @db.ObjectId
   Product       Product       @relation(fields: [productId], references: [id])
-  status        BookingStatus 
+  status        BookingStatus
   holdTimestamp DateTime?     @default(now())
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt

@@ -9,7 +9,8 @@ import {
 } from '@nestjs/graphql';
 import { fieldsMap } from 'graphql-fields-list';
 import { CategoriesService } from 'src/categories/categories.service';
-import { Vendor } from 'src/vendors/models/vendor.model';
+// import { Vendor } from 'src/vendors/models/vendor.model';
+import { Vendor } from '@prisma/client';
 import { Category } from 'src/categories/models/category.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';

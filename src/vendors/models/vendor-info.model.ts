@@ -30,6 +30,10 @@ export class VendorInfo {
   terms?: string;
 
   @Field()
+  heroImage?: string;
+
+  @Field()
+  logo?: string;
   location?: string;
 
   @Field()

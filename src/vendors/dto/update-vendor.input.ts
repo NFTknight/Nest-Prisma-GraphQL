@@ -35,6 +35,12 @@ class UpdateVendorInfoInput {
 
   @Field()
   terms?: string;
+
+  @Field()
+  heroImage?: string;
+
+  @Field()
+  logo?: string;
 }
 
 @InputType()

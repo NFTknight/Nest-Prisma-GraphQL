@@ -639,6 +639,8 @@ input UpdateVendorInfoInput {
   description: String
   description_ar: String
   email: String
+  heroImage: String
+  logo: String
   phone: String
   terms: String
 }
@@ -669,7 +671,7 @@ type User {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   vendor: Vendor
-  vendorId: String!
+  vendorId: String
   verified: Boolean!
 }
 
@@ -731,9 +733,11 @@ type VendorInfo {
   description_ar: String
   email: String
   facebook: String
+  heroImage: String
   iban: String
   instagram: String
   location: String
+  logo: String
   phone: String
   snapchat: String
   terms: String
