@@ -4,6 +4,9 @@ import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateTagInput } from './dto/create-tag.input';
 import { UpdateTagInput } from './dto/update-tag.input';
 import { Tag } from './models/tag.model';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 
 @Injectable()
 export class TagsService {
@@ -20,8 +23,17 @@ export class TagsService {
     return tag;
   }
 
-  getTags(vendorId?: string): Promise<Tag[]> {
-    return this.prisma.tag.findMany({ where: vendorId ? { vendorId } : {} });
+  getTags(
+    vendorId?: string,
+    pg?: PaginationArgs,
+    sortOrder?: SortOrder
+  ): Promise<Tag[]> {
+    const { skip, take } = getPaginationArgs(pg);
+
+    const where = {
+      vendorId,
+    };
+    return this.prisma.tag.findMany({ where, skip, take });
   }
 
   async createTags(data: CreateTagInput): Promise<Tag> {

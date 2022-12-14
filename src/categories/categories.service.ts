@@ -4,7 +4,9 @@ import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
 import { Category } from './models/category.model';
-
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 @Injectable()
 export class CategoriesService {
   constructor(
@@ -23,19 +25,32 @@ export class CategoriesService {
 
   async getCategories(
     vendorId: string,
-    active: boolean | null
+    active: boolean | null,
+    pg?: PaginationArgs,
+    sortOrder?: SortOrder
   ): Promise<Category[]> {
+    const { skip, take } = getPaginationArgs(pg);
+
     const where = {
       vendorId,
     };
+
+    let orderBy = {};
+    if (sortOrder) {
+      orderBy[sortOrder.field] = sortOrder.direction;
+    } else {
+      orderBy = {
+        sortOrder: 'asc',
+      };
+    }
     if (typeof active === 'boolean') {
       where['active'] = active;
     }
     return this.prisma.category.findMany({
       where,
-      orderBy: {
-        sortOrder: 'asc',
-      },
+      skip,
+      take,
+      orderBy,
     });
   }
 

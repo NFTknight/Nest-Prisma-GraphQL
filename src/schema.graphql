@@ -445,16 +445,16 @@ enum ProductType {
 type Query {
   getBooking(id: String!): Booking!
   getCart(cartId: String!): Cart!
-  getCategories(active: Boolean, vendorId: String!): [Category!]!
+  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
-  getCoupons(vendorId: String): [Coupon!]!
+  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
   getOrder(id: String!): Order!
-  getOrders(vendorId: String): [Order!]!
+  getOrders(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
-  getTags(vendorId: String): [Tag!]!
+  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!

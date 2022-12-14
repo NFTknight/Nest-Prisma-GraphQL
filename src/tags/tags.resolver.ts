@@ -12,6 +12,8 @@ import { CreateTagInput } from './dto/create-tag.input';
 import { UpdateTagInput } from './dto/update-tag.input';
 import { Tag } from './models/tag.model';
 import { TagsService } from './tags.service';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 
 @Resolver(() => Tag)
 export class TagsResolver {
@@ -26,9 +28,13 @@ export class TagsResolver {
   }
 
   @Query(() => [Tag])
-  async getTags(@Args('vendorId', { nullable: true }) vendorId?: string) {
+  async getTags(
+    @Args('vendorId', { nullable: true }) vendorId?: string,
+    @Args('pagination', { nullable: true }) pg?: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder?: SortOrder
+  ) {
     try {
-      const tags = this.tagsService.getTags(vendorId);
+      const tags = this.tagsService.getTags(vendorId, pg, sortOrder);
 
       return tags;
     } catch (err) {
