@@ -33,6 +33,7 @@ Table Vendor {
   tags Tag [not null]
   coupons Coupon [not null]
   orders Order [not null]
+  booking Booking [not null]
   ownerId String [unique, not null]
   owner User
   createdAt DateTime [default: `now()`, not null]
@@ -50,6 +51,7 @@ Table Tag {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
+  booking Booking [not null]
 }
 
 Table Category {
@@ -162,15 +164,18 @@ Table Order {
 
 Table Booking {
   id String [pk]
-  startDate DateTime [default: `now()`, not null]
-  endDate DateTime [default: `now()`, not null]
   cartId String [not null]
   Cart Cart [not null]
-  orderId String [not null]
-  Order Order [not null]
+  orderId String
+  Order Order
   productId String [not null]
   Product Product [not null]
+  vendorId String [not null]
+  Vendor Vendor [not null]
+  tagId String [not null]
+  Tag Tag [not null]
   status BookingStatus [not null]
+  times BookingTime [not null]
   holdTimestamp DateTime [default: `now()`]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
@@ -248,3 +253,7 @@ Ref: Booking.cartId > Cart.id
 Ref: Booking.orderId > Order.id
 
 Ref: Booking.productId > Product.id
+
+Ref: Booking.vendorId > Vendor.id
+
+Ref: Booking.tagId > Tag.id

@@ -49,6 +49,7 @@ model Vendor {
   tags       Tag[]
   coupons    Coupon[]
   orders     Order[]
+  booking    Booking[]
 
   ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
@@ -127,6 +128,7 @@ model Tag {
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
   CartItem       CartItem[]
+  booking        Booking[]
 }
 
 model Category {
@@ -317,17 +319,26 @@ enum BookingStatus {
   REJECTED
 }
 
+type BookingTime {
+  date      String
+  startTime String
+  endTime   String
+}
+
 model Booking {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  startDate     DateTime      @default(now())
-  endDate       DateTime      @default(now())
   cartId        String        @db.ObjectId
   Cart          Cart          @relation(fields: [cartId], references: [id])
-  orderId       String        @db.ObjectId
-  Order         Order         @relation(fields: [orderId], references: [id])
+  orderId       String?       @db.ObjectId
+  Order         Order?        @relation(fields: [orderId], references: [id])
   productId     String        @db.ObjectId
   Product       Product       @relation(fields: [productId], references: [id])
+  vendorId      String
+  Vendor        Vendor        @relation(fields: [vendorId], references: [id])
+  tagId         String
+  Tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
+  times         BookingTime
   holdTimestamp DateTime?     @default(now())
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
