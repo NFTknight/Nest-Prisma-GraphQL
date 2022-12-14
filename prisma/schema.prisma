@@ -173,22 +173,15 @@ type ServiceAvailability {
   endTime   String
 }
 
-type VariationValue {
-  value    String
-  value_ar String
-}
-
-type VariationOption {
-  key    String
-  key_ar String
-  values VariationValue[]
-}
-
 type Variant {
   identifier String
   sku        String
+  options    String[]
+  options_ar String[]
   price      Float
-  quantity   Int
+  image      String
+  title      String
+  title_ar   String?
 }
 
 type TimeSlot {
@@ -210,13 +203,12 @@ model Product {
   vendor           Vendor                @relation(fields: [vendorId], references: [id])
   active           Boolean               @default(true)
   minPreorderDays  Int?
-  price            Float
+  
   category         Category?             @relation(fields: [categoryId], references: [id])
   categoryId       String?               @db.ObjectId
   noOfSeats        Int?
   itemsInStock     Int?
   availabilities   ServiceAvailability[]
-  variationOptions VariationOption[]
   variants         Variant[]
   attributes       ProductAttribute[]
   sortOrder        Int?                  @default(0)

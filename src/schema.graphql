@@ -215,8 +215,6 @@ input CreateProductInput {
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
-  price: Float!
-  sku: String
   slug: String!
   sortOrder: Int
   startDate: DateTime
@@ -225,7 +223,6 @@ input CreateProductInput {
   title_ar: String!
   type: ProductType!
   variants: [VariantInput!]
-  variationOptions: [VariationOptionInput!]
   vendorId: String!
 }
 
@@ -418,8 +415,6 @@ type Product {
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
-  price: Float!
-  sku: String
   slug: String!
   sortOrder: Int
   startDate: DateTime!
@@ -431,7 +426,6 @@ type Product {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   variants: [Variant!]
-  variationOptions: [VariationOption!]
   vendor: Vendor!
   vendorId: String!
 }
@@ -592,8 +586,6 @@ input UpdateProductInput {
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
-  price: Float
-  sku: String
   slug: String
   sortOrder: Int
   startDate: DateTime
@@ -601,8 +593,7 @@ input UpdateProductInput {
   title: String
   title_ar: String
   type: ProductType
-  variants: [VariantInput!]
-  variationOptions: [VariationOptionInput!]
+  variants: [UpdateVariantInput!]
   vendorId: String
 }
 
@@ -616,6 +607,17 @@ input UpdateTagInput {
 input UpdateUserInput {
   firstname: String
   lastname: String
+}
+
+input UpdateVariantInput {
+  identifier: String
+  image: String
+  options: [String!]
+  options_ar: [String!]
+  price: Float
+  sku: String
+  title: String
+  title_ar: String
 }
 
 input UpdateVendorBankInput {
@@ -666,38 +668,24 @@ type User {
 
 type Variant {
   identifier: String!
+  image: String!
+  options: [String!]
+  options_ar: [String!]
   price: Float!
-  quantity: Int!
   sku: String!
+  title: String!
+  title_ar: String!
 }
 
 input VariantInput {
   identifier: String!
+  image: String!
+  options: [String!]
+  options_ar: [String!]
   price: Float!
-  quantity: Int!
   sku: String!
-}
-
-type VariationOption {
-  key: String!
-  key_ar: String!
-  values: [VariationValue!]
-}
-
-input VariationOptionInput {
-  key: String!
-  key_ar: String!
-  values: [VariationValueInput!]!
-}
-
-type VariationValue {
-  value: String!
-  value_ar: String!
-}
-
-input VariationValueInput {
-  value: String!
-  value_ar: String!
+  title: String!
+  title_ar: String
 }
 
 type Vendor {
