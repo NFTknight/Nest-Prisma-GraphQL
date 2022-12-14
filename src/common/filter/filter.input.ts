@@ -14,3 +14,9 @@ export class ProductFilterInput {
   @Field(() => AttendanceType)
   attendanceType?: AttendanceType;
 }
+
+@InputType()
+export class OrdersFilterInput {
+  field: string;
+  title?: string;
+}
