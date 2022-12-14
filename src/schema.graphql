@@ -611,6 +611,7 @@ input UpdateTagInput {
 input UpdateUserInput {
   firstname: String
   lastname: String
+  vendorId: String
 }
 
 input UpdateVariantInput {
@@ -667,6 +668,7 @@ type User {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   vendor: Vendor
+  vendorId: String!
   verified: Boolean!
 }
 

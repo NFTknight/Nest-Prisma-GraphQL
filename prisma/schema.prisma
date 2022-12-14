@@ -50,6 +50,7 @@ model Vendor {
   coupons    Coupon[]
   orders     Order[]
 
+  ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
 
   createdAt DateTime @default(now())

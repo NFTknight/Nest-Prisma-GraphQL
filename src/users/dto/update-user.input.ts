@@ -6,4 +6,6 @@ export class UpdateUserInput {
   firstname?: string;
   @Field({ nullable: true })
   lastname?: string;
+  @Field({ nullable: true })
+  vendorId?: string;
 }
