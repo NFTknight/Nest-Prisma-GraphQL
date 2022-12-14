@@ -2,11 +2,11 @@ import { PrismaService } from 'nestjs-prisma';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVendorInput } from './dto/create-vendor.input';
 import { UpdateVendorInput } from './dto/update-vendor.input';
-import { Vendor } from './models/vendor.model';
 import { User } from 'src/users/models/user.model';
 import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
+import { Vendor } from '@prisma/client';
 
 @Injectable()
 export class VendorsService {
