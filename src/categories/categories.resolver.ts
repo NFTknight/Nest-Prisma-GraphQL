@@ -13,6 +13,8 @@ import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
 import { Category } from './models/category.model';
 import { CategoriesService } from './categories.service';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -29,9 +31,16 @@ export class CategoriesResolver {
   @Query(() => [Category])
   getCategories(
     @Args('vendorId') vendorId: string,
-    @Args('active', { nullable: true }) active: boolean | null
+    @Args('active', { nullable: true }) active: boolean | null,
+    @Args('pagination', { nullable: true }) pg?: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder?: SortOrder
   ) {
-    return this.categoriesService.getCategories(vendorId, active);
+    return this.categoriesService.getCategories(
+      vendorId,
+      active,
+      pg,
+      sortOrder
+    );
   }
 
   @Mutation(() => Category)

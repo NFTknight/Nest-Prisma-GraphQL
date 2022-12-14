@@ -8,7 +8,9 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateOrderInput } from './dto/create-order.input';
 import { UpdateOrderInput } from './dto/update-order.input';
-
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -26,9 +28,18 @@ export class OrdersService {
     return order;
   }
 
-  async getOrders(vendorId: string): Promise<Order[]> {
+  async getOrders(
+    vendorId: string,
+    pg?: PaginationArgs,
+    sortOrder?: SortOrder
+  ): Promise<Order[]> {
     try {
-      return await this.prisma.order.findMany({ where: { vendorId } });
+      const { skip, take } = getPaginationArgs(pg);
+
+      const where = {
+        vendorId,
+      };
+      return await this.prisma.order.findMany({ where, skip, take });
     } catch (err) {
       console.log('Err => ', err);
     }
