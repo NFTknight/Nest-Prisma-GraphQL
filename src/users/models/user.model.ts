@@ -7,7 +7,6 @@ import {
 import { BaseModel } from 'src/common/models/base.model';
 import { Role } from '@prisma/client';
 import { Vendor } from 'src/vendors/models/vendor.model';
-
 registerEnumType(Role, {
   name: 'Role',
   description: 'User role',
@@ -27,7 +26,7 @@ export class User extends BaseModel {
   @HideField()
   password: string;
 
-  vendorId: string;
+  vendorId?: string;
   @Field(() => Vendor, { nullable: true })
   vendor?: Vendor;
 }

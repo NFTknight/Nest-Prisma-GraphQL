@@ -13,6 +13,7 @@ Table User {
   lastName String
   verified Boolean [not null, default: false]
   role Role [not null]
+  vendorId String
   vendor Vendor
 }
 
