@@ -79,6 +79,7 @@ Table Coupon {
 Table Product {
   id String [pk]
   slug String [not null]
+  sku String
   title String [not null]
   title_ar String [not null]
   description String [not null]
