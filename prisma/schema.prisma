@@ -47,11 +47,15 @@ model Vendor {
   coupons    Coupon[]
   orders     Order[]
 
-  ownerId String @unique @db.ObjectId
-  owner   User   @relation(fields: [ownerId], references: [id])
+  owner   User?  @relation(fields: [ownerId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+type Certificate {
+  title String
+  image String
 }
 
 type VendorInfo {
@@ -62,6 +66,15 @@ type VendorInfo {
   description    String?
   description_ar String?
   terms          String?
+  location       String?
+  instagram      String?
+  facebook       String?
+  snapchat       String?
+  whatsapp       String?
+  vat_num        String?
+  cr_num         String?
+  certificates   Certificate[]
+  iban           String?
 }
 
 enum DeliveryMethods {
@@ -77,9 +90,17 @@ enum PaymentMethods {
   STORE
 }
 
+type DeliveryAreas {
+  label    String
+  label_ar String
+  active   Boolean
+  charge   Int
+}
+
 type VendorSettings {
   paymentMethods  PaymentMethods[]
   deliveryMethods DeliveryMethods[]
+  deliveryAreas   DeliveryAreas[]
 }
 
 type VendorBankInfo {
@@ -99,6 +120,7 @@ model Tag {
   availabilities ServiceAvailability[]
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
+  CartItem       CartItem[]
 }
 
 model Category {
@@ -150,22 +172,20 @@ type ServiceAvailability {
   endTime   String
 }
 
-type VariationValue {
-  value    String
-  value_ar String
-}
-
-type VariationOption {
-  key    String
-  key_ar String
-  values VariationValue[]
-}
-
 type Variant {
   identifier String
   sku        String
+  options    String[]
+  options_ar String[]
   price      Float
-  quantity   Int
+  image      String
+  title      String
+  title_ar   String?
+}
+
+type TimeSlot {
+  startTime DateTime
+  endTime   DateTime
 }
 
 model Product {
@@ -182,13 +202,12 @@ model Product {
   vendor           Vendor                @relation(fields: [vendorId], references: [id])
   active           Boolean               @default(true)
   minPreorderDays  Int?
-  price            Float
+  
   category         Category?             @relation(fields: [categoryId], references: [id])
   categoryId       String?               @db.ObjectId
   noOfSeats        Int?
   itemsInStock     Int?
   availabilities   ServiceAvailability[]
-  variationOptions VariationOption[]
   variants         Variant[]
   attributes       ProductAttribute[]
   sortOrder        Int                   @default(0)
@@ -204,20 +223,26 @@ model Product {
   duration         Int?
   startDate        DateTime              @default(now())
   endDate          DateTime              @default(now())
+
+  booking         Booking[]
 }
 
 model CartItem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  productId String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id])
-
+  productId      String  @db.ObjectId
+  product        Product @relation(fields: [productId], references: [id])
   productVariant String?
 
-  quantity Int @default(1)
+  Variant Variant[]
 
-  cartId String @db.ObjectId
-  Cart   Cart   @relation(fields: [cartId], references: [id])
+  quantity Int        @default(1)
+  tagId    String?    @db.ObjectId
+  tag      Tag?       @relation(fields: [tagId], references: [id])
+  slots    TimeSlot[]
+
+  cartId String? @db.ObjectId
+  Cart   Cart?   @relation(fields: [cartId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -242,6 +267,7 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Order     Order[]
+  booking   Booking[]
 }
 
 model Order {
@@ -250,11 +276,52 @@ model Order {
   cartId String @db.ObjectId
   Cart   Cart   @relation(fields: [cartId], references: [id])
 
-  totalAmount Float
-  finalAmount Float
+  customerInfo CustomerInfo
+  deliveryMethod  DeliveryMethods?
+  paymentMethod  PaymentMethods?
+  status       OrderStatus 
   vendorId    String @db.ObjectId
   Vendor      Vendor @relation(fields: [vendorId], references: [id])
+  booking     Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+type CustomerInfo {
+  firstName   String
+  lastName    String
+  phone       String
+  email       String
+  address     String?
+  city        String?
+}
+
+enum OrderStatus {
+  PENDING
+  FAILED
+  COMPLETE
+}
+
+enum BookingStatus {
+  HOLD  
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+model Booking {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  startDate     DateTime      @default(now())
+  endDate       DateTime      @default(now())
+  cartId        String        @db.ObjectId
+  Cart          Cart          @relation(fields: [cartId], references: [id])
+  orderId       String        @db.ObjectId
+  Order         Order         @relation(fields: [orderId], references: [id])
+  productId     String        @db.ObjectId
+  Product       Product       @relation(fields: [productId], references: [id])
+  status        BookingStatus 
+  holdTimestamp DateTime?     @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }

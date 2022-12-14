@@ -4,6 +4,7 @@ import { CreateVendorInput } from './dto/create-vendor.input';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { Vendor } from './models/vendor.model';
 import { User } from 'src/users/models/user.model';
+import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 
 @Injectable()
 export class VendorsService {
@@ -48,5 +49,26 @@ export class VendorsService {
 
   getVendors(): Promise<Vendor[]> {
     return this.prisma.vendor.findMany();
+  }
+
+  addDeliveryAreas(
+    id: string,
+    areas: AddDeliveryAreasInput[]
+  ): Promise<Vendor> {
+    return this.prisma.vendor.update({
+      data: {
+        settings: {
+          upsert: {
+            set: {
+              deliveryAreas: areas,
+            },
+            update: {
+              deliveryAreas: areas,
+            },
+          },
+        },
+      },
+      where: { id },
+    });
   }
 }
