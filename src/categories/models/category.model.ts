@@ -12,10 +12,10 @@ export class Category extends BaseModel {
   Vendor?: Vendor;
   active: boolean;
   @Field(() => [String], { nullable: false })
-  tagIds: string[];
+  tagIds?: string[];
   @Field(() => [Tag], { nullable: false })
   Tags?: Tag[];
 
   @Field(() => Int, { nullable: false })
-  sortOrder: number;
+  sortOrder?: number;
 }

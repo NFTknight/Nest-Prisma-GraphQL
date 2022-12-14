@@ -47,7 +47,6 @@ model Vendor {
   coupons    Coupon[]
   orders     Order[]
 
-  ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
 
   createdAt DateTime @default(now())
@@ -132,7 +131,7 @@ model Category {
   Vendor    Vendor    @relation(fields: [vendorId], references: [id])
   tagIds    String[]
   active    Boolean   @default(false)
-  sortOrder Int       @default(0)
+  sortOrder Int?      @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Product   Product[]
@@ -211,7 +210,7 @@ model Product {
   availabilities   ServiceAvailability[]
   variants         Variant[]
   attributes       ProductAttribute[]
-  sortOrder        Int?                  @default(0)
+  sortOrder        Int                   @default(0)
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
   CartItem         CartItem[]
