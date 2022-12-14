@@ -205,8 +205,9 @@ Enum AttendanceType {
 
 Enum OrderStatus {
   PENDING
-  FAILED
-  COMPLETE
+  COMPLETED
+  CONFIRMED
+  REJECTED
 }
 
 Enum BookingStatus {

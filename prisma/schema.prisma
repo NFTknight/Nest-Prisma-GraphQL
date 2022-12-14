@@ -303,8 +303,9 @@ type CustomerInfo {
 
 enum OrderStatus {
   PENDING
-  FAILED
-  COMPLETE
+  COMPLETED
+  CONFIRMED
+  REJECTED
 }
 
 enum BookingStatus {
