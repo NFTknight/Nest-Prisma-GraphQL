@@ -68,8 +68,6 @@ export class ProductsResolver {
       where['categoryId'] = categoryId;
     }
 
-    console.log(filter);
-
     if (filter && filter?.field) {
       if (filter.field === 'title') {
         where[filter.field] = {
