@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { ProductsService } from 'src/products/services/products.service';
 import { Cart } from '../models/cart.model';
 
 @Injectable()
 export class CartService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly productService: ProductsService
-  ) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async createNewCart(vendorId: string): Promise<Cart> {
     return await this.prisma.cart.create({

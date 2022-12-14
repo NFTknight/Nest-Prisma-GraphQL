@@ -1,6 +1,7 @@
 import { PrismaService } from 'nestjs-prisma';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PasswordService } from 'src/auth/password.service';
+import { VendorsService } from 'src/vendors/vendors.service';
 import { ChangePasswordInput } from './dto/change-password.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { SmsService } from 'src/sms/sms.service';
@@ -11,10 +12,11 @@ export class UsersService {
   constructor(
     private prisma: PrismaService,
     private passwordService: PasswordService,
-    private readonly sms: SmsService
+    private readonly sms: SmsService,
+    private readonly vendorService: VendorsService
   ) {}
 
-  updateUser(userId: string, newUserData: UpdateUserInput) {
+  async updateUser(userId: string, newUserData: UpdateUserInput) {
     return this.prisma.user.update({
       data: newUserData,
       where: {

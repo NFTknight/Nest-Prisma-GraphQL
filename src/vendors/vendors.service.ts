@@ -4,18 +4,30 @@ import { CreateVendorInput } from './dto/create-vendor.input';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { Vendor } from './models/vendor.model';
 import { User } from 'src/users/models/user.model';
+import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
+import { SendgridService } from 'src/sendgrid/sendgrid.service';
+import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 
 @Injectable()
 export class VendorsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly emailService: SendgridService
+  ) {}
 
-  createVendor(
+  async createVendor(
     createVendorInput: CreateVendorInput,
     user: User
   ): Promise<Vendor> {
-    return this.prisma.vendor.create({
+    const res = await this.prisma.vendor.create({
       data: { ...createVendorInput, ownerId: user.id },
     });
+
+    this.emailService.send(
+      SendEmails(EMAIL_OPTIONS.WELCOME_VENDOR, user.email)
+    );
+
+    return res;
   }
 
   updateVendor(
@@ -48,5 +60,26 @@ export class VendorsService {
 
   getVendors(): Promise<Vendor[]> {
     return this.prisma.vendor.findMany();
+  }
+
+  addDeliveryAreas(
+    id: string,
+    areas: AddDeliveryAreasInput[]
+  ): Promise<Vendor> {
+    return this.prisma.vendor.update({
+      data: {
+        settings: {
+          upsert: {
+            set: {
+              deliveryAreas: areas,
+            },
+            update: {
+              deliveryAreas: areas,
+            },
+          },
+        },
+      },
+      where: { id },
+    });
   }
 }

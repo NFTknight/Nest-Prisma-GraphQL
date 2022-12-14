@@ -48,6 +48,7 @@ Table Tag {
   availabilities ServiceAvailability[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  CartItem CartItem [not null]
 }
 
 Table Category {
@@ -89,16 +90,14 @@ Table Product {
   vendor Vendor [not null]
   active Boolean [not null, default: true]
   minPreorderDays Int
-  price Float [not null]
   category Category
   categoryId String
   noOfSeats Int
   itemsInStock Int
   availabilities ServiceAvailability[] [not null]
-  variationOptions VariationOption[] [not null]
   variants Variant[] [not null]
   attributes ProductAttribute[] [not null]
-  sortOrder Int [default: 0]
+  sortOrder Int [not null, default: 0]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
@@ -111,6 +110,7 @@ Table Product {
   duration Int
   startDate DateTime [default: `now()`, not null]
   endDate DateTime [default: `now()`, not null]
+  booking Booking [not null]
 }
 
 Table CartItem {
@@ -118,9 +118,13 @@ Table CartItem {
   productId String [not null]
   product Product [not null]
   productVariant String
+  Variant Variant[] [not null]
   quantity Int [not null, default: 1]
-  cartId String [not null]
-  Cart Cart [not null]
+  tagId String
+  tag Tag
+  slots TimeSlot[] [not null]
+  cartId String
+  Cart Cart
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -137,16 +141,36 @@ Table Cart {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Order Order [not null]
+  booking Booking [not null]
 }
 
 Table Order {
   id String [pk]
   cartId String [not null]
   Cart Cart [not null]
-  totalAmount Float [not null]
-  finalAmount Float [not null]
+  customerInfo CustomerInfo [not null]
+  deliveryMethod DeliveryMethods
+  paymentMethod PaymentMethods
+  status OrderStatus [not null]
   vendorId String [not null]
   Vendor Vendor [not null]
+  booking Booking [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Booking {
+  id String [pk]
+  startDate DateTime [default: `now()`, not null]
+  endDate DateTime [default: `now()`, not null]
+  cartId String [not null]
+  Cart Cart [not null]
+  orderId String [not null]
+  Order Order [not null]
+  productId String [not null]
+  Product Product [not null]
+  status BookingStatus [not null]
+  holdTimestamp DateTime [default: `now()`]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -180,6 +204,20 @@ Enum AttendanceType {
   PHYSICAL
 }
 
+Enum OrderStatus {
+  PENDING
+  COMPLETED
+  CONFIRMED
+  REJECTED
+}
+
+Enum BookingStatus {
+  HOLD
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
 Ref: Vendor.ownerId - User.id
 
 Ref: Tag.vendorId > Vendor.id
@@ -194,6 +232,8 @@ Ref: Product.categoryId > Category.id
 
 Ref: CartItem.productId > Product.id
 
+Ref: CartItem.tagId > Tag.id
+
 Ref: CartItem.cartId > Cart.id
 
 Ref: Cart.vendorId > Vendor.id
@@ -201,3 +241,9 @@ Ref: Cart.vendorId > Vendor.id
 Ref: Order.cartId > Cart.id
 
 Ref: Order.vendorId > Vendor.id
+
+Ref: Booking.cartId > Cart.id
+
+Ref: Booking.orderId > Order.id
+
+Ref: Booking.productId > Product.id

@@ -19,6 +19,9 @@ import { SmsModule } from './sms/sms.module';
 import { ShippingModule } from './shipping/shipping.module';
 import { HealthController } from './health.controller';
 import { PaymentModule } from './payment/payment.module';
+import { SendgridService } from './sendgrid/sendgrid.service';
+import { BookingsModule } from './bookings/bookings.module';
+import { SendgridModule } from './sendgrid/sendgrid.module';
 
 @Module({
   imports: [
@@ -47,7 +50,10 @@ import { PaymentModule } from './payment/payment.module';
     SmsModule,
     ShippingModule,
     PaymentModule,
+    BookingsModule,
+    SendgridModule,
   ],
   controllers: [HealthController],
+  providers: [SendgridService],
 })
 export class AppModule {}

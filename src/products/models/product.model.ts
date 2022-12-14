@@ -3,7 +3,6 @@ import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { ProductType, AttendanceType } from 'prisma/prisma-client';
-import { VariationOption } from './variation-option.model';
 import { Variant } from './variant.model';
 import { ServiceAvailability } from 'src/common/models/service-availability.model';
 import { Tag } from 'src/tags/models/tag.model';
@@ -12,7 +11,6 @@ import './product-type.enum';
 @ObjectType()
 export class Product extends BaseModel {
   slug: string;
-  sku?: string;
   title: string;
   title_ar: string;
 
@@ -37,9 +35,6 @@ export class Product extends BaseModel {
 
   minPreorderDays?: number;
 
-  @Field(() => [VariationOption], { nullable: true })
-  variationOptions: VariationOption[];
-
   @Field(() => [Variant], { nullable: true })
   variants?: Variant[];
 
@@ -55,9 +50,6 @@ export class Product extends BaseModel {
 
   @Field(() => Int)
   itemsInStock?: number;
-
-  @Field(() => Float)
-  price: number;
 
   @Field(() => Int)
   sortOrder?: number;
