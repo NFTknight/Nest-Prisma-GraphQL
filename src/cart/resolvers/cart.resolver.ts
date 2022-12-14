@@ -16,7 +16,7 @@ export class CartResolver {
   constructor(
     private readonly cartService: CartService,
     private readonly cartItemService: CartItemService
-  ) {}
+  ) { }
 
   @Query(() => Cart)
   getCart(@Args('cartId') cartId: string): Promise<Cart> {

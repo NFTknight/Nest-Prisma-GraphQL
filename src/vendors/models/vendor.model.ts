@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { BaseModel } from 'src/common/models/base.model';
+import { User } from 'src/users/models/user.model';
 import { VendorBank } from './vendor-bank.model';
 import { VendorInfo } from './vendor-info.model';
 import { VendorSettings } from './vendor-settings.model';
@@ -21,8 +22,20 @@ export class Vendor extends BaseModel {
   info?: VendorInfo;
 
   @Field(() => VendorSettings)
-  settings: VendorSettings;
+  settings?: VendorSettings;
 
   @Field(() => VendorBank)
-  bank: VendorBank;
+  bank?: VendorBank;
+
+  @Field()
+  logo?: string;
+
+  @Field()
+  heroImage?: string;
+
+  @Field()
+  ownerId: string;
+
+  @Field(() => User)
+  owner?: User;
 }
