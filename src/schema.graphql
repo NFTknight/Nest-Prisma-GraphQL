@@ -34,6 +34,34 @@ type Auth {
   user: User!
 }
 
+type Booking {
+  Cart: Cart
+  Order: Order
+  Product: Product
+  cartId: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  endDate: DateTime!
+  holdTimestamp: DateTime
+  id: ID!
+  orderId: String!
+  productId: String!
+  startDate: DateTime!
+  status: BookingStatus!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+}
+
+"""Booking Status"""
+enum BookingStatus {
+  CONFIRMED
+  HOLD
+  PENDING
+  REJECTED
+}
+
 type Cart {
   appliedCoupon: String!
   checkedOut: Boolean!
@@ -86,6 +114,11 @@ type Category {
   vendorId: String!
 }
 
+type Certificate {
+  image: String!
+  title: String!
+}
+
 input ChangePasswordInput {
   newPassword: String!
   oldPassword: String!
@@ -120,6 +153,15 @@ type Coupon {
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
+}
+
+input CreateBookingInput {
+  cartId: String!
+  endDate: DateTime
+  orderId: String!
+  productId: String!
+  startDate: DateTime
+  status: BookingStatus!
 }
 
 input CreateCategoryInput {
@@ -173,8 +215,6 @@ input CreateProductInput {
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
-  price: Float!
-  sku: String
   slug: String!
   sortOrder: Int
   startDate: DateTime
@@ -183,7 +223,6 @@ input CreateProductInput {
   title_ar: String!
   type: ProductType!
   variants: [VariantInput!]
-  variationOptions: [VariationOptionInput!]
   vendorId: String!
 }
 
@@ -245,6 +284,7 @@ type Mutation {
   addWorkshopToCart(data: AddToCartInput!): CartItem!
   changePassword(data: ChangePasswordInput!): User!
   checkout(cartId: String!): Cart!
+  createBooking(data: CreateBookingInput!): Booking!
   createCart(vendorId: String!): CartItem!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
@@ -252,6 +292,7 @@ type Mutation {
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
   createVendor(data: CreateVendorInput!): Vendor!
+  deleteBooking(id: String!): Booking!
   deleteCategory(id: String!): Category!
   deleteCoupon(id: String!): Coupon!
   deleteOrder(id: String!): Order!
@@ -264,6 +305,7 @@ type Mutation {
   removeItemFromCart(cartItemId: String!): CartItem!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
+  updateBooking(data: UpdateBookingInput!, id: String!): Booking!
   updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
@@ -368,8 +410,6 @@ type Product {
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
-  price: Float!
-  sku: String
   slug: String!
   sortOrder: Int
   startDate: DateTime!
@@ -381,7 +421,6 @@ type Product {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   variants: [Variant!]
-  variationOptions: [VariationOption!]
   vendor: Vendor!
   vendorId: String!
 }
@@ -403,6 +442,7 @@ enum ProductType {
 }
 
 type Query {
+  getBooking(id: String!): Booking!
   getCart(cartId: String!): Cart!
   getCategories(active: Boolean, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
@@ -502,6 +542,15 @@ type Token {
   refreshToken: JWT!
 }
 
+input UpdateBookingInput {
+  cartId: String
+  endDate: DateTime
+  orderId: String
+  productId: String
+  startDate: DateTime
+  status: BookingStatus
+}
+
 input UpdateCategoryInput {
   active: Boolean
   sortOrder: Int
@@ -541,8 +590,6 @@ input UpdateProductInput {
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
-  price: Float
-  sku: String
   slug: String
   sortOrder: Int
   startDate: DateTime
@@ -550,8 +597,7 @@ input UpdateProductInput {
   title: String
   title_ar: String
   type: ProductType
-  variants: [VariantInput!]
-  variationOptions: [VariationOptionInput!]
+  variants: [UpdateVariantInput!]
   vendorId: String
 }
 
@@ -565,6 +611,17 @@ input UpdateTagInput {
 input UpdateUserInput {
   firstname: String
   lastname: String
+}
+
+input UpdateVariantInput {
+  identifier: String
+  image: String
+  options: [String!]
+  options_ar: [String!]
+  price: Float
+  sku: String
+  title: String
+  title_ar: String
 }
 
 input UpdateVendorBankInput {
@@ -615,43 +672,29 @@ type User {
 
 type Variant {
   identifier: String!
+  image: String!
+  options: [String!]
+  options_ar: [String!]
   price: Float!
-  quantity: Int!
   sku: String!
+  title: String!
+  title_ar: String!
 }
 
 input VariantInput {
   identifier: String!
+  image: String!
+  options: [String!]
+  options_ar: [String!]
   price: Float!
-  quantity: Int!
   sku: String!
-}
-
-type VariationOption {
-  key: String!
-  key_ar: String!
-  values: [VariationValue!]
-}
-
-input VariationOptionInput {
-  key: String!
-  key_ar: String!
-  values: [VariationValueInput!]!
-}
-
-type VariationValue {
-  value: String!
-  value_ar: String!
-}
-
-input VariationValueInput {
-  value: String!
-  value_ar: String!
+  title: String!
+  title_ar: String
 }
 
 type Vendor {
   active: Boolean!
-  bank: VendorBank!
+  bank: VendorBank
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -660,6 +703,8 @@ type Vendor {
   info: VendorInfo
   logo: String
   name: String!
+  owner: User
+  ownerId: String!
   settings: VendorSettings
   slug: String!
 
@@ -677,11 +722,20 @@ type VendorBank {
 type VendorInfo {
   address: String
   addressUrl: String
+  certificates: [Certificate!]
+  cr_num: String
   description: String
   description_ar: String
   email: String
+  facebook: String
+  iban: String
+  instagram: String
+  location: String
   phone: String
+  snapchat: String
   terms: String
+  vat_num: String
+  whatsapp: String
 }
 
 type VendorSettings {

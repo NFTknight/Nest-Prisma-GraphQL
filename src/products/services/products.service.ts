@@ -15,7 +15,7 @@ export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly vendorService: VendorsService
-  ) { }
+  ) {}
 
   async getProduct(id: string): Promise<Product> {
     const product = await this.prisma.product.findUnique({ where: { id } });
@@ -37,7 +37,7 @@ export class ProductsService {
     const error = CreateProductValidator(data);
     if (error) throw new BadRequestException(error);
 
-    const { vendorId, categoryId, ...rest } = data;
+    const { vendorId, categoryId, variants, ...rest } = data;
 
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(vendorId);
@@ -46,6 +46,7 @@ export class ProductsService {
     const prod = await this.prisma.product.create({
       data: {
         ...rest,
+        variants: variants as any,
         vendor: { connect: { id: vendorId } },
         category: categoryId ? { connect: { id: categoryId } } : undefined,
       },
@@ -61,7 +62,7 @@ export class ProductsService {
 
     return this.prisma.product.update({
       where: { id },
-      data: { ...data, updatedAt: new Date() },
+      data: { ...data, updatedAt: new Date() } as any,
     });
   }
 
