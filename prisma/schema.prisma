@@ -36,6 +36,9 @@ model Vendor {
   slug   String
   active Boolean @default(false)
 
+  logo      String?
+  heroImage String?
+
   info     VendorInfo?
   bank     VendorBankInfo?
   settings VendorSettings?

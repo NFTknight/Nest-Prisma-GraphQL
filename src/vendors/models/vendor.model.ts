@@ -28,6 +28,12 @@ export class Vendor extends BaseModel {
   bank?: VendorBank;
 
   @Field()
+  logo?: string;
+
+  @Field()
+  heroImage?: string;
+
+  @Field()
   ownerId: string;
 
   @Field(() => User)

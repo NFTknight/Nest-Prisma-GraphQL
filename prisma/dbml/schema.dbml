@@ -21,6 +21,8 @@ Table Vendor {
   name String [not null]
   slug String [not null]
   active Boolean [not null, default: false]
+  logo String
+  heroImage String
   info VendorInfo
   bank VendorBankInfo
   settings VendorSettings

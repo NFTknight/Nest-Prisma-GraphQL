@@ -1,7 +1,16 @@
-import { InputType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
+import { AttendanceType, ProductType } from '@prisma/client';
 
 @InputType()
-export class FilterInput {
+export class ProductFilterInput {
   field: string;
-  value: string;
+  title?: string;
+
+  @Field(() => ProductType)
+  type?: ProductType;
+  priceUpperLimit?: number;
+  priceLowerLimit?: number;
+
+  @Field(() => AttendanceType)
+  attendanceType?: AttendanceType;
 }

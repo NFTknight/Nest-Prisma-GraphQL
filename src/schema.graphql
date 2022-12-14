@@ -267,11 +267,6 @@ enum DeliveryMethods {
   SMSA
 }
 
-input FilterInput {
-  field: String!
-  value: String!
-}
-
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -430,6 +425,15 @@ type Product {
   vendorId: String!
 }
 
+input ProductFilterInput {
+  attendanceType: AttendanceType
+  field: String!
+  priceLowerLimit: Int
+  priceUpperLimit: Int
+  title: String
+  type: ProductType
+}
+
 """Product Type"""
 enum ProductType {
   PRODUCT
@@ -447,7 +451,7 @@ type Query {
   getOrder(id: String!): Order!
   getOrders(vendorId: String): [Order!]!
   getProduct(id: String!): Product!
-  getProducts(categoryId: String, filter: FilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
+  getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTags(vendorId: String): [Tag!]!
   getVendor(id: String!): Vendor!
@@ -694,8 +698,10 @@ type Vendor {
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
+  heroImage: String
   id: ID!
   info: VendorInfo
+  logo: String
   name: String!
   owner: User
   ownerId: String!
