@@ -185,26 +185,26 @@ type Variant {
   identifier String
   title      String
   title_ar   String
-  options    VariantsOptions[]
+  options    VariantOptions[]
   createdAt DateTime
   updatedAt DateTime 
 }
 
-type VariantsOptions {
-  sku        String
-  price      Float
-  image      String
-  title      String
-  title_ar   String
+type VariantOptions {
+  sku        String?
+  price      Float?
+  image      String?
+  title      String?
+  title_ar   String?
 }
 
 
 model VariantModel {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
-  title      String
-  title_ar   String
-  options    VariantsOptions[]
+  identifier String?
+  title      String?
+  title_ar   String?
+  options    VariantOptions[]
 }
 
 

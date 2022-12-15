@@ -7,5 +7,5 @@ export class VariantModel extends BaseModel {
   title_ar: string;
 
   @Field(() => [VariantOptions])
-  options: VariantOptions[];
+  options?: VariantOptions[];
 }

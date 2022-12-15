@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
-import { VariantsOptions } from './variant-options.input';
+import { VariantOptionsInput } from './variant-options.input';
 @InputType()
 export class CreateVariantInput {
   @Field()
@@ -15,6 +15,6 @@ export class CreateVariantInput {
   @IsNotEmpty()
   title_ar: string;
 
-  @Field(() => [VariantsOptions])
-  options?: VariantsOptions[];
+  @Field(() => [VariantOptionsInput])
+  options?: VariantOptionsInput[];
 }
