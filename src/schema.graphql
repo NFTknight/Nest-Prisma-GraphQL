@@ -361,6 +361,8 @@ enum OrderDirection {
 enum OrderStatus {
   COMPLETED
   CONFIRMED
+  CREATED
+  FAILED
   PENDING
   REJECTED
 }

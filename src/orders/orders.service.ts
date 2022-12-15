@@ -19,8 +19,13 @@ export class OrdersService {
   ) {}
 
   async getOrder(id: string): Promise<Order> {
-    const order = await this.prisma.order.findUnique({ where: { id } });
-
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        booking: true,
+      },
+    });
+    console.log(JSON.stringify(order));
     if (!order) throw new NotFoundException('Order Not Found.');
 
     return order;
@@ -78,9 +83,27 @@ export class OrdersService {
       (data.status === OrderStatus.CONFIRMED ||
         data.status === OrderStatus.REJECTED)
     ) {
+      // Email notification
       this.emailService.send(SendEmails(data.status, res.customerInfo.email));
       if (vendor?.info?.email)
         this.emailService.send(SendEmails(data.status, vendor.info.email));
+    }
+
+    // if order is rejected delete all bookings otherwise update the status to PENDING OR CONFIRMED
+    if (res.id) {
+      if (data.status === OrderStatus.REJECTED) {
+        await this.prisma.booking.deleteMany({ where: { orderId: res.id } });
+      } else if (
+        data.status === OrderStatus.PENDING ||
+        data.status === OrderStatus.CONFIRMED
+      ) {
+        await this.prisma.booking.updateMany({
+          where: { orderId: res.id },
+          data: {
+            status: data.status,
+          },
+        });
+      }
     }
 
     return res;
