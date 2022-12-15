@@ -12,7 +12,7 @@ spec:
       labels:
         app: {{ .Release.Name }}
       annotations:
-        sha: "{{ .Values.sha }}"
+        sha: "{{ .Values.image.tag }}"
     spec:
       containers:
         - name: {{ .Release.Name }}

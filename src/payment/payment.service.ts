@@ -18,7 +18,6 @@ export class PaymentService {
 
   initiateSession() {
     const url = `${this.paymentConfig.url}/v2/InitiateSession`;
-    console.log(this.paymentConfig);
     return firstValueFrom(
       this.httpService
         .post<{
