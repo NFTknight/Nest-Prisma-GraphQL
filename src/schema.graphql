@@ -323,6 +323,7 @@ type Mutation {
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
+  uploadFile(file: String!, key: String!): String!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
   verifyPhone(data: PhoneVerify!): Auth!
 }
