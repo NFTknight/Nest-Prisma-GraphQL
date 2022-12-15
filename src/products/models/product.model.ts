@@ -3,7 +3,7 @@ import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { ProductType, AttendanceType } from 'prisma/prisma-client';
-import { Variant } from './variant.model';
+import { VariantModel } from '../../variants/models/variant.model';
 import { ServiceAvailability } from 'src/common/models/service-availability.model';
 import { Tag } from 'src/tags/models/tag.model';
 import './product-type.enum';
@@ -35,8 +35,8 @@ export class Product extends BaseModel {
 
   minPreorderDays?: number;
 
-  @Field(() => [Variant], { nullable: true })
-  variants?: Variant[];
+  @Field(() => [VariantModel], { nullable: true })
+  variants?: any[];
 
   @Field(() => [ServiceAvailability], { nullable: true })
   availabilities?: ServiceAvailability[];

@@ -234,6 +234,13 @@ input CreateTagInput {
   vendorId: String!
 }
 
+input CreateVariantInput {
+  identifier: String!
+  options: [VariantsOptions!]
+  title: String!
+  title_ar: String!
+}
+
 input CreateVendorInput {
   name: String!
   slug: String!
@@ -291,6 +298,7 @@ type Mutation {
   createOrder(data: CreateOrderInput!): Order!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
+  createVariant(data: CreateVariantInput!): VariantModel!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteBooking(id: String!): Booking!
   deleteCategory(id: String!): Category!
@@ -314,7 +322,6 @@ type Mutation {
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
-  uploadFile(file: String!, key: String!): String!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
 }
 
@@ -422,7 +429,7 @@ type Product {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  variants: [Variant!]
+  variants: [VariantModel!]
   vendor: Vendor!
   vendorId: String!
 }
@@ -677,17 +684,6 @@ type User {
   verified: Boolean!
 }
 
-type Variant {
-  identifier: String!
-  image: String!
-  options: [String!]
-  options_ar: [String!]
-  price: Float!
-  sku: String!
-  title: String!
-  title_ar: String!
-}
-
 input VariantInput {
   identifier: String!
   image: String!
@@ -697,6 +693,33 @@ input VariantInput {
   sku: String!
   title: String!
   title_ar: String
+}
+
+type VariantModel {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  options: [VariantOptions!]!
+  title: String!
+  title_ar: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+}
+
+type VariantOptions {
+  image: String!
+  sku: String!
+  title: String!
+  title_ar: String!
+}
+
+input VariantsOptions {
+  image: String!
+  price: Int!
+  sku: String!
+  title: String!
+  title_ar: String!
 }
 
 type Vendor {
