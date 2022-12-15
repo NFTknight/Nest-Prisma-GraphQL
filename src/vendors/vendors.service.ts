@@ -54,8 +54,14 @@ export class VendorsService {
     return vendor;
   }
 
-  getVendorBySlug(slug: string) {
-    return this.prisma.vendor.findFirst({ where: { slug } });
+  async getVendorBySlug(slug: string) {
+    const vendor = await this.prisma.vendor.findFirst({
+      where: { slug },
+    });
+
+    if (!vendor) throw new NotFoundException('Vendor Not Found');
+
+    return vendor;
   }
 
   getVendors(): Promise<Vendor[]> {

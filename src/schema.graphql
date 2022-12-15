@@ -459,6 +459,7 @@ type Query {
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
+  isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
