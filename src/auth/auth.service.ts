@@ -78,7 +78,6 @@ export class AuthService {
   async phoneVerify(phone: string, code: string): Promise<Token> {
     const response = await this.sms.verifyOtp(phone, code);
     if (response.status === OtpStatusCode.CORRECT) {
-      console.log('otp correct');
       await this.prisma.user.update({
         data: {
           phone: phone,
@@ -87,7 +86,7 @@ export class AuthService {
         where: { phone: phone },
       });
     } else
-      throw new NotFoundException(
+      throw new UnauthorizedException(
         `Your OPT is incorrect for the phone: ${phone}`
       );
     const user = await this.prisma.user.findFirst({ where: { phone } });

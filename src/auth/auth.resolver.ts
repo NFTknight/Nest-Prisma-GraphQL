@@ -49,7 +49,6 @@ export class AuthResolver {
   @Mutation(() => OtpResponse)
   async phoneLogin(@Args('data') { phone }: PhoneLoginInput) {
     const phoneValid = await this.auth.validatePhone(phone);
-    console.log(phoneValid);
     if (phoneValid) {
       return this.sms.sendOtp(phone);
     } else return null;
