@@ -7,6 +7,10 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
+RUN apk upgrade --update-cache --available && \
+    apk add openssl && \
+    rm -rf /var/cache/apk/*
+
 # Install app dependencies
 RUN npm install
 
