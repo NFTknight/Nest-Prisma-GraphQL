@@ -301,6 +301,7 @@ type Mutation {
   deleteVendor(id: String!): Vendor!
   initiatePaymentSession: PaymentSession!
   login(data: LoginInput!): Auth!
+  phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
   removeItemFromCart(cartItemId: String!): CartItem!
   sendOtp(data: SendOtpInput!): OtpResponse!
@@ -315,6 +316,7 @@ type Mutation {
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
+  verifyPhone(data: PhoneVerify!): Auth!
 }
 
 type Order {
@@ -386,6 +388,15 @@ enum PaymentMethods {
 type PaymentSession {
   CountryCode: String!
   SessionId: String!
+}
+
+input PhoneLoginInput {
+  phone: String!
+}
+
+input PhoneVerify {
+  code: String!
+  phone: String!
 }
 
 type Product {
