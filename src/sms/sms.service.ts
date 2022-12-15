@@ -65,6 +65,7 @@ export class SmsService {
             data.id = res.data.id;
             data.to = res.data.to;
             data.status = res.data.error_code;
+            console.log('verifyotp', data);
             return data;
           })
         )
