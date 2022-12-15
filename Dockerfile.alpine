@@ -4,7 +4,7 @@ FROM node:16-alpine AS builder
 WORKDIR /app
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+COPY package.json ./
 COPY prisma ./prisma/
 
 RUN apk upgrade --update-cache --available && \
@@ -25,7 +25,7 @@ RUN apk upgrade --update-cache --available && \
     rm -rf /var/cache/apk/*
 
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/package.json ./
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000

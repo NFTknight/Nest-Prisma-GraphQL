@@ -728,6 +728,7 @@ type VariantModel {
 
 type VariantOptions {
   image: String
+  price: Int
   sku: String
   title: String
   title_ar: String
