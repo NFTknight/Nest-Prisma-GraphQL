@@ -1,5 +1,7 @@
 FROM node:16.15-slim AS builder
 
+RUN apt-get update && apt-get -y install openssl
+
 # Create app directory
 WORKDIR /app
 
