@@ -97,7 +97,6 @@ Table Product {
   categoryId String
   noOfSeats Int
   itemsInStock Int
-  availabilities ServiceAvailability[] [not null]
   variants Variant[] [not null]
   attributes ProductAttribute[] [not null]
   sortOrder Int [not null, default: 0]
@@ -211,10 +210,12 @@ Enum AttendanceType {
 }
 
 Enum OrderStatus {
+  CREATED
   PENDING
   COMPLETED
   CONFIRMED
   REJECTED
+  FAILED
 }
 
 Enum BookingStatus {

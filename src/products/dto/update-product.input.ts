@@ -41,9 +41,6 @@ export class UpdateProductInput {
   @Field(() => [UpdateVariantInput], { nullable: true })
   variants: UpdateVariantInput[];
 
-  @Field(() => [ServiceAvailabilityInput])
-  availabilities?: ServiceAvailabilityInput[];
-
   @Field(() => Int)
   noOfSeats?: number;
 

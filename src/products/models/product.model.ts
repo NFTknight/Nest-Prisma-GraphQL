@@ -38,9 +38,6 @@ export class Product extends BaseModel {
   @Field(() => [Variant], { nullable: true })
   variants?: Variant[];
 
-  @Field(() => [ServiceAvailability], { nullable: true })
-  availabilities?: ServiceAvailability[];
-
   tagIds: string[];
 
   @Field(() => [Tag], { nullable: true })

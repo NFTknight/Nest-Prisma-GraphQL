@@ -216,7 +216,6 @@ input CreateOrderInput {
 input CreateProductInput {
   active: Boolean!
   attendanceType: AttendanceType
-  availabilities: [ServiceAvailabilityInput!]
   categoryId: String
   customerLocation: Boolean
   description: String!
@@ -407,7 +406,6 @@ type Product {
   Tags: [Tag!]
   active: Boolean!
   attendanceType: AttendanceType
-  availabilities: [ServiceAvailability!]
   category: Category
   categoryId: String
 
@@ -593,7 +591,6 @@ input UpdateOrderInput {
 input UpdateProductInput {
   active: Boolean
   attendanceType: AttendanceType
-  availabilities: [ServiceAvailabilityInput!]
   categoryId: String
   customerLocation: Boolean
   description: String
