@@ -1,10 +1,20 @@
 import { InputType } from '@nestjs/graphql';
-import { VariantsOptions as VariantsOptionsTypes } from 'prisma/prisma-client';
+import { IsNotEmpty } from 'class-validator';
+import { Field } from '@nestjs/graphql';
 @InputType()
-export class VariantsOptions implements VariantsOptionsTypes {
-  title: string;
-  title_ar: string;
-  sku: string;
-  price: number;
-  image: string;
+export class VariantOptionsInput {
+  @Field()
+  title?: string;
+
+  @Field()
+  title_ar?: string;
+
+  @Field()
+  sku?: string;
+
+  @Field()
+  price?: number;
+
+  @Field()
+  image?: string;
 }

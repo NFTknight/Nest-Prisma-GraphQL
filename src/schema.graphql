@@ -236,7 +236,7 @@ input CreateTagInput {
 
 input CreateVariantInput {
   identifier: String!
-  options: [VariantsOptions!]
+  options: [VariantOptionsInput!]
   title: String!
   title_ar: String!
 }
@@ -704,7 +704,7 @@ type VariantModel {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
-  options: [VariantOptions!]!
+  options: [VariantOptions!]
   title: String!
   title_ar: String!
 
@@ -713,18 +713,18 @@ type VariantModel {
 }
 
 type VariantOptions {
-  image: String!
-  sku: String!
-  title: String!
-  title_ar: String!
+  image: String
+  sku: String
+  title: String
+  title_ar: String
 }
 
-input VariantsOptions {
-  image: String!
-  price: Int!
-  sku: String!
-  title: String!
-  title_ar: String!
+input VariantOptionsInput {
+  image: String
+  price: Int
+  sku: String
+  title: String
+  title_ar: String
 }
 
 type Vendor {
