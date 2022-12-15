@@ -61,4 +61,15 @@ export class VendorsResolver {
   ): Promise<Vendor> {
     return await this.vendorsService.addDeliveryAreas(id, areas);
   }
+
+  @UseGuards(GqlAuthGuard)
+  @Query(() => Boolean)
+  async isVendorSlugAvailable(@Args('slug') slug: string) {
+    try {
+      await this.getVendorBySlug(slug);
+      return false;
+    } catch (error) {
+      return true;
+    }
+  }
 }
