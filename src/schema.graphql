@@ -235,10 +235,10 @@ input CreateTagInput {
 }
 
 input CreateVariantInput {
-  identifier: String!
   options: [VariantOptionsInput!]
   title: String!
   title_ar: String!
+  vendorId: String!
 }
 
 input CreateVendorInput {
@@ -468,6 +468,7 @@ type Query {
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
+  getVariants(vendorId: String!): [VariantModel!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
@@ -710,6 +711,7 @@ type VariantModel {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendorId: Vendor!
 }
 
 type VariantOptions {

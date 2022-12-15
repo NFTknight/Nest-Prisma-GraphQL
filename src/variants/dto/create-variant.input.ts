@@ -9,7 +9,7 @@ export class CreateVariantInput {
 
   @Field()
   @IsNotEmpty()
-  identifier: string;
+  vendorId: string;
 
   @Field()
   @IsNotEmpty()

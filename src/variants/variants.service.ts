@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateVariantInput } from './dto/create-variant.input';
 
 @Injectable()
 export class VariantsService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly vendorService: VendorsService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async createVariant(data: CreateVariantInput): Promise<any> {
     return this.prisma.variantModel.create({
       data: data,
+    });
+  }
+
+  async getVariants(vendorId: string): Promise<any> {
+    return this.prisma.variantModel.findMany({
+      where: { vendorId: vendorId },
     });
   }
 }
