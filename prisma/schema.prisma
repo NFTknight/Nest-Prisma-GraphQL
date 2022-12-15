@@ -154,6 +154,8 @@ model Coupon {
   updatedAt DateTime @updatedAt
 }
 
+
+
 enum ProductType {
   PRODUCT
   SERVICE
@@ -179,15 +181,32 @@ type ServiceAvailability {
 }
 
 type Variant {
+   id        String   
   identifier String
+  title      String
+  title_ar   String
+  options    VariantsOptions[]
+  createdAt DateTime
+  updatedAt DateTime 
+}
+
+type VariantsOptions {
   sku        String
-  options    String[]
-  options_ar String[]
   price      Float
   image      String
   title      String
-  title_ar   String?
+  title_ar   String
 }
+
+
+model VariantModel {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  title      String
+  title_ar   String
+  options    VariantsOptions[]
+}
+
 
 type TimeSlot {
   startTime DateTime
