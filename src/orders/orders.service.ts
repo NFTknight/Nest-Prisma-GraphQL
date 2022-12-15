@@ -11,6 +11,7 @@ import { UpdateOrderInput } from './dto/update-order.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { OrdersFilterInput } from 'src/common/filter/filter.input';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -31,15 +32,27 @@ export class OrdersService {
   async getOrders(
     vendorId: string,
     pg?: PaginationArgs,
-    sortOrder?: SortOrder
+    sortOrder?: SortOrder,
+    filter?: OrdersFilterInput
   ): Promise<Order[]> {
     try {
       const { skip, take } = getPaginationArgs(pg);
 
+      let orderBy = {};
+      if (sortOrder) {
+        orderBy[sortOrder.field] = sortOrder.direction;
+      } else {
+        orderBy = { id: 'asc' };
+      }
+
       const where = {
         vendorId,
       };
-      return await this.prisma.order.findMany({ where, skip, take });
+
+      if (filter && filter?.field) {
+        where[filter.field] = filter.title.trim();
+      }
+      return await this.prisma.order.findMany({ where, skip, take, orderBy });
     } catch (err) {
       console.log('Err => ', err);
     }

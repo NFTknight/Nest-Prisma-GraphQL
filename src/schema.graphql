@@ -359,6 +359,11 @@ enum OrderStatus {
   REJECTED
 }
 
+input OrdersFilterInput {
+  field: String!
+  title: String
+}
+
 type OtpResponse {
   id: String!
   to: String!
@@ -458,7 +463,7 @@ type Query {
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
   getOrder(id: String!): Order!
-  getOrders(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
+  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
