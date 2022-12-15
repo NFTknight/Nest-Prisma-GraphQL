@@ -1,4 +1,4 @@
-FROM node:16.12-alpine AS builder
+FROM node:16.15-alpine3.16 AS builder
 
 # Create app directory
 WORKDIR /app
@@ -7,17 +7,17 @@ WORKDIR /app
 COPY package.json ./
 COPY prisma ./prisma/
 
-RUN apk add --update --no-cache openssl1.1-compat
 # Install app dependencies
+RUN openssl version -v
+RUN apk add openssl1.1-compat
+
 RUN npm install
 
 COPY . .
 
 RUN npm run build
 
-FROM node:16.12-alpine
-
-RUN apk add --update --no-cache openssl1.1-compat
+FROM node:16.15-alpine3.16
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
