@@ -38,20 +38,23 @@ type Booking {
   Cart: Cart
   Order: Order
   Product: Product
+  Tag: Tag
+  Vendor: Vendor
   cartId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
-  endDate: DateTime!
   holdTimestamp: DateTime
   id: ID!
-  orderId: String!
+  orderId: String
   productId: String!
-  startDate: DateTime!
   status: BookingStatus!
+  tagId: String!
+  times: [BookingTime!]
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendorId: String!
 }
 
 """Booking Status"""
@@ -60,6 +63,18 @@ enum BookingStatus {
   HOLD
   PENDING
   REJECTED
+}
+
+type BookingTime {
+  date: String!
+  endTime: String!
+  startTime: String!
+}
+
+input BookingTimeInput {
+  date: String!
+  endTime: String!
+  startTime: String!
 }
 
 type Cart {
@@ -157,11 +172,11 @@ type Coupon {
 
 input CreateBookingInput {
   cartId: String!
-  endDate: DateTime
-  orderId: String!
   productId: String!
-  startDate: DateTime
   status: BookingStatus!
+  tagId: String!
+  times: [BookingTimeInput!]!
+  vendorId: String!
 }
 
 input CreateCategoryInput {
@@ -444,6 +459,7 @@ enum ProductType {
 
 type Query {
   getBooking(id: String!): Booking!
+  getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCart(cartId: String!): Cart!
   getCategories(active: Boolean, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
@@ -545,11 +561,11 @@ type Token {
 
 input UpdateBookingInput {
   cartId: String
-  endDate: DateTime
   orderId: String
   productId: String
-  startDate: DateTime
   status: BookingStatus
+  times: [BookingTimeInput!]
+  vendorId: String
 }
 
 input UpdateCategoryInput {

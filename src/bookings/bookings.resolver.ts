@@ -32,6 +32,27 @@ export class BookingResolver {
     return this.bookingService.getBooking(id);
   }
 
+  @Query(() => [Booking])
+  async getBookings(
+    @Args('vendorId') vendorId: string,
+    @Args('productId', { nullable: true }) productId: string,
+    @Args('tagId', { nullable: true }) tagId: string
+  ): Promise<Booking[]> {
+    const where = {
+      vendorId,
+    };
+
+    if (productId) {
+      where['productId'] = productId;
+    }
+    if (tagId) {
+      where['tagId'] = tagId;
+    }
+
+    const list = await this.bookingService.getBookings(where);
+    return list;
+  }
+
   @Mutation(() => Booking)
   createBooking(@Args('data') data: CreateBookingInput): Promise<Booking> {
     return this.bookingService.createBooking(data);

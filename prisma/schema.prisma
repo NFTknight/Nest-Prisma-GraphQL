@@ -333,12 +333,12 @@ model Booking {
   Order         Order?        @relation(fields: [orderId], references: [id])
   productId     String        @db.ObjectId
   Product       Product       @relation(fields: [productId], references: [id])
-  vendorId      String
+  vendorId      String        @db.ObjectId
   Vendor        Vendor        @relation(fields: [vendorId], references: [id])
-  tagId         String
+  tagId         String        @db.ObjectId
   Tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
-  times         BookingTime
+  times         BookingTime[]
   holdTimestamp DateTime?     @default(now())
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
