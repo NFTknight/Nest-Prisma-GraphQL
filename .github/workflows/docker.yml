@@ -13,7 +13,6 @@ on:
 env:
   # TODO: Change variable to your image's name.
   IMAGE_NAME: backend-api
-  TAG: ${{ github.sha }}
 
 jobs:
   #Push to Digital Ocean private Registry
@@ -37,14 +36,14 @@ jobs:
 
       - name: Build image
         if: steps.changes.outputs.app == 'true'
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
+        run: docker build . --file Dockerfile.alpine --tag $IMAGE_NAME
 
       - name: Push image
         if: steps.changes.outputs.app == 'true'
         run: |
           doctl registry login
-          docker tag $IMAGE_NAME registry.digitalocean.com/anyaa/$IMAGE_NAME:$TAG
-          docker push registry.digitalocean.com/anyaa/$IMAGE_NAME:$TAG
+          docker tag $IMAGE_NAME registry.digitalocean.com/anyaa/$IMAGE_NAME
+          docker push registry.digitalocean.com/anyaa/$IMAGE_NAME
 
       - name: Set up kubectl
         uses: matootie/dokube@v1.4.0
@@ -55,6 +54,5 @@ jobs:
       - name: Upgrade deployment
         run: |
           helm upgrade --install --atomic --timeout 5m backend-api ./infra/ -f ./infra/values-dev.yaml \
-          --set-string image.tag=${{ github.sha }} \
           --namespace dev --create-namespace \
           --set-string sha=${{ github.sha }}
