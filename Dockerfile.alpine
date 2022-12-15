@@ -8,7 +8,7 @@ COPY package.json ./
 COPY prisma ./prisma/
 
 # Install app dependencies
-RUN apk add openssl1.1-compat
+RUN apk add  --update --no-cache openssl1.1-compat
 RUN openssl version -v
 
 RUN npm install
