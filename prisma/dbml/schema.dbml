@@ -79,7 +79,7 @@ Table Coupon {
 
 Table VariantModel {
   id String [pk]
-  identifier String
+  vendorId String [not null]
   title String
   title_ar String
   options VariantOptions[] [not null]

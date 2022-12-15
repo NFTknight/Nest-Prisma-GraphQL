@@ -182,7 +182,7 @@ type ServiceAvailability {
 
 type Variant {
    id        String   
-  identifier String
+  vendorId String
   title      String
   title_ar   String
   options    VariantOptions[]
@@ -201,7 +201,7 @@ type VariantOptions {
 
 model VariantModel {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String?
+  vendorId String
   title      String?
   title_ar   String?
   options    VariantOptions[]
