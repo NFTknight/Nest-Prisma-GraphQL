@@ -22,6 +22,7 @@ import { PaymentModule } from './payment/payment.module';
 import { SendgridService } from './sendgrid/sendgrid.service';
 import { BookingsModule } from './bookings/bookings.module';
 import { SendgridModule } from './sendgrid/sendgrid.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { SendgridModule } from './sendgrid/sendgrid.module';
     PaymentModule,
     BookingsModule,
     SendgridModule,
+    StorageModule,
   ],
   controllers: [HealthController],
   providers: [SendgridService],
