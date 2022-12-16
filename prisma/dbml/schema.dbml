@@ -165,6 +165,7 @@ Table Order {
   vendorId String [not null]
   Vendor Vendor [not null]
   booking Booking [not null]
+  wayBill WayBill
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
