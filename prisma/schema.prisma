@@ -291,6 +291,18 @@ model Cart {
   booking   Booking[]
 }
 
+type Waybills {
+  awb String
+  awbFile String
+}
+
+type WayBill {
+    sawb String
+    createDate String
+    shipmentParcelsCount Int
+    waybills Waybills[]
+}
+
 model Order {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   orderId String
@@ -305,6 +317,7 @@ model Order {
   vendorId       String           @db.ObjectId
   Vendor         Vendor           @relation(fields: [vendorId], references: [id])
   booking        Booking[]
+  wayBill        WayBill? 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
