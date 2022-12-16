@@ -174,9 +174,10 @@ type ProductAttribute {
 }
 
 type ServiceAvailability {
-  days      String[]
+  date      String
   startTime String
   endTime   String
+  isAvailable Boolean  @default(true)
 }
 
 type Variant {

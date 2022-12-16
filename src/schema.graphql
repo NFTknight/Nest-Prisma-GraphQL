@@ -517,13 +517,14 @@ input SendOtpInput {
 }
 
 type ServiceAvailability {
-  days: [String!]
+  date: String!
   endTime: String!
+  isAvailable: Boolean!
   startTime: String!
 }
 
 input ServiceAvailabilityInput {
-  days: [String!]!
+  date: String!
   endTime: String!
   startTime: String!
 }
