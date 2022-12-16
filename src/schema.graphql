@@ -236,7 +236,7 @@ input CreateProductInput {
   title: String!
   title_ar: String!
   type: ProductType!
-  variants: [VariantInput!]
+  variants: [CreateVariantInput!]
   vendorId: String!
 }
 
@@ -641,7 +641,7 @@ input UpdateProductInput {
   title: String
   title_ar: String
   type: ProductType
-  variants: [UpdateVariantInput!]
+  variants: [CreateVariantInput!]
   vendorId: String
 }
 
@@ -656,17 +656,6 @@ input UpdateUserInput {
   firstname: String
   lastname: String
   vendorId: String
-}
-
-input UpdateVariantInput {
-  identifier: String
-  image: String
-  options: [String!]
-  options_ar: [String!]
-  price: Float
-  sku: String
-  title: String
-  title_ar: String
 }
 
 input UpdateVendorBankInput {
@@ -716,17 +705,6 @@ type User {
   vendor: Vendor
   vendorId: String
   verified: Boolean!
-}
-
-input VariantInput {
-  identifier: String!
-  image: String!
-  options: [String!]
-  options_ar: [String!]
-  price: Float!
-  sku: String!
-  title: String!
-  title_ar: String
 }
 
 type VariantModel {

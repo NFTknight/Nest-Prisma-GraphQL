@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { VariantInput } from './variant.input';
+import { CreateVariantInput } from '../../variants/dto/create-variant.input';
 import { ProductType, AttendanceType } from '@prisma/client';
 
 @InputType()
@@ -47,8 +47,8 @@ export class CreateProductInput {
   @Field(() => Int)
   minPreorderDays?: number;
 
-  @Field(() => [VariantInput], { nullable: true })
-  variants?: VariantInput[];
+  @Field(() => [CreateVariantInput], { nullable: true })
+  variants?: CreateVariantInput[];
 
   @Field(() => Int)
   noOfSeats?: number;
