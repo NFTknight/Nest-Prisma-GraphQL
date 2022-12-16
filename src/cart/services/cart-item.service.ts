@@ -115,6 +115,31 @@ export class CartItemService {
       },
     });
 
+    const tag = await this.prisma.tag.findUnique({
+      where: { id: tagId },
+    });
+
+    const tagAvailabilities = [...tag.availabilities];
+    const updatedAvailabilities = tagAvailabilities.map((item) => {
+      const booked = slots.find(
+        (slot) =>
+          slot.date === item.date &&
+          slot.startTime === item.startTime &&
+          slot.endTime === item.endTime
+      );
+      if (booked) {
+        return {
+          ...item,
+          isAvailable: false,
+        };
+      } else return item;
+    });
+
+    await this.prisma.tag.update({
+      where: { id: tagId },
+      data: { availabilities: updatedAvailabilities },
+    });
+
     const cartItem = await this.getCartItemFromProduct(productId);
     if (cartItem) {
       // if the cart item exists
