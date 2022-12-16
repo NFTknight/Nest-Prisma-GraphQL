@@ -60,7 +60,8 @@ export class BookingsService {
     if (data.orderId) {
       await this.orderService.getOrder(data.orderId);
     }
-    if (data.status !== BookingStatus.HOLD) {
+    // remove booking holdtimestamp when order is created for this booking
+    if ((data.status && data.status !== BookingStatus.HOLD) || data.orderId) {
       await this.prisma.$runCommandRaw({
         update: 'Booking',
         updates: [
