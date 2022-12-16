@@ -56,3 +56,7 @@ jobs:
           helm upgrade --install --atomic --timeout 5m backend-api ./infra/ -f ./infra/values-dev.yaml \
           --namespace dev --create-namespace \
           --set-string sha=${{ github.sha }}
+
+      - name: Restart deployment
+        run: |
+          kubectl rollout restart deployment backend-api -n dev
