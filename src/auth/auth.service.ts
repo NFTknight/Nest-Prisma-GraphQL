@@ -78,7 +78,7 @@ export class AuthService {
   async phoneVerify(phone: string, code: string): Promise<Token> {
     const response = await this.sms.verifyOtp(phone, code);
     if (response.status === OtpStatusCode.CORRECT) {
-      await this.prisma.user.update({
+      await this.prisma.user.updateMany({
         data: {
           phone: phone,
           verified: true,
@@ -140,7 +140,7 @@ export class AuthService {
         userId,
       });
     } catch (e) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('refresh Token');
     }
   }
 }

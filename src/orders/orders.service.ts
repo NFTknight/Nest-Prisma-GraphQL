@@ -63,8 +63,22 @@ export class OrdersService {
     await this.cartService.getCart(data.cartId);
     const vendor = await this.vendorService.getVendor(data.vendorId);
 
+    // get order ID from vendor
+    let orderId = '';
+    const vendorStrArr = vendor.name.split(' ');
+    if (vendorStrArr.length === 1) {
+      orderId = vendor.name.slice(0, 2).toUpperCase();
+    } else if (vendorStrArr.length === 2) {
+      orderId = vendorStrArr[0][0] + vendorStrArr[1][0];
+    } else {
+      orderId = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
+    }
+    orderId = orderId + '-' + Math.random().toString(36).substring(2, 10);
+
+    const newData = { ...data, orderId };
+
     // if vendor and cart exists we can successfully create the order.
-    const res = await this.prisma.order.create({ data });
+    const res = await this.prisma.order.create({ data: newData });
 
     // Email notification to vendor and customer when order is created
     if (res.id) {
