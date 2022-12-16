@@ -260,7 +260,7 @@ model CartItem {
   quantity Int        @default(1)
   tagId    String?    @db.ObjectId
   tag      Tag?       @relation(fields: [tagId], references: [id])
-  slots    TimeSlot[]
+  slots    BookingTime[]
 
   cartId String? @db.ObjectId
   Cart   Cart?   @relation(fields: [cartId], references: [id])

@@ -14,7 +14,7 @@ input AddToCartInput {
   productId: String!
   productVariant: String
   quantity: Int
-  slots: [Time!]
+  slots: [BookingTimeInput!]
   tagId: String
   vendorId: String!
 }
@@ -102,7 +102,7 @@ type CartItem {
   productId: String!
   productVariant: String
   quantity: Int!
-  slots: [TimeSlot!]
+  slots: [BookingTime!]
   tagId: String
 
   """Identifies the date and time when the object was last updated."""
@@ -566,16 +566,6 @@ type Tag {
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: Vendor!
-}
-
-input Time {
-  endTime: DateTime!
-  startTime: DateTime!
-}
-
-type TimeSlot {
-  endTime: DateTime!
-  startTime: DateTime!
 }
 
 type Token {

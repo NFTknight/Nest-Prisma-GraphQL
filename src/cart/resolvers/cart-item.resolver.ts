@@ -18,7 +18,7 @@ export class CartItemResolver {
     private readonly cartItemService: CartItemService,
     private readonly productService: ProductsService,
     private readonly cartService: CartService
-  ) { }
+  ) {}
 
   @Mutation(() => CartItem)
   async createCart(@Args('vendorId') vendorId: string) {

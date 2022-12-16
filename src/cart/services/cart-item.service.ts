@@ -1,5 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { BookingStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
+import { BookingsService } from 'src/bookings/bookings.service';
 import { ProductsService } from '../../products/services/products.service';
 import { AddToCartInput } from '../dto/add-to-cart.input';
 import { CartItem } from '../models/cart-item.model';
@@ -83,10 +90,31 @@ export class CartItemService {
   }
 
   async addServiceToCart(data: AddToCartInput): Promise<CartItem> {
-    const { productId, productVariant, quantity, cartId, tagId, slots } = data;
+    const {
+      productId,
+      productVariant,
+      quantity,
+      cartId,
+      tagId,
+      slots,
+      vendorId,
+    } = data;
     if (!cartId) {
       throw new BadRequestException('No cart created');
     }
+
+    // create booking
+    await this.prisma.booking.create({
+      data: {
+        status: BookingStatus.HOLD,
+        times: slots,
+        Vendor: { connect: { id: vendorId } },
+        Cart: { connect: { id: cartId } },
+        Tag: { connect: { id: tagId } },
+        Product: { connect: { id: productId } },
+      },
+    });
+
     const cartItem = await this.getCartItemFromProduct(productId);
     if (cartItem) {
       // if the cart item exists

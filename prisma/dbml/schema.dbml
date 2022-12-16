@@ -131,7 +131,7 @@ Table CartItem {
   quantity Int [not null, default: 1]
   tagId String
   tag Tag
-  slots TimeSlot[] [not null]
+  slots BookingTime[] [not null]
   cartId String
   Cart Cart
   createdAt DateTime [default: `now()`, not null]

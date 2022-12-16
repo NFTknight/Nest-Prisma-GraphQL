@@ -141,6 +141,9 @@ export class OrdersService {
             status: data.status,
           },
         });
+        //delete cart if customer Order is pending.
+        if (data.status === OrderStatus.PENDING)
+          this.prisma.cart.delete({ where: { id: res.cartId } });
       }
     }
 
