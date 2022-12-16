@@ -9,12 +9,19 @@ import { AuthService } from './auth.service';
 import { Auth } from './models/auth.model';
 import { Token } from './models/token.model';
 import { LoginInput } from './dto/login.input';
+import { PhoneLoginInput } from './dto/phone-login.input';
+import { PhoneVerify } from './dto/phone-verify.input';
 import { SignupInput } from './dto/signup.input';
 import { RefreshTokenInput } from './dto/refresh-token.input';
+import { SmsService } from 'src/sms/sms.service';
+import { OtpResponse } from 'src/sms/models/otp.model';
 
 @Resolver(() => Auth)
 export class AuthResolver {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly sms: SmsService
+  ) {}
 
   @Mutation(() => Auth)
   async signup(@Args('data') data: SignupInput) {
@@ -31,6 +38,27 @@ export class AuthResolver {
     const { accessToken, refreshToken } = await this.auth.login(
       email.toLowerCase(),
       password
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  @Mutation(() => OtpResponse)
+  async phoneLogin(@Args('data') { phone }: PhoneLoginInput) {
+    const phoneValid = await this.auth.validatePhone(phone);
+    if (phoneValid) {
+      return this.sms.sendOtp(phone);
+    } else return null;
+  }
+
+  @Mutation(() => Auth)
+  async verifyPhone(@Args('data') { phone, code }: PhoneVerify) {
+    const { accessToken, refreshToken } = await this.auth.phoneVerify(
+      phone,
+      code
     );
 
     return {

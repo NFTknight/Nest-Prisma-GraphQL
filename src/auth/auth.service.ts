@@ -11,6 +11,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PasswordService } from './password.service';
 import { SignupInput } from './dto/signup.input';
+import { SmsService } from 'src/sms/sms.service';
+import { OtpStatusCode } from 'src/sms/models/check-otp.model';
 import { Token } from './models/token.model';
 import { SecurityConfig } from 'src/common/configs/config.interface';
 
@@ -18,6 +20,7 @@ import { SecurityConfig } from 'src/common/configs/config.interface';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly sms: SmsService,
     private readonly prisma: PrismaService,
     private readonly passwordService: PasswordService,
     private readonly configService: ConfigService
@@ -72,8 +75,35 @@ export class AuthService {
     });
   }
 
+  async phoneVerify(phone: string, code: string): Promise<Token> {
+    const response = await this.sms.verifyOtp(phone, code);
+    if (response.status === OtpStatusCode.CORRECT) {
+      await this.prisma.user.updateMany({
+        data: {
+          phone: phone,
+          verified: true,
+        },
+        where: { phone: phone },
+      });
+    } else
+      throw new UnauthorizedException(
+        `Your OPT is incorrect for the phone: ${phone}`
+      );
+    const user = await this.prisma.user.findFirst({ where: { phone } });
+
+    return this.generateTokens({
+      userId: user.id,
+    });
+  }
+
   validateUser(userId: string): Promise<User> {
     return this.prisma.user.findUnique({ where: { id: userId } });
+  }
+
+  async validatePhone(phone: string): Promise<boolean> {
+    const user = await this.prisma.user.findFirst({ where: { phone } });
+    if (user) return true;
+    else return false;
   }
 
   getUserFromToken(token: string): Promise<User> {
@@ -110,7 +140,7 @@ export class AuthService {
         userId,
       });
     } catch (e) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('refresh Token');
     }
   }
 }

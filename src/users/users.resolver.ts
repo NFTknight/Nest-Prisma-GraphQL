@@ -77,6 +77,6 @@ export class UsersResolver {
   @UseGuards(GqlAuthGuard)
   @ResolveField('vendor')
   vendor(@Parent() user: User): Promise<Vendor> {
-    return this.vendorService.getVendor(user.vendorId);
+    return this.vendorService.getVendorByUserId(user.id);
   }
 }

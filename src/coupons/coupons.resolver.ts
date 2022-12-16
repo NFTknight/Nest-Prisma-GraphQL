@@ -12,6 +12,8 @@ import { CreateCouponInput } from './dto/create-coupon.input';
 import { UpdateCouponInput } from './dto/update-coupon.input';
 import { Coupon } from './models/coupon.model';
 import { CouponsService } from './coupons.service';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 
 @Resolver(() => Coupon)
 export class CouponsResolver {
@@ -26,8 +28,12 @@ export class CouponsResolver {
   }
 
   @Query(() => [Coupon])
-  getCoupons(@Args('vendorId', { nullable: true }) vendorId?: string) {
-    return this.couponsService.getCoupons(vendorId);
+  getCoupons(
+    @Args('vendorId', { nullable: true }) vendorId?: string,
+    @Args('pagination', { nullable: true }) pg?: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder?: SortOrder
+  ) {
+    return this.couponsService.getCoupons(vendorId, pg, sortOrder);
   }
 
   @Mutation(() => Coupon)

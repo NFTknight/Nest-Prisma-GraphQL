@@ -12,7 +12,7 @@ spec:
       labels:
         app: {{ .Release.Name }}
       annotations:
-        sha: "{{ .Values.sha }}"
+        sha: "{{ .Values.image.tag }}"
     spec:
       containers:
         - name: {{ .Release.Name }}
@@ -53,6 +53,20 @@ spec:
                 secretKeyRef:
                   name: smsa
                   key: token
+            - name: DO_ENDPOINT
+              value: {{ .Values.storage.endpoint }}
+            - name: DO_SPACE
+              value: {{ .Values.storage.space }}
+            - name: DO_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: do-storage
+                  key: access-key
+            - name: DO_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: do-storage
+                  key: secret-key
           resources: {{ toYaml .Values.resources | nindent 12 }}
           livenessProbe:
             httpGet:

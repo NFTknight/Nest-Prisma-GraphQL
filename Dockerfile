@@ -1,4 +1,6 @@
-FROM node:16 AS builder
+FROM node:16.15-slim AS builder
+
+RUN apt-get update && apt-get -y install openssl
 
 # Create app directory
 WORKDIR /app
@@ -14,7 +16,7 @@ COPY . .
 
 RUN npm run build
 
-FROM node:16
+FROM node:16.15-slim
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./

@@ -34,6 +34,12 @@ const config: Config = {
     url: process.env.MYFATOORAH_API_URL as string,
     token: process.env.MYFATOORAH_API_TOKEN as string,
   },
+  storage: {
+    enpoint: process.env.DO_ENDPOINT as string,
+    space: process.env.DO_SPACE as string,
+    accessKey: process.env.DO_ACCESS_KEY as string,
+    secretKey: process.env.DO_SECRET_KEY as string,
+  },
 };
 
 export default (): Config => config;

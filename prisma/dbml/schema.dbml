@@ -79,6 +79,14 @@ Table Coupon {
   updatedAt DateTime [not null]
 }
 
+Table VariantModel {
+  id String [pk]
+  vendorId String [not null]
+  title String
+  title_ar String
+  options VariantOptions[] [not null]
+}
+
 Table Product {
   id String [pk]
   slug String [not null]
@@ -148,6 +156,7 @@ Table Cart {
 
 Table Order {
   id String [pk]
+  orderId String [not null]
   cartId String [not null]
   Cart Cart [not null]
   customerInfo CustomerInfo [not null]

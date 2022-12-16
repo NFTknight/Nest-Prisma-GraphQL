@@ -248,6 +248,13 @@ input CreateTagInput {
   vendorId: String!
 }
 
+input CreateVariantInput {
+  options: [VariantOptionsInput!]
+  title: String
+  title_ar: String
+  vendorId: String!
+}
+
 input CreateVendorInput {
   name: String!
   slug: String!
@@ -305,6 +312,7 @@ type Mutation {
   createOrder(data: CreateOrderInput!): Order!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
+  createVariant(data: CreateVariantInput!): VariantModel!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteBooking(id: String!): Booking!
   deleteCategory(id: String!): Category!
@@ -315,6 +323,7 @@ type Mutation {
   deleteVendor(id: String!): Vendor!
   initiatePaymentSession: PaymentSession!
   login(data: LoginInput!): Auth!
+  phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
   removeItemFromCart(cartItemId: String!): CartItem!
   sendOtp(data: SendOtpInput!): OtpResponse!
@@ -328,7 +337,9 @@ type Mutation {
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
+  uploadFile(file: String!, key: String!): String!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
+  verifyPhone(data: PhoneVerify!): Auth!
 }
 
 type Order {
@@ -340,6 +351,7 @@ type Order {
   customerInfo: CustomerInfo
   deliveryMethod: DeliveryMethods
   id: ID!
+  orderId: String!
   paymentMethod: PaymentMethods
   status: OrderStatus!
 
@@ -365,6 +377,11 @@ enum OrderStatus {
   FAILED
   PENDING
   REJECTED
+}
+
+input OrdersFilterInput {
+  field: String!
+  title: String
 }
 
 type OtpResponse {
@@ -404,6 +421,15 @@ type PaymentSession {
   SessionId: String!
 }
 
+input PhoneLoginInput {
+  phone: String!
+}
+
+input PhoneVerify {
+  code: String!
+  phone: String!
+}
+
 type Product {
   Tags: [Tag!]
   active: Boolean!
@@ -436,7 +462,7 @@ type Product {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  variants: [Variant!]
+  variants: [VariantModel!]
   vendor: Vendor!
   vendorId: String!
 }
@@ -461,19 +487,21 @@ type Query {
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCart(cartId: String!): Cart!
-  getCategories(active: Boolean, vendorId: String!): [Category!]!
+  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
-  getCoupons(vendorId: String): [Coupon!]!
+  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
   getOrder(id: String!): Order!
-  getOrders(vendorId: String): [Order!]!
+  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
-  getTags(vendorId: String): [Tag!]!
+  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
+  getVariants(vendorId: String!): [VariantModel!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
+  isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
@@ -690,17 +718,6 @@ type User {
   verified: Boolean!
 }
 
-type Variant {
-  identifier: String!
-  image: String!
-  options: [String!]
-  options_ar: [String!]
-  price: Float!
-  sku: String!
-  title: String!
-  title_ar: String!
-}
-
 input VariantInput {
   identifier: String!
   image: String!
@@ -709,6 +726,35 @@ input VariantInput {
   price: Float!
   sku: String!
   title: String!
+  title_ar: String
+}
+
+type VariantModel {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  options: [VariantOptions!]
+  title: String!
+  title_ar: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendorId: Vendor!
+}
+
+type VariantOptions {
+  image: String
+  price: Int
+  sku: String
+  title: String
+  title_ar: String
+}
+
+input VariantOptionsInput {
+  image: String
+  price: Int
+  sku: String
+  title: String
   title_ar: String
 }
 

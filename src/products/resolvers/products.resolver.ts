@@ -69,7 +69,7 @@ export class ProductsResolver {
     }
 
     if (filter && filter?.field) {
-      if (filter.field === 'titie') {
+      if (filter.field === 'title') {
         where[filter.field] = {
           contains: filter.title.trim(),
           mode: 'insensitive',

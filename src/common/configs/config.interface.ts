@@ -6,6 +6,7 @@ export interface Config {
   sms: SmsConfig;
   shipping: ShippingConfig;
   payment: PaymentConfig;
+  storage: StorageConfig;
 }
 
 export interface NestConfig {
@@ -46,4 +47,11 @@ export interface ShippingConfig {
 export interface PaymentConfig {
   url: string;
   token: string;
+}
+
+export interface StorageConfig {
+  enpoint: string;
+  space: string;
+  accessKey: string;
+  secretKey: string;
 }

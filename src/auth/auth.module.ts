@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './jwt.strategy';
 import { SecurityConfig } from 'src/common/configs/config.interface';
+import { SmsModule } from 'src/sms/sms.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SecurityConfig } from 'src/common/configs/config.interface';
       },
       inject: [ConfigService],
     }),
+    SmsModule,
   ],
   providers: [
     AuthService,

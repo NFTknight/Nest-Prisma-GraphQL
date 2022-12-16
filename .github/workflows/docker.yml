@@ -38,7 +38,7 @@ jobs:
         if: steps.changes.outputs.app == 'true'
         run: docker build . --file Dockerfile.alpine --tag $IMAGE_NAME
 
-      - name: push image to digitalocean
+      - name: Push image
         if: steps.changes.outputs.app == 'true'
         run: |
           doctl registry login
@@ -57,23 +57,6 @@ jobs:
           --namespace dev --create-namespace \
           --set-string sha=${{ github.sha }}
 
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Set up kubectl
-  #       uses: matootie/dokube@v1.4.0
-  #       with:
-  #         personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-  #         clusterName: anyaa-k8s
-
-  #     - name: Check path
-  #       run: |
-  #         echo $GITHUB_WORKSPACE
-  #         pwd
-  #         ls -la
-
-  #     - name: Deploy to Kubernetes
-  #       run: |
-  #         helm upgrade --install --atomic --timeout 1m backend-api $GITHUB_WORKSPACE/infra/ -f $GITHUB_WORKSPACE/infra/values-dev.yaml \
-  #         --namespace dev --create-namespace
+      - name: Restart deployment
+        run: |
+          kubectl rollout restart deployment backend-api -n dev

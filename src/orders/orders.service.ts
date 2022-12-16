@@ -8,7 +8,10 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateOrderInput } from './dto/create-order.input';
 import { UpdateOrderInput } from './dto/update-order.input';
-
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { OrdersFilterInput } from 'src/common/filter/filter.input';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -31,9 +34,30 @@ export class OrdersService {
     return order;
   }
 
-  async getOrders(vendorId: string): Promise<Order[]> {
+  async getOrders(
+    vendorId: string,
+    pg?: PaginationArgs,
+    sortOrder?: SortOrder,
+    filter?: OrdersFilterInput
+  ): Promise<Order[]> {
     try {
-      return await this.prisma.order.findMany({ where: { vendorId } });
+      const { skip, take } = getPaginationArgs(pg);
+
+      let orderBy = {};
+      if (sortOrder) {
+        orderBy[sortOrder.field] = sortOrder.direction;
+      } else {
+        orderBy = { id: 'asc' };
+      }
+
+      const where = {
+        vendorId,
+      };
+
+      if (filter && filter?.field) {
+        where[filter.field] = filter.title.trim();
+      }
+      return await this.prisma.order.findMany({ where, skip, take, orderBy });
     } catch (err) {
       console.log('Err => ', err);
     }
@@ -44,8 +68,22 @@ export class OrdersService {
     await this.cartService.getCart(data.cartId);
     const vendor = await this.vendorService.getVendor(data.vendorId);
 
+    // get order ID from vendor
+    let orderId = '';
+    const vendorStrArr = vendor.name.split(' ');
+    if (vendorStrArr.length === 1) {
+      orderId = vendor.name.slice(0, 2).toUpperCase();
+    } else if (vendorStrArr.length === 2) {
+      orderId = vendorStrArr[0][0] + vendorStrArr[1][0];
+    } else {
+      orderId = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
+    }
+    orderId = orderId + '-' + Math.random().toString(36).substring(2, 10);
+
+    const newData = { ...data, orderId };
+
     // if vendor and cart exists we can successfully create the order.
-    const res = await this.prisma.order.create({ data });
+    const res = await this.prisma.order.create({ data: newData });
 
     // Email notification to vendor and customer when order is created
     if (res.id) {
