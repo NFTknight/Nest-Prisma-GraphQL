@@ -45,7 +45,6 @@ model Vendor {
 
   products   Product[]
   categories Category[]
-  carts      Cart[]
   tags       Tag[]
   coupons    Coupon[]
   orders     Order[]
@@ -260,16 +259,13 @@ model Cart {
 
   items CartItem[]
 
-  vendorId String @db.ObjectId
-  vendor   Vendor @relation(fields: [vendorId], references: [id])
+  customerId String @db.ObjectId
 
   totalPrice Float
 
   appliedCoupon String?
 
   finalPrice Float
-
-  checkedOut Boolean @default(false)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
