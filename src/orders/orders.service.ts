@@ -13,13 +13,20 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { OrdersFilterInput } from 'src/common/filter/filter.input';
 import { FormResponse } from './models/order.model';
+// import { SHIPPING_CONSTANT } from 'src/constant/shipping';
+// import { ShippingConfig } from 'src/common/configs/config.interface';
+// import axios from 'axios';
+import { WayBill } from 'src/shipping/models/waybill.model';
+// import { ShippingService } from 'src/shipping/shipping.service';
+
 @Injectable()
 export class OrdersService {
   constructor(
+    // private readonly shippingConfig: ShippingConfig,
     private readonly prisma: PrismaService,
     private readonly cartService: CartService,
     private readonly vendorService: VendorsService,
-    private readonly emailService: SendgridService
+    private readonly emailService: SendgridService // private readonly shippingService: ShippingService
   ) {}
 
   async getOrder(id: string): Promise<Order> {
@@ -125,31 +132,40 @@ export class OrdersService {
       await this.cartService.getCart(data.cartId);
     }
 
-    const res = await this.prisma.order.update({
-      where: { id },
-      data: { ...data, updatedAt: new Date() },
-    });
-
-    // Email notification to vendor and customer if order is confirmed or rejected
+    const order = await this.getOrder(id);
+    let wayBillResponse: WayBill = null;
     if (
-      res.status === OrderStatus.PENDING &&
-      res.deliveryMethod === DeliveryMethods.SMSA
+      order.status === OrderStatus.PENDING &&
+      order.deliveryMethod === DeliveryMethods.SMSA
     ) {
-      // create Shipment will add here.
-      // added constant for now. it will be remove after addition of create shipment function.
-      res['waybill'] = {
+      // const url = `${this.shippingConfig.url}/api/shipment/b2c/new`;
+      // wayBillResponse = await axios({
+      //   method: 'post',
+      //   url: url,
+      //   data: SHIPPING_CONSTANT,
+      // });
+      //adding dummy data for now as we need Shipping detail of customer.
+      wayBillResponse = {
         sawb: '231200021000',
-        createDate: '2021-01-01710:40:53',
+        createDate: '2021-01-01T10:40:53',
         shipmentParcelsCount: 1,
         waybills: [
           {
             awb: '231200021879',
-            awbFile: 'IVBERio×LiOKJeLiz9MKMSA',
+            awbFile: 'JVBERi0xLjQKJeLjz9MKMSA...',
           },
         ],
       };
     }
-    console.log({ res });
+
+    const res = await this.prisma.order.update({
+      where: { id },
+      data: wayBillResponse.sawb
+        ? { ...data, wayBill: wayBillResponse, updatedAt: new Date() }
+        : { ...data, updatedAt: new Date() },
+    });
+
+    // Email notification to vendor and customer if order is confirmed or rejected
     if (
       res.id &&
       (data.status === OrderStatus.CONFIRMED ||

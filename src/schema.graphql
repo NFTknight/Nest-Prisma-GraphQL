@@ -386,7 +386,7 @@ type Order {
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
-  waybill: WayBill
+  wayBill: WayBill
 }
 
 """
