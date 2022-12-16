@@ -36,9 +36,7 @@ export class CartItemService {
     const product = await this.productService.getProduct(productId);
     if (
       productVariant &&
-      product.variants.findIndex(
-        (item) => item.identifier === productVariant
-      ) === -1
+      product.variants.findIndex((item) => item.id === productVariant) === -1
     ) {
       // throws exception when there is no product with such productVariant
       throw new BadRequestException('No variant found on the product');
@@ -65,9 +63,7 @@ export class CartItemService {
     const product = await this.productService.getProduct(productId);
     if (
       productVariant &&
-      product.variants.findIndex(
-        (item) => item.identifier === productVariant
-      ) === -1
+      product.variants.findIndex((item) => item.id === productVariant) === -1
     ) {
       // throws exception when there is no product with such productVariant
       throw new BadRequestException('No variant found on the product');
