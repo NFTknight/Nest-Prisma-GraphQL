@@ -282,6 +282,18 @@ type FormResponse {
   answers   String
 }
 
+type Waybills {
+  awb String
+  awbFile String
+}
+
+type WayBill {
+    sawb String
+    createDate String
+    shipmentParcelsCount Int
+    waybills Waybills[]
+}
+
 model Order {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   orderId    String
@@ -295,11 +307,19 @@ model Order {
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
+<<<<<<< HEAD
   formResponses  FormResponse[]
 
   vendorId String    @db.ObjectId
   vendor   Vendor    @relation(fields: [vendorId], references: [id])
   booking  Booking[]
+=======
+  status         OrderStatus
+  vendorId       String           @db.ObjectId
+  Vendor         Vendor           @relation(fields: [vendorId], references: [id])
+  booking        Booking[]
+  wayBill        WayBill? 
+>>>>>>> 73df9ae (update prisma schema)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
