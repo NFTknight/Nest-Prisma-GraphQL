@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Order, OrderStatus } from '@prisma/client';
+import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
@@ -131,6 +131,25 @@ export class OrdersService {
     });
 
     // Email notification to vendor and customer if order is confirmed or rejected
+    if (
+      res.status === OrderStatus.PENDING &&
+      res.deliveryMethod === DeliveryMethods.SMSA
+    ) {
+      // create Shipment will add here.
+      // added constant for now. it will be remove after addition of create shipment function.
+      res['waybill'] = {
+        sawb: '231200021000',
+        createDate: '2021-01-01710:40:53',
+        shipmentParcelsCount: 1,
+        waybills: [
+          {
+            awb: '231200021879',
+            awbFile: 'IVBERio×LiOKJeLiz9MKMSA',
+          },
+        ],
+      };
+    }
+    console.log({ res });
     if (
       res.id &&
       (data.status === OrderStatus.CONFIRMED ||
