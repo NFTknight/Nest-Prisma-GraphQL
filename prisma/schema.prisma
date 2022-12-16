@@ -274,7 +274,7 @@ model Cart {
 
   items CartItem[]
 
-  customerId String @db.ObjectId
+  customerId String  @unique @db.ObjectId 
 
   totalPrice Float
 

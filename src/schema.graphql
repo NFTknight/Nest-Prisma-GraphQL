@@ -79,10 +79,10 @@ input BookingTimeInput {
 
 type Cart {
   appliedCoupon: String!
-  checkedOut: Boolean!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
+  customerId: String!
   finalPrice: Float!
   id: ID!
   items: [CartItem!]
@@ -90,8 +90,6 @@ type Cart {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor
-  vendorId: String!
 }
 
 type CartItem {
@@ -491,6 +489,7 @@ type Query {
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
+  getCustomerCart(customerId: String!): Cart!
   getOrder(id: String!): Order!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
   getProduct(id: String!): Product!

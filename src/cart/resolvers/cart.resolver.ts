@@ -16,11 +16,16 @@ export class CartResolver {
   constructor(
     private readonly cartService: CartService,
     private readonly cartItemService: CartItemService
-  ) { }
+  ) {}
 
   @Query(() => Cart)
   getCart(@Args('cartId') cartId: string): Promise<Cart> {
     return this.cartService.getCart(cartId);
+  }
+
+  @Query(() => Cart)
+  getCustomerCart(@Args('customerId') customerId: string): Promise<Cart> {
+    return this.cartService.getCartByCustomer(customerId);
   }
 
   @ResolveField('items')

@@ -29,7 +29,6 @@ Table Vendor {
   settings VendorSettings
   products Product [not null]
   categories Category [not null]
-  carts Cart [not null]
   tags Tag [not null]
   coupons Coupon [not null]
   orders Order [not null]
@@ -142,12 +141,10 @@ Table CartItem {
 Table Cart {
   id String [pk]
   items CartItem [not null]
-  vendorId String [not null]
-  vendor Vendor [not null]
+  customerId String [unique, not null]
   totalPrice Float [not null]
   appliedCoupon String
   finalPrice Float [not null]
-  checkedOut Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Order Order [not null]
@@ -251,8 +248,6 @@ Ref: CartItem.productId > Product.id
 Ref: CartItem.tagId > Tag.id
 
 Ref: CartItem.cartId > Cart.id
-
-Ref: Cart.vendorId > Vendor.id
 
 Ref: Order.cartId > Cart.id
 

@@ -46,7 +46,7 @@ export class ProductsService {
     const prod = await this.prisma.product.create({
       data: {
         ...rest,
-        variants: variants,
+        variants: variants as any,
         vendor: { connect: { id: vendorId } },
         category: categoryId ? { connect: { id: categoryId } } : undefined,
       },
