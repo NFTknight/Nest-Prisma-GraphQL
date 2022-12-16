@@ -7,7 +7,7 @@ Table User {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   email String [unique, not null]
-  phone String [unique]
+  phone String
   password String [not null]
   firstName String
   lastName String
@@ -155,6 +155,7 @@ Table Cart {
 
 Table Order {
   id String [pk]
+  orderId String [not null]
   cartId String [not null]
   Cart Cart [not null]
   customerInfo CustomerInfo [not null]

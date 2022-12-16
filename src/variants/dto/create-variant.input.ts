@@ -5,7 +5,7 @@ import { VariantOptionsInput } from './variant-options.input';
 export class CreateVariantInput {
   @Field()
   @IsNotEmpty()
-  title: string;
+  title?: string;
 
   @Field()
   @IsNotEmpty()
@@ -13,7 +13,7 @@ export class CreateVariantInput {
 
   @Field()
   @IsNotEmpty()
-  title_ar: string;
+  title_ar?: string;
 
   @Field(() => [VariantOptionsInput])
   options?: VariantOptionsInput[];

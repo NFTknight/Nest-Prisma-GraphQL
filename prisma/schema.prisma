@@ -16,7 +16,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email     String   @unique
-  phone     String?  @unique
+  phone     String?
   password  String
   firstName String?
   lastName  String?
@@ -154,8 +154,6 @@ model Coupon {
   updatedAt DateTime @updatedAt
 }
 
-
-
 enum ProductType {
   PRODUCT
   SERVICE
@@ -181,32 +179,30 @@ type ServiceAvailability {
 }
 
 type Variant {
-   id        String   
-  vendorId String
-  title      String
-  title_ar   String
-  options    VariantOptions[]
+  id        String
+  vendorId  String
+  title     String
+  title_ar  String
+  options   VariantOptions[]
   createdAt DateTime
-  updatedAt DateTime 
+  updatedAt DateTime
 }
 
 type VariantOptions {
-  sku        String?
-  price      Float?
-  image      String?
-  title      String?
-  title_ar   String?
+  sku      String?
+  price    Float?
+  image    String?
+  title    String?
+  title_ar String?
 }
-
 
 model VariantModel {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id       String           @id @default(auto()) @map("_id") @db.ObjectId
   vendorId String
-  title      String?
-  title_ar   String?
-  options    VariantOptions[]
+  title    String?
+  title_ar String?
+  options  VariantOptions[]
 }
-
 
 type TimeSlot {
   startTime DateTime
@@ -296,7 +292,8 @@ model Cart {
 }
 
 model Order {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String
 
   cartId String @db.ObjectId
   Cart   Cart   @relation(fields: [cartId], references: [id])

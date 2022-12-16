@@ -236,8 +236,8 @@ input CreateTagInput {
 
 input CreateVariantInput {
   options: [VariantOptionsInput!]
-  title: String!
-  title_ar: String!
+  title: String
+  title_ar: String
   vendorId: String!
 }
 
@@ -337,6 +337,7 @@ type Order {
   customerInfo: CustomerInfo
   deliveryMethod: DeliveryMethods
   id: ID!
+  orderId: String!
   paymentMethod: PaymentMethods
   status: OrderStatus!
 

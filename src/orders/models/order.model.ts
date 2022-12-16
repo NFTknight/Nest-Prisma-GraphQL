@@ -12,6 +12,9 @@ export class Order extends BaseModel {
   customerInfo: CustomerInfo;
 
   @IsString()
+  orderId: string;
+
+  @IsString()
   cartId: string;
   @Field(() => Cart, { nullable: false })
   cart?: Cart;
