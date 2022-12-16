@@ -3,6 +3,7 @@ import { DeliveryMethods, OrderStatus, PaymentMethods } from '@prisma/client';
 import { IsString } from 'class-validator';
 import { Cart } from 'src/cart/models/cart.model';
 import { BaseModel } from 'src/common/models/base.model';
+import { WayBill } from 'src/shipping/models/waybill.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { CustomerInfo } from './customer-info.model';
 
@@ -41,4 +42,6 @@ export class Order extends BaseModel {
 
   @Field(() => [FormResponse])
   formResponses?: FormResponse[];
+  @Field(() => WayBill, { nullable: true })
+  waybill?: WayBill;
 }
