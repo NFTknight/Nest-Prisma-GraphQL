@@ -35,5 +35,5 @@ export class Order extends BaseModel {
   paymentMethod?: PaymentMethods;
 
   @Field(() => WayBill, { nullable: true })
-  waybill?: WayBill;
+  wayBill?: WayBill;
 }
