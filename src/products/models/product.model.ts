@@ -36,7 +36,7 @@ export class Product extends BaseModel {
   minPreorderDays?: number;
 
   @Field(() => [VariantModel], { nullable: true })
-  variants?: any[];
+  variants?: VariantModel[];
 
   @Field(() => [ServiceAvailability], { nullable: true })
   availabilities?: ServiceAvailability[];
