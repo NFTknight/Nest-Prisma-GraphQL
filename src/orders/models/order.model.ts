@@ -43,5 +43,5 @@ export class Order extends BaseModel {
   @Field(() => [FormResponse])
   formResponses?: FormResponse[];
   @Field(() => WayBill, { nullable: true })
-  waybill?: WayBill;
+  wayBill?: WayBill;
 }
