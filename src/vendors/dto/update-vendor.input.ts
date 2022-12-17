@@ -13,6 +13,15 @@ registerEnumType(PaymentMethods, {
 });
 
 @InputType()
+class Certificate {
+  @Field()
+  title: string;
+
+  @Field()
+  image: string;
+}
+
+@InputType()
 class UpdateVendorInfoInput {
   @Field()
   address?: string;
@@ -41,6 +50,12 @@ class UpdateVendorInfoInput {
 
   @Field()
   logo?: string;
+
+  @Field()
+  certificates?: Certificate[];
+
+  @Field()
+  iban?: string;
 }
 
 @InputType()

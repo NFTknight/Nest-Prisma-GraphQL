@@ -127,7 +127,12 @@ type Category {
   vendorId: String!
 }
 
-type Certificate {
+input Certificate {
+  image: String!
+  title: String!
+}
+
+type Certificates {
   image: String!
   title: String!
 }
@@ -658,10 +663,12 @@ input UpdateVendorBankInput {
 input UpdateVendorInfoInput {
   address: String
   addressUrl: String
+  certificates: [Certificate!]
   description: String
   description_ar: String
   email: String
   heroImage: String
+  iban: String
   logo: String
   phone: String
   terms: String
@@ -732,10 +739,8 @@ type Vendor {
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
-  heroImage: String
   id: ID!
   info: VendorInfo
-  logo: String
   name: String!
   owner: User
   ownerId: String!
@@ -756,7 +761,7 @@ type VendorBank {
 type VendorInfo {
   address: String
   addressUrl: String
-  certificates: [Certificate!]
+  certificates: [Certificates!]
   cr_num: String
   description: String
   description_ar: String
