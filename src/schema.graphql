@@ -14,7 +14,7 @@ input AddToCartInput {
   productId: String!
   productVariant: String
   quantity: Int
-  slots: [Time!]
+  slots: [BookingTimeInput!]
   tagId: String
   vendorId: String!
 }
@@ -38,20 +38,23 @@ type Booking {
   Cart: Cart
   Order: Order
   Product: Product
+  Tag: Tag
+  Vendor: Vendor
   cartId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
-  endDate: DateTime!
   holdTimestamp: DateTime
   id: ID!
-  orderId: String!
+  orderId: String
   productId: String!
-  startDate: DateTime!
   status: BookingStatus!
+  tagId: String!
+  times: [BookingTime!]
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendorId: String!
 }
 
 """Booking Status"""
@@ -62,12 +65,24 @@ enum BookingStatus {
   REJECTED
 }
 
+type BookingTime {
+  date: String!
+  endTime: String!
+  startTime: String!
+}
+
+input BookingTimeInput {
+  date: String!
+  endTime: String!
+  startTime: String!
+}
+
 type Cart {
   appliedCoupon: String!
-  checkedOut: Boolean!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
+  customerId: String!
   finalPrice: Float!
   id: ID!
   items: [CartItem!]
@@ -75,8 +90,6 @@ type Cart {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor
-  vendorId: String!
 }
 
 type CartItem {
@@ -89,7 +102,7 @@ type CartItem {
   productId: String!
   productVariant: String
   quantity: Int!
-  slots: [TimeSlot!]
+  slots: [BookingTime!]
   tagId: String
 
   """Identifies the date and time when the object was last updated."""
@@ -157,11 +170,11 @@ type Coupon {
 
 input CreateBookingInput {
   cartId: String!
-  endDate: DateTime
-  orderId: String!
   productId: String!
-  startDate: DateTime
   status: BookingStatus!
+  tagId: String!
+  times: [BookingTimeInput!]!
+  vendorId: String!
 }
 
 input CreateCategoryInput {
@@ -201,7 +214,6 @@ input CreateOrderInput {
 input CreateProductInput {
   active: Boolean!
   attendanceType: AttendanceType
-  availabilities: [ServiceAvailabilityInput!]
   categoryId: String
   customerLocation: Boolean
   description: String!
@@ -359,6 +371,8 @@ enum OrderDirection {
 enum OrderStatus {
   COMPLETED
   CONFIRMED
+  CREATED
+  FAILED
   PENDING
   REJECTED
 }
@@ -418,7 +432,6 @@ type Product {
   Tags: [Tag!]
   active: Boolean!
   attendanceType: AttendanceType
-  availabilities: [ServiceAvailability!]
   category: Category
   categoryId: String
 
@@ -470,11 +483,13 @@ enum ProductType {
 
 type Query {
   getBooking(id: String!): Booking!
+  getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCart(cartId: String!): Cart!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
+  getCustomerCart(customerId: String!): Cart!
   getOrder(id: String!): Order!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
   getProduct(id: String!): Product!
@@ -502,13 +517,14 @@ input SendOtpInput {
 }
 
 type ServiceAvailability {
-  days: [String!]
+  date: String!
   endTime: String!
+  isAvailable: Boolean!
   startTime: String!
 }
 
 input ServiceAvailabilityInput {
-  days: [String!]!
+  date: String!
   endTime: String!
   startTime: String!
 }
@@ -553,16 +569,6 @@ type Tag {
   vendorId: Vendor!
 }
 
-input Time {
-  endTime: DateTime!
-  startTime: DateTime!
-}
-
-type TimeSlot {
-  endTime: DateTime!
-  startTime: DateTime!
-}
-
 type Token {
   """JWT access token"""
   accessToken: JWT!
@@ -573,11 +579,11 @@ type Token {
 
 input UpdateBookingInput {
   cartId: String
-  endDate: DateTime
   orderId: String
   productId: String
-  startDate: DateTime
   status: BookingStatus
+  times: [BookingTimeInput!]
+  vendorId: String
 }
 
 input UpdateCategoryInput {
@@ -605,7 +611,6 @@ input UpdateOrderInput {
 input UpdateProductInput {
   active: Boolean
   attendanceType: AttendanceType
-  availabilities: [ServiceAvailabilityInput!]
   categoryId: String
   customerLocation: Boolean
   description: String

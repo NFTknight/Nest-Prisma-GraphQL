@@ -29,10 +29,10 @@ Table Vendor {
   settings VendorSettings
   products Product [not null]
   categories Category [not null]
-  carts Cart [not null]
   tags Tag [not null]
   coupons Coupon [not null]
   orders Order [not null]
+  booking Booking [not null]
   ownerId String [unique, not null]
   owner User
   createdAt DateTime [default: `now()`, not null]
@@ -50,6 +50,7 @@ Table Tag {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
+  booking Booking [not null]
 }
 
 Table Category {
@@ -103,7 +104,6 @@ Table Product {
   categoryId String
   noOfSeats Int
   itemsInStock Int
-  availabilities ServiceAvailability[] [not null]
   variants Variant[] [not null]
   attributes ProductAttribute[] [not null]
   sortOrder Int [not null, default: 0]
@@ -131,7 +131,7 @@ Table CartItem {
   quantity Int [not null, default: 1]
   tagId String
   tag Tag
-  slots TimeSlot[] [not null]
+  slots BookingTime[] [not null]
   cartId String
   Cart Cart
   createdAt DateTime [default: `now()`, not null]
@@ -141,12 +141,10 @@ Table CartItem {
 Table Cart {
   id String [pk]
   items CartItem [not null]
-  vendorId String [not null]
-  vendor Vendor [not null]
+  customerId String [unique, not null]
   totalPrice Float [not null]
   appliedCoupon String
   finalPrice Float [not null]
-  checkedOut Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Order Order [not null]
@@ -171,15 +169,18 @@ Table Order {
 
 Table Booking {
   id String [pk]
-  startDate DateTime [default: `now()`, not null]
-  endDate DateTime [default: `now()`, not null]
   cartId String [not null]
   Cart Cart [not null]
-  orderId String [not null]
-  Order Order [not null]
+  orderId String
+  Order Order
   productId String [not null]
   Product Product [not null]
+  vendorId String [not null]
+  Vendor Vendor [not null]
+  tagId String [not null]
+  Tag Tag [not null]
   status BookingStatus [not null]
+  times BookingTime[] [not null]
   holdTimestamp DateTime [default: `now()`]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
@@ -215,10 +216,12 @@ Enum AttendanceType {
 }
 
 Enum OrderStatus {
+  CREATED
   PENDING
   COMPLETED
   CONFIRMED
   REJECTED
+  FAILED
 }
 
 Enum BookingStatus {
@@ -246,8 +249,6 @@ Ref: CartItem.tagId > Tag.id
 
 Ref: CartItem.cartId > Cart.id
 
-Ref: Cart.vendorId > Vendor.id
-
 Ref: Order.cartId > Cart.id
 
 Ref: Order.vendorId > Vendor.id
@@ -257,3 +258,7 @@ Ref: Booking.cartId > Cart.id
 Ref: Booking.orderId > Order.id
 
 Ref: Booking.productId > Product.id
+
+Ref: Booking.vendorId > Vendor.id
+
+Ref: Booking.tagId > Tag.id

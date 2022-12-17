@@ -4,16 +4,27 @@ import { Cart } from '../models/cart.model';
 
 @Injectable()
 export class CartService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async createNewCart(vendorId: string): Promise<Cart> {
+  async createNewCart(customerId: string): Promise<Cart> {
     return await this.prisma.cart.create({
-      data: { vendorId, totalPrice: 0, finalPrice: 0 },
+      data: { customerId, totalPrice: 0, finalPrice: 0 },
     });
   }
 
   async getCart(cartId: string): Promise<Cart> {
-    return await this.prisma.cart.findUnique({ where: { id: cartId } });
+    return await this.prisma.cart.findUnique({
+      where: { id: cartId },
+    });
+  }
+
+  async getCartByCustomer(customerId: string): Promise<Cart> {
+    const existingCart = await this.prisma.cart.findUnique({
+      where: { customerId },
+    });
+    if (!existingCart) {
+      return await this.createNewCart(customerId);
+    } else return existingCart;
   }
 
   async updateCartPrice(

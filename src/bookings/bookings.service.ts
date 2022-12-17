@@ -5,8 +5,9 @@ import { ProductsService } from 'src/products/services/products.service';
 import { OrdersService } from 'src/orders/orders.service';
 import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
-import { Booking } from './models/booking.model';
-import { BookingStatus } from '@prisma/client';
+import { BookingStatus, Booking } from '@prisma/client';
+import { TagsService } from 'src/tags/tags.service';
+import { VendorsService } from 'src/vendors/vendors.service';
 
 @Injectable()
 export class BookingsService {
@@ -14,7 +15,9 @@ export class BookingsService {
     private readonly prisma: PrismaService,
     private readonly orderService: OrdersService,
     private readonly productService: ProductsService,
-    private readonly cartService: CartService
+    private readonly cartService: CartService,
+    private readonly tagService: TagsService,
+    private readonly vendorService: VendorsService
   ) {}
 
   async getBooking(id: string): Promise<Booking> {
@@ -25,19 +28,40 @@ export class BookingsService {
 
     return booking;
   }
+  async getBookings(where: any): Promise<Booking[]> {
+    const booking = await this.prisma.booking.findMany({ where });
+
+    if (!booking) throw new NotFoundException('Bookings Not Found.');
+
+    return booking;
+  }
 
   async createBooking(data: CreateBookingInput): Promise<Booking> {
+    const { vendorId, cartId, productId, tagId, ...rest } = data;
     // if the cart/product or order does not exist, this function will throw an error.
     await this.cartService.getCart(data.cartId);
     await this.productService.getProduct(data.productId);
-    await this.orderService.getOrder(data.orderId);
+    await this.vendorService.getVendor(data.vendorId);
+    await this.tagService.getTag(data.tagId);
     // if all of these exist we can successfully create the booking.
 
-    return this.prisma.booking.create({ data });
+    return this.prisma.booking.create({
+      data: {
+        ...rest,
+        Vendor: { connect: { id: vendorId } },
+        Cart: { connect: { id: cartId } },
+        Tag: { connect: { id: tagId } },
+        Product: { connect: { id: productId } },
+      },
+    });
   }
 
   async updateBooking(id: string, data: UpdateBookingInput): Promise<Booking> {
-    if (data.status !== BookingStatus.HOLD) {
+    if (data.orderId) {
+      await this.orderService.getOrder(data.orderId);
+    }
+    // remove booking holdtimestamp when order is created for this booking
+    if ((data.status && data.status !== BookingStatus.HOLD) || data.orderId) {
       await this.prisma.$runCommandRaw({
         update: 'Booking',
         updates: [
