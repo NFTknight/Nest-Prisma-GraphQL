@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from '../models/cart.model';
 
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { GraphQLError } from 'graphql';
+
 @Injectable()
 export class CartService {
   constructor(private readonly prisma: PrismaService) {}
@@ -12,10 +15,22 @@ export class CartService {
     });
   }
 
-  async getCart(cartId: string): Promise<Cart> {
-    return await this.prisma.cart.findUnique({
-      where: { id: cartId },
-    });
+  async getCart(cartId: string, vendorId?: string): Promise<Cart> {
+    if (!cartId && !vendorId) {
+      throw new GraphQLError('Cart id or Vendor id must be provided', {
+        extensions: {
+          code: 400,
+        },
+      });
+    }
+    if (cartId) {
+      return await this.prisma.cart.findUnique({
+        where: { id: cartId },
+      });
+    } else {
+      console.log(vendorId);
+      return await this.createNewCart(vendorId);
+    }
   }
 
   async getCartByCustomer(customerId: string): Promise<Cart> {
