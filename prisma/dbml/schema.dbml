@@ -51,6 +51,8 @@ Table Tag {
   updatedAt DateTime [not null]
   CartItem CartItem [not null]
   booking Booking [not null]
+  Product Product
+  productId String
 }
 
 Table Category {
@@ -100,6 +102,7 @@ Table Product {
   vendor Vendor [not null]
   active Boolean [not null, default: true]
   minPreorderDays Int
+  Tags Tag [not null]
   category Category
   categoryId String
   noOfSeats Int
@@ -234,6 +237,8 @@ Enum BookingStatus {
 Ref: Vendor.ownerId - User.id
 
 Ref: Tag.vendorId > Vendor.id
+
+Ref: Tag.productId > Product.id
 
 Ref: Category.vendorId > Vendor.id
 

@@ -24,6 +24,8 @@ import makePrismaSelection from 'src/common/helpers/makePrismaSelection';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { ProductFilterInput } from 'src/common/filter/filter.input';
+import { TagsService } from 'src/tags/tags.service';
+import { Tag } from 'src/tags/models/tag.model';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -31,7 +33,8 @@ export class ProductsResolver {
     private readonly prismaService: PrismaService,
     private readonly productService: ProductsService,
     private readonly vendorService: VendorsService,
-    private readonly categoriesService: CategoriesService
+    private readonly categoriesService: CategoriesService,
+    private readonly tagService: TagsService
   ) {}
 
   @Query(() => Product)
@@ -88,7 +91,7 @@ export class ProductsResolver {
 
     const selectedFields = fieldsMap(info, {
       path: 'list',
-      skip: ['vendor', 'category'],
+      skip: ['vendor', 'category', 'Tags'],
     });
 
     const select = makePrismaSelection(selectedFields);
@@ -135,6 +138,11 @@ export class ProductsResolver {
   @ResolveField('category')
   category(@Parent() product: Product): Promise<Category> {
     return this.categoriesService.getCategory(product.categoryId);
+  }
+
+  @ResolveField('Tags')
+  Tags(@Parent() product: Product): Promise<Tag[]> {
+    return this.tagService.getTags(product.vendorId);
   }
 
   // @ResolveField('variants')
