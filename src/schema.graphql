@@ -463,6 +463,7 @@ type Product {
   variants: [VariantModel!]
   vendor: Vendor!
   vendorId: String!
+  workshopBookedCount: Int
 }
 
 input ProductFilterInput {
@@ -633,6 +634,7 @@ input UpdateProductInput {
   type: ProductType
   variants: [CreateVariantInput!]
   vendorId: String
+  workshopBookedCount: Int
 }
 
 input UpdateTagInput {

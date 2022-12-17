@@ -46,6 +46,9 @@ export class Product extends BaseModel {
   noOfSeats?: number;
 
   @Field(() => Int)
+  workshopBookedCount?: number;
+
+  @Field(() => Int)
   itemsInStock?: number;
 
   @Field(() => Int)

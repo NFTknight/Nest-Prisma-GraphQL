@@ -44,6 +44,9 @@ export class UpdateProductInput {
   @Field(() => Int)
   noOfSeats?: number;
 
+  @Field(() => Int)
+  workshopBookedCount?: number;
+
   @Field(() => [String], { nullable: true })
   tagIds?: string[];
 

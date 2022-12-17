@@ -103,6 +103,7 @@ Table Product {
   active Boolean [not null, default: true]
   minPreorderDays Int
   Tags Tag [not null]
+  workshopBookedCount Int
   category Category
   categoryId String
   noOfSeats Int
