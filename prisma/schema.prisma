@@ -128,6 +128,8 @@ model Tag {
   updatedAt      DateTime              @updatedAt
   CartItem       CartItem[]
   booking        Booking[]
+  Product        Product?              @relation(fields: [productId], references: [id])
+  productId      String?               @db.ObjectId
 }
 
 model Category {
@@ -174,10 +176,10 @@ type ProductAttribute {
 }
 
 type ServiceAvailability {
-  date      String
-  startTime String
-  endTime   String
-  isAvailable Boolean  @default(true)
+  date        String
+  startTime   String
+  endTime     String
+  isAvailable Boolean @default(true)
 }
 
 type Variant {
@@ -212,39 +214,39 @@ type TimeSlot {
 }
 
 model Product {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  slug            String
-  sku             String?
-  title           String
-  title_ar        String
-  description     String
-  description_ar  String
-  image           String
-  type            ProductType
-  vendorId        String      @db.ObjectId
-  vendor          Vendor      @relation(fields: [vendorId], references: [id])
-  active          Boolean     @default(true)
-  minPreorderDays Int?
-
-  category         Category?             @relation(fields: [categoryId], references: [id])
-  categoryId       String?               @db.ObjectId
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  slug             String
+  sku              String?
+  title            String
+  title_ar         String
+  description      String
+  description_ar   String
+  image            String
+  type             ProductType
+  vendorId         String             @db.ObjectId
+  vendor           Vendor             @relation(fields: [vendorId], references: [id])
+  active           Boolean            @default(true)
+  minPreorderDays  Int?
+  Tags             Tag[]
+  category         Category?          @relation(fields: [categoryId], references: [id])
+  categoryId       String?            @db.ObjectId
   noOfSeats        Int?
   itemsInStock     Int?
   variants         Variant[]
   attributes       ProductAttribute[]
-  sortOrder        Int                   @default(0)
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  sortOrder        Int                @default(0)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   CartItem         CartItem[]
-  tagIds           String[]              @db.ObjectId
+  tagIds           String[]           @db.ObjectId
   attendanceType   AttendanceType?
   meetingLink      String?
   location         String?
-  endTime          Boolean?              @default(false)
-  customerLocation Boolean?              @default(false)
+  endTime          Boolean?           @default(false)
+  customerLocation Boolean?           @default(false)
   duration         Int?
-  startDate        DateTime              @default(now())
-  endDate          DateTime              @default(now())
+  startDate        DateTime           @default(now())
+  endDate          DateTime           @default(now())
 
   booking Booking[]
 }
@@ -258,9 +260,9 @@ model CartItem {
 
   Variant Variant[]
 
-  quantity Int        @default(1)
-  tagId    String?    @db.ObjectId
-  tag      Tag?       @relation(fields: [tagId], references: [id])
+  quantity Int           @default(1)
+  tagId    String?       @db.ObjectId
+  tag      Tag?          @relation(fields: [tagId], references: [id])
   slots    BookingTime[]
 
   cartId String? @db.ObjectId
@@ -275,7 +277,7 @@ model Cart {
 
   items CartItem[]
 
-  customerId String  @unique @db.ObjectId 
+  customerId String @unique @db.ObjectId
 
   totalPrice Float
 
