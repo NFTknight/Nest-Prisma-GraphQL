@@ -15,8 +15,8 @@ export class CartService {
     });
   }
 
-  async getCart(cartId: string, vendorId?: string): Promise<Cart> {
-    if (!cartId && !vendorId) {
+  async getCart(cartId: string, customerId?: string): Promise<Cart> {
+    if (!cartId && !customerId) {
       throw new GraphQLError('Cart id or Vendor id must be provided', {
         extensions: {
           code: 400,
@@ -28,8 +28,7 @@ export class CartService {
         where: { id: cartId },
       });
     } else {
-      console.log(vendorId);
-      return await this.createNewCart(vendorId);
+      return await this.createNewCart(customerId);
     }
   }
 
