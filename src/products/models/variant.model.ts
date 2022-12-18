@@ -1,21 +1,10 @@
-import { Field, ObjectType, Int, Float } from '@nestjs/graphql';
+import { ObjectType, PickType } from '@nestjs/graphql';
+import { VariantModel } from 'src/variants/models/variant.model';
 
 @ObjectType()
-export class Variant {
-  identifier: string;
-  title: string;
-  title_ar: string;
-
-  @Field(() => [String], { nullable: true })
-  options?: string[];
-
-  @Field(() => [String], { nullable: true })
-  options_ar?: string[];
-
-  @Field(() => String)
-  image: string;
-
-  @Field(() => Float)
-  price: number;
-  sku: string;
-}
+export class Variant extends PickType(VariantModel, [
+  'id',
+  'title',
+  'title_ar',
+  'options',
+]) {}
