@@ -1,8 +1,7 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { ProductType, AttendanceType } from 'prisma/prisma-client';
-import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
-import { UpdateVariantInput } from './variant.input';
-import { CreateVariantInput } from '../../variants/dto/create-variant.input';
+import { ProductVariantInput } from './variant.input';
+
 @InputType()
 export class UpdateProductInput {
   @Field()
@@ -27,9 +26,6 @@ export class UpdateProductInput {
   type?: ProductType;
 
   @Field()
-  vendorId?: string;
-
-  @Field()
   categoryId?: string;
 
   @Field()
@@ -38,8 +34,8 @@ export class UpdateProductInput {
   @Field(() => Int)
   minPreorderDays?: number;
 
-  @Field(() => [CreateVariantInput], { nullable: true })
-  variants: CreateVariantInput[];
+  @Field()
+  variants?: string[];
 
   @Field(() => Int)
   noOfSeats?: number;

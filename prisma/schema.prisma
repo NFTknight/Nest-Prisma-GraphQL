@@ -183,13 +183,10 @@ type ServiceAvailability {
 }
 
 type Variant {
-  id        String
-  vendorId  String
+  id        String           @db.ObjectId
   title     String
   title_ar  String
   options   VariantOptions[]
-  createdAt DateTime
-  updatedAt DateTime
 }
 
 type VariantOptions {
@@ -277,7 +274,7 @@ model Cart {
 
   items CartItem[]
 
-  customerId String @unique @db.ObjectId
+  customerId String @unique
 
   totalPrice Float
 

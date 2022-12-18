@@ -1,4 +1,6 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateVariantInput } from './dto/create-variant.input';
@@ -12,13 +14,19 @@ export class VariantsResolver {
     private readonly vendorService: VendorsService
   ) {}
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => VariantModel)
-  createVariant(@Args('data') data: CreateVariantInput): Promise<VariantModel> {
+  createVariant(@Args('data') data: CreateVariantInput) {
     return this.variantService.createVariant(data);
   }
 
   @Query(() => [VariantModel])
-  getVariants(@Args('vendorId') vendorId: string): Promise<VariantModel> {
+  getVariants(@Args('vendorId') vendorId: string) {
     return this.variantService.getVariants(vendorId);
+  }
+
+  @Query(() => VariantModel)
+  getVariant(@Args('id') id: string) {
+    return this.variantService.getVariant(id);
   }
 }
