@@ -2,25 +2,21 @@ import {
   Args,
   Mutation,
   Query,
-  Info,
   ResolveField,
   Resolver,
   Parent,
 } from '@nestjs/graphql';
-import { fieldsMap } from 'graphql-fields-list';
 import { CategoriesService } from 'src/categories/categories.service';
-// import { Vendor } from 'src/vendors/models/vendor.model';
-import { Vendor } from '@prisma/client';
+import { Prisma, Vendor } from '@prisma/client';
 import { Category } from 'src/categories/models/category.model';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateProductInput } from '../dto/create-product.input';
-import { UpdateProductInput } from '../dto/update-product.input';
-import { Product } from '../models/product.model';
-import { ProductsService } from '../services/products.service';
-import { PaginatedProducts } from '../models/paginated-products.model';
+import { CreateProductInput } from './dto/create-product.input';
+import { UpdateProductInput } from './dto/update-product.input';
+import { Product } from './models/product.model';
+import { ProductsService } from './services/products.service';
+import { PaginatedProducts } from './models/paginated-products.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { PrismaService } from 'nestjs-prisma';
-import makePrismaSelection from 'src/common/helpers/makePrismaSelection';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { ProductFilterInput } from 'src/common/filter/filter.input';
@@ -50,9 +46,7 @@ export class ProductsResolver {
     @Args('categoryId', { nullable: true }) categoryId: string,
     @Args('pagination', { nullable: true }) pg: PaginationArgs,
     @Args('sortOrder', { nullable: true }) sortOrder: SortOrder,
-    @Args('filter', { nullable: true }) filter: ProductFilterInput,
-    @Info()
-    info
+    @Args('filter', { nullable: true }) filter: ProductFilterInput
   ): Promise<PaginatedProducts> {
     const { skip, take } = getPaginationArgs(pg);
 
@@ -65,7 +59,8 @@ export class ProductsResolver {
       };
     }
 
-    const where = {
+    const where: Prisma.ProductWhereInput = {
+      ...filter,
       vendorId,
     };
 
@@ -73,38 +68,10 @@ export class ProductsResolver {
       where['categoryId'] = categoryId;
     }
 
-    if (filter && filter?.field) {
-      if (filter.field === 'title') {
-        where[filter.field] = {
-          contains: filter.title.trim(),
-          mode: 'insensitive',
-        };
-      } else if (filter.field === 'type') {
-        where[filter.field] = filter.type;
-      } else if (filter.field === 'price') {
-        where[filter.field] = {
-          gte: filter.priceUpperLimit,
-          lte: filter.priceLowerLimit,
-        };
-      } else if (filter.field === 'attendanceType') {
-        where[filter.field] = filter.attendanceType;
-      }
-    }
-
-    const selectedFields = fieldsMap(info, {
-      path: 'list',
-      skip: ['vendor', 'category', 'Tags'],
-    });
-
-    const select = Object.keys(makePrismaSelection(selectedFields)).length
-      ? makePrismaSelection(selectedFields)
-      : undefined;
-
     const list = await this.prismaService.product.findMany({
       where,
       skip,
       take,
-      select,
       orderBy,
     });
 
@@ -147,8 +114,8 @@ export class ProductsResolver {
     return this.categoriesService.getCategory(product.categoryId);
   }
 
-  @ResolveField('Tags')
-  Tags(@Parent() product: Product): Promise<Tag[]> {
-    return this.tagService.getTags(product.vendorId);
+  @ResolveField('tags', () => [Tag], { nullable: true })
+  tags(@Parent() product: Product): Promise<Tag[]> {
+    return this.tagService.getTagsByProduct(product.id);
   }
 }

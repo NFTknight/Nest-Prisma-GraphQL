@@ -24,13 +24,12 @@ export class Booking extends BaseModel {
   @Field(() => Tag)
   Tag?: Tag;
 
+  @Field()
   vendorId: string;
-  @Field(() => Vendor)
-  Vendor?: Vendor;
 
   productId: string;
   @Field(() => Product)
-  Product?: Product;
+  product?: Product;
 
   @Field(() => BookingStatus)
   status: BookingStatus;

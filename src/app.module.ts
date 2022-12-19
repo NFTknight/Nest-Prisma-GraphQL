@@ -23,7 +23,6 @@ import { SendgridService } from './sendgrid/sendgrid.service';
 import { BookingsModule } from './bookings/bookings.module';
 import { SendgridModule } from './sendgrid/sendgrid.module';
 import { StorageModule } from './storage/storage.module';
-import { VariantsModule } from './variants/variants.module';
 import { FormsModule } from './forms/forms.module';
 
 @Module({
@@ -56,7 +55,6 @@ import { FormsModule } from './forms/forms.module';
     BookingsModule,
     SendgridModule,
     StorageModule,
-    VariantsModule,
     FormsModule,
   ],
   controllers: [HealthController],
