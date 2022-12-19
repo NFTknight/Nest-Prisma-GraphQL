@@ -16,12 +16,15 @@ import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { PrismaService } from 'nestjs-prisma';
+import { Product } from 'src/products/models/product.model';
 
 @Resolver(() => Tag)
 export class TagsResolver {
   constructor(
     private readonly tagsService: TagsService,
-    private readonly vendorService: VendorsService
+    private readonly vendorService: VendorsService,
+    private readonly prisma: PrismaService
   ) {}
 
   @Query(() => Tag)
@@ -67,6 +70,19 @@ export class TagsResolver {
   @ResolveField('vendor')
   vendor(@Parent() tag: Tag): Promise<Vendor> {
     return this.vendorService.getVendor(tag.vendorId);
+  }
+
+  @ResolveField('products', () => [Product])
+  products(@Parent() tag: Tag): Promise<Product[]> {
+    return this.prisma.product.findMany({
+      where: {
+        tags: {
+          some: {
+            id: tag.id,
+          },
+        },
+      },
+    });
   }
 
   @Query(() => [String])

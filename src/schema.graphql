@@ -554,6 +554,7 @@ type Tag {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  products: [Product!]!
   title: String!
   title_ar: String!
 

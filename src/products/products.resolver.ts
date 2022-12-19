@@ -93,7 +93,7 @@ export class ProductsResolver {
 
     const selectedFields = fieldsMap(info, {
       path: 'list',
-      skip: ['vendor', 'category', 'Tags'],
+      skip: ['vendor', 'category', 'tags'],
     });
 
     const select = makePrismaSelection(selectedFields);
