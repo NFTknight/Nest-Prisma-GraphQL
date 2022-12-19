@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { Certificate } from '@prisma/client';
 
 @ObjectType()
-class Certificate {
+class Certificates {
   title: string;
   image: string;
 }
@@ -54,7 +55,7 @@ export class VendorInfo {
   @Field()
   cr_num?: string;
 
-  @Field(() => [Certificate])
+  @Field(() => [Certificates])
   certificates?: Certificate[];
 
   @Field()

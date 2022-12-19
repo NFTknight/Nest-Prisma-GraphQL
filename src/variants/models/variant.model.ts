@@ -4,8 +4,8 @@ import { VariantOptions } from './variant-options.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 @ObjectType()
 export class VariantModel extends BaseModel {
-  title: string;
-  title_ar: string;
+  title?: string;
+  title_ar?: string;
   @Field(() => Vendor, { nullable: false })
   vendorId: string;
 

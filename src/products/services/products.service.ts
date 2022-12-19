@@ -8,7 +8,8 @@ import { CreateProductValidator } from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
-import { Product } from '../models/product.model';
+import { Product, Prisma } from '@prisma/client';
+import { omit } from 'lodash';
 
 @Injectable()
 export class ProductsService {
@@ -42,11 +43,18 @@ export class ProductsService {
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(vendorId);
 
+    let vars: any = [];
+    if (variants && variants.length > 0) {
+      vars = await this.prisma.variantModel.findMany({
+        where: { id: { in: variants } },
+      });
+    }
+
     // if vendor exists we can successfully create the product.
     const prod = await this.prisma.product.create({
       data: {
         ...rest,
-        variants: variants as any,
+        variants: { set: vars.map((v) => omit(v, 'vendorId')) },
         vendor: { connect: { id: vendorId } },
         category: categoryId ? { connect: { id: categoryId } } : undefined,
       },
@@ -55,14 +63,25 @@ export class ProductsService {
   }
 
   async updateProduct(id: string, data: UpdateProductInput): Promise<Product> {
-    if (data.vendorId) {
-      // if the vendor does not exist, this function will throw an error.
-      await this.vendorService.getVendor(data.vendorId);
+    const { categoryId, variants, ...restData } = data;
+    const updateData: Prisma.ProductUpdateArgs['data'] = {
+      ...restData,
+    };
+
+    if (categoryId) {
+      updateData.category = { connect: { id: categoryId } };
+    }
+
+    if (variants && variants.length > 0) {
+      const vars = await this.prisma.variantModel.findMany({
+        where: { id: { in: variants } },
+      });
+      updateData.variants = { set: vars.map((v) => omit(v, 'vendorId')) };
     }
 
     return this.prisma.product.update({
       where: { id },
-      data: { ...data, updatedAt: new Date() } as any,
+      data: { ...updateData, updatedAt: new Date() },
     });
   }
 

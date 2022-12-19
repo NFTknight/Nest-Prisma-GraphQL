@@ -1,5 +1,9 @@
 import { PrismaService } from 'nestjs-prisma';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateVendorInput } from './dto/create-vendor.input';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { User } from 'src/users/models/user.model';
@@ -19,6 +23,12 @@ export class VendorsService {
     createVendorInput: CreateVendorInput,
     user: User
   ): Promise<Vendor> {
+    const vendor = await this.prisma.vendor.findFirst({
+      where: { ownerId: user.id },
+    });
+
+    if (vendor) throw new BadRequestException('Vendor Already Exists For User');
+
     const res = await this.prisma.vendor.create({
       data: { ...createVendorInput, ownerId: user.id },
     });

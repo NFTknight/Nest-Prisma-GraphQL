@@ -26,6 +26,8 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { ProductFilterInput } from 'src/common/filter/filter.input';
 import { TagsService } from 'src/tags/tags.service';
 import { Tag } from 'src/tags/models/tag.model';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -112,11 +114,13 @@ export class ProductsResolver {
     };
   }
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Product)
   createProduct(@Args('data') data: CreateProductInput): Promise<Product> {
     return this.productService.createProduct(data);
   }
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Product)
   updateProduct(
     @Args('id') id: string,
@@ -125,6 +129,7 @@ export class ProductsResolver {
     return this.productService.updateProduct(id, data);
   }
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Product)
   deleteProduct(@Args('id') id: string): Promise<Product> {
     return this.productService.deleteProduct(id);

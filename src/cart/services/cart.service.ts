@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from '../models/cart.model';
 
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { GraphQLError } from 'graphql';
 
 @Injectable()
@@ -34,7 +33,9 @@ export class CartService {
 
   async getCartByCustomer(customerId: string): Promise<Cart> {
     const existingCart = await this.prisma.cart.findUnique({
-      where: { customerId },
+      where: {
+        customerId: customerId,
+      },
     });
     if (!existingCart) {
       return await this.createNewCart(customerId);

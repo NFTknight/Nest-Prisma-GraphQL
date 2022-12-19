@@ -127,7 +127,12 @@ type Category {
   vendorId: String!
 }
 
-type Certificate {
+input Certificate {
+  image: String!
+  title: String!
+}
+
+type Certificates {
   image: String!
   title: String!
 }
@@ -234,7 +239,7 @@ input CreateProductInput {
   title: String!
   title_ar: String!
   type: ProductType!
-  variants: [CreateVariantInput!]
+  variants: [String!]
   vendorId: String!
 }
 
@@ -247,6 +252,7 @@ input CreateTagInput {
 }
 
 input CreateVariantInput {
+  id: String
   options: [VariantOptionsInput!]
   title: String
   title_ar: String
@@ -460,7 +466,7 @@ type Product {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  variants: [VariantModel!]
+  variants: [Variant!]
   vendor: Vendor!
   vendorId: String!
   workshopBookedCount: Int
@@ -497,6 +503,7 @@ type Query {
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
+  getVariant(id: String!): VariantModel!
   getVariants(vendorId: String!): [VariantModel!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
@@ -660,10 +667,12 @@ input UpdateVendorBankInput {
 input UpdateVendorInfoInput {
   address: String
   addressUrl: String
+  certificates: [Certificate!]
   description: String
   description_ar: String
   email: String
   heroImage: String
+  iban: String
   logo: String
   phone: String
   terms: String
@@ -699,13 +708,20 @@ type User {
   verified: Boolean!
 }
 
+type Variant {
+  id: ID!
+  options: [VariantOptions!]
+  title: String
+  title_ar: String
+}
+
 type VariantModel {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
   options: [VariantOptions!]
-  title: String!
-  title_ar: String!
+  title: String
+  title_ar: String
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
@@ -734,10 +750,8 @@ type Vendor {
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
-  heroImage: String
   id: ID!
   info: VendorInfo
-  logo: String
   name: String!
   owner: User
   ownerId: String!
@@ -758,7 +772,7 @@ type VendorBank {
 type VendorInfo {
   address: String
   addressUrl: String
-  certificates: [Certificate!]
+  certificates: [Certificates!]
   cr_num: String
   description: String
   description_ar: String

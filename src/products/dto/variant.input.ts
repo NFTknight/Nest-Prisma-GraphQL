@@ -1,40 +1,10 @@
-import { IsNotEmpty } from 'class-validator';
-import { InputType, Field, Float } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
+import { VariantOptionsInput } from 'src/variants/dto/variant-options.input';
 
 @InputType()
-export class VariantInput {
+export class ProductVariantInput {
   @Field()
-  identifier: string;
-
-  @Field()
-  title: string;
-
-  @Field()
-  title_ar?: string;
-
-  @Field()
-  @IsNotEmpty()
-  sku: string;
-
-  @Field()
-  @IsNotEmpty()
-  image: string;
-
-  @Field()
-  options?: string[];
-
-  @Field()
-  options_ar?: string[];
-
-  @Field(() => Float)
-  @IsNotEmpty()
-  price: number;
-}
-
-@InputType()
-export class UpdateVariantInput {
-  @Field()
-  identifier?: string;
+  id: string;
 
   @Field()
   title?: string;
@@ -42,18 +12,6 @@ export class UpdateVariantInput {
   @Field()
   title_ar?: string;
 
-  @Field()
-  sku?: string;
-
-  @Field()
-  image?: string;
-
-  @Field()
-  options?: string[];
-
-  @Field()
-  options_ar?: string[];
-
-  @Field(() => Float)
-  price?: number;
+  @Field(() => [VariantOptionsInput])
+  options?: VariantOptionsInput[];
 }

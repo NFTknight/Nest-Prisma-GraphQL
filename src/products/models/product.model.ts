@@ -3,10 +3,9 @@ import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { ProductType, AttendanceType } from 'prisma/prisma-client';
-import { VariantModel } from '../../variants/models/variant.model';
-import { ServiceAvailability } from 'src/common/models/service-availability.model';
 import { Tag } from 'src/tags/models/tag.model';
 import './product-type.enum';
+import { Variant } from './variant.model';
 
 @ObjectType()
 export class Product extends BaseModel {
@@ -23,6 +22,7 @@ export class Product extends BaseModel {
   image: string;
 
   vendorId: string;
+
   @Field(() => Vendor, { nullable: false })
   vendor?: Vendor;
 
@@ -35,8 +35,8 @@ export class Product extends BaseModel {
 
   minPreorderDays?: number;
 
-  @Field(() => [VariantModel], { nullable: true })
-  variants?: VariantModel[];
+  @Field(() => [Variant], { nullable: true })
+  variants?: Variant[];
 
   tagIds: string[];
 
