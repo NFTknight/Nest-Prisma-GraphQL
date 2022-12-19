@@ -2,11 +2,9 @@ import { Field, InputType } from '@nestjs/graphql';
 import { BookingTime } from '@prisma/client';
 
 @InputType()
-export class BookingTimeInput implements BookingTime {
+export class BookingSlotInput implements BookingTime {
   @Field()
-  date: string;
+  from: Date;
   @Field()
-  startTime: string;
-  @Field()
-  endTime: string;
+  to: Date;
 }

@@ -10,7 +10,6 @@ import { Cart } from 'src/cart/models/cart.model';
 import { CartService } from 'src/cart/services/cart.service';
 import { Order } from 'src/orders/models/order.model';
 import { OrdersService } from 'src/orders/orders.service';
-import { Product } from 'src/products/models/product.model';
 import { ProductsService } from 'src/products/services/products.service';
 
 import { BookingsService } from './bookings.service';
@@ -71,16 +70,16 @@ export class BookingResolver {
     return this.bookingService.deleteBooking(id);
   }
 
-  @ResolveField('Cart')
-  Cart(@Parent() booking: Booking): Promise<Cart> {
+  @ResolveField('cart', () => Cart)
+  cart(@Parent() booking: Booking): Promise<Cart> {
     return this.cartService.getCart(booking.cartId);
   }
-  @ResolveField('Product')
-  Product(@Parent() booking: Booking): Promise<Product> {
+  @ResolveField('product')
+  product(@Parent() booking: Booking) {
     return this.productService.getProduct(booking.productId);
   }
-  @ResolveField('Order')
-  Order(@Parent() booking: Booking): Promise<Order> {
+  @ResolveField('order', () => Order)
+  order(@Parent() booking: Booking): Promise<Order> {
     return this.orderService.getOrder(booking.orderId);
   }
 }

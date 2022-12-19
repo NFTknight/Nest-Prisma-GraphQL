@@ -79,18 +79,9 @@ Table Coupon {
   updatedAt DateTime [not null]
 }
 
-Table VariantModel {
-  id String [pk]
-  vendorId String [not null]
-  title String
-  title_ar String
-  options VariantOptions[] [not null]
-}
-
 Table Product {
   id String [pk]
   slug String [not null]
-  sku String
   title String [not null]
   title_ar String [not null]
   description String [not null]
@@ -107,8 +98,7 @@ Table Product {
   minPreorderDays Int
   noOfSeats Int
   itemsInStock Int
-  variants Variant[] [not null]
-  attributes ProductAttribute[] [not null]
+  variants VariantOption[] [not null]
   sortOrder Int [not null, default: 0]
   CartItem CartItem [not null]
   attendanceType AttendanceType
@@ -128,8 +118,7 @@ Table CartItem {
   id String [pk]
   productId String [not null]
   product Product [not null]
-  productVariant String
-  Variant Variant[] [not null]
+  sku String [not null]
   quantity Int [not null, default: 1]
   tagId String
   slots BookingTime[] [not null]
@@ -181,7 +170,7 @@ Table Booking {
   tagId String [not null]
   tag Tag [not null]
   status BookingStatus [not null]
-  times BookingTime[] [not null]
+  slots BookingTime[] [not null]
   holdTimestamp DateTime [default: `now()`]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]

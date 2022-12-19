@@ -12,9 +12,9 @@ input AddDeliveryAreasInput {
 input AddToCartInput {
   cartId: String
   productId: String!
-  productVariant: String
   quantity: Int
-  slots: [BookingTimeInput!]
+  sku: String!
+  slots: [BookingSlotInput!]
   tagId: String
   vendorId: String!
 }
@@ -37,16 +37,17 @@ type Auth {
 type Booking {
   Cart: Cart
   Order: Order
-  Product: Product
   Tag: Tag
-  Vendor: Vendor
+  cart: Cart!
   cartId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   holdTimestamp: DateTime
   id: ID!
+  order: Order!
   orderId: String
+  product: Product
   productId: String!
   status: BookingStatus!
   tagId: String!
@@ -55,6 +56,11 @@ type Booking {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   vendorId: String!
+}
+
+input BookingSlotInput {
+  from: DateTime!
+  to: DateTime!
 }
 
 """Booking Status"""
@@ -66,15 +72,8 @@ enum BookingStatus {
 }
 
 type BookingTime {
-  date: String!
-  endTime: String!
-  startTime: String!
-}
-
-input BookingTimeInput {
-  date: String!
-  endTime: String!
-  startTime: String!
+  from: DateTime!
+  to: DateTime!
 }
 
 type Cart {
@@ -176,9 +175,9 @@ type Coupon {
 input CreateBookingInput {
   cartId: String!
   productId: String!
+  slots: [BookingSlotInput!]!
   status: BookingStatus!
   tagId: String!
-  times: [BookingTimeInput!]!
   vendorId: String!
 }
 
@@ -239,7 +238,7 @@ input CreateProductInput {
   title: String!
   title_ar: String!
   type: ProductType!
-  variants: [String!]
+  variants: [VariantInput!]
   vendorId: String!
 }
 
@@ -250,14 +249,6 @@ input CreateTagInput {
   title_ar: String!
   vendorId: String!
   workdays: [WorkDayInput!]!
-}
-
-input CreateVariantInput {
-  id: String
-  options: [VariantOptionsInput!]
-  title: String
-  title_ar: String
-  vendorId: String!
 }
 
 input CreateVendorInput {
@@ -317,7 +308,6 @@ type Mutation {
   createOrder(data: CreateOrderInput!): Order!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
-  createVariant(data: CreateVariantInput!): VariantModel!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteBooking(id: String!): Booking!
   deleteCategory(id: String!): Category!
@@ -474,10 +464,6 @@ type Product {
 
 input ProductFilterInput {
   attendanceType: AttendanceType
-  field: String!
-  priceLowerLimit: Int
-  priceUpperLimit: Int
-  title: String
   type: ProductType
 }
 
@@ -504,8 +490,6 @@ type Query {
   getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [String!]!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
   getTagsByProduct(productId: String!): [Tag!]!
-  getVariant(id: String!): VariantModel!
-  getVariants(vendorId: String!): [VariantModel!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendors: [Vendor!]!
@@ -575,10 +559,11 @@ type Token {
 
 input UpdateBookingInput {
   cartId: String
-  orderId: String
+  orderId: String!
   productId: String
+  slots: [BookingSlotInput!]
   status: BookingStatus
-  times: [BookingTimeInput!]
+  tagId: String
   vendorId: String
 }
 
@@ -627,7 +612,7 @@ input UpdateProductInput {
   title: String
   title_ar: String
   type: ProductType
-  variants: [String!]
+  variants: [VariantInput!]
 }
 
 input UpdateTagInput {
@@ -696,39 +681,21 @@ type User {
 }
 
 type Variant {
-  id: ID!
-  options: [VariantOptions!]
-  title: String
-  title_ar: String
-}
-
-type VariantModel {
-  """Identifies the date and time when the object was created."""
-  createdAt: DateTime!
-  id: ID!
-  options: [VariantOptions!]
-  title: String
-  title_ar: String
-
-  """Identifies the date and time when the object was last updated."""
-  updatedAt: DateTime!
-  vendorId: Vendor!
-}
-
-type VariantOptions {
+  default: Boolean
   image: String
-  price: Int
-  sku: String
-  title: String
-  title_ar: String
+  price: Int!
+  sku: String!
+  title: String!
+  title_ar: String!
 }
 
-input VariantOptionsInput {
+input VariantInput {
+  default: Boolean
   image: String
-  price: Int
-  sku: String
-  title: String
-  title_ar: String
+  price: Int!
+  sku: String!
+  title: String!
+  title_ar: String!
 }
 
 type Vendor {

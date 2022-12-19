@@ -1,17 +1,22 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { VariantOptionsInput } from 'src/variants/dto/variant-options.input';
 
 @InputType()
-export class ProductVariantInput {
+export class VariantInput {
   @Field()
-  id: string;
+  default?: boolean;
 
   @Field()
-  title?: string;
+  title: string;
 
   @Field()
-  title_ar?: string;
+  title_ar: string;
 
-  @Field(() => [VariantOptionsInput])
-  options?: VariantOptionsInput[];
+  @Field()
+  sku: string;
+
+  @Field()
+  price: number;
+
+  @Field()
+  image?: string;
 }

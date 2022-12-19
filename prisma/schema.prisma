@@ -188,34 +188,13 @@ enum AttendanceType {
   PHYSICAL
 }
 
-type ProductAttribute {
-  key      String
-  key_ar   String
-  value    String
-  value_ar String
-}
-
-type Variant {
-  id       String           @db.ObjectId
-  title    String?
-  title_ar String?
-  options  VariantOptions[]
-}
-
-type VariantOptions {
-  sku      String?
-  price    Float?
+type VariantOption {
+  default  Boolean?
+  sku      String
+  price    Float
   image    String?
-  title    String?
-  title_ar String?
-}
-
-model VariantModel {
-  id       String           @id @default(auto()) @map("_id") @db.ObjectId
-  vendorId String
-  title    String?
-  title_ar String?
-  options  VariantOptions[]
+  title    String
+  title_ar String
 }
 
 type TimeSlot {
@@ -226,7 +205,6 @@ type TimeSlot {
 model Product {
   id             String      @id @default(auto()) @map("_id") @db.ObjectId
   slug           String
-  sku            String?
   title          String
   title_ar       String
   description    String
@@ -243,22 +221,21 @@ model Product {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?   @db.ObjectId
 
-  active           Boolean            @default(true)
+  active           Boolean         @default(true)
   minPreorderDays  Int?
   noOfSeats        Int?
   itemsInStock     Int?
-  variants         Variant[]
-  attributes       ProductAttribute[]
-  sortOrder        Int                @default(0)
+  variants         VariantOption[]
+  sortOrder        Int             @default(0)
   CartItem         CartItem[]
   attendanceType   AttendanceType?
   meetingLink      String?
   location         String?
-  endTime          Boolean?           @default(false)
-  customerLocation Boolean?           @default(false)
+  endTime          Boolean?        @default(false)
+  customerLocation Boolean?        @default(false)
   duration         Int?
-  startDate        DateTime           @default(now())
-  endDate          DateTime           @default(now())
+  startDate        DateTime        @default(now())
+  endDate          DateTime        @default(now())
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -268,11 +245,10 @@ model Product {
 model CartItem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  productId      String  @db.ObjectId
-  product        Product @relation(fields: [productId], references: [id])
-  productVariant String?
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
 
-  Variant Variant[]
+  sku String
 
   quantity Int     @default(1)
   tagId    String? @db.ObjectId
@@ -350,9 +326,8 @@ enum BookingStatus {
 }
 
 type BookingTime {
-  date      String
-  startTime String
-  endTime   String
+  from DateTime
+  to   DateTime
 }
 
 model Booking {
@@ -368,7 +343,7 @@ model Booking {
   tagId         String        @db.ObjectId
   tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
-  times         BookingTime[]
+  slots         BookingTime[]
   holdTimestamp DateTime?     @default(now())
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
