@@ -89,15 +89,16 @@ export class CartItemService {
     }
   }
 
+  // TODO revisit HOLD booking logic
   async addServiceToCart(data: AddToCartInput): Promise<CartItem> {
     const {
       productId,
       productVariant,
       quantity,
       cartId,
-      tagId,
       slots,
       vendorId,
+      tagId,
     } = data;
     if (!cartId) {
       throw new BadRequestException('No cart created');
@@ -108,10 +109,10 @@ export class CartItemService {
       data: {
         status: BookingStatus.HOLD,
         times: slots,
-        Vendor: { connect: { id: vendorId } },
-        Cart: { connect: { id: cartId } },
-        Tag: { connect: { id: tagId } },
-        Product: { connect: { id: productId } },
+        tag: { connect: { id: tagId } },
+        vendor: { connect: { id: vendorId } },
+        cart: { connect: { id: cartId } },
+        product: { connect: { id: productId } },
       },
     });
 
@@ -119,7 +120,7 @@ export class CartItemService {
       where: { id: tagId },
     });
 
-    const tagAvailabilities = [...tag.availabilities];
+    const tagAvailabilities = []; // TODO: get availabilities from tag bookings
     const updatedAvailabilities = tagAvailabilities.map((item) => {
       const booked = slots.find(
         (slot) =>
@@ -135,10 +136,10 @@ export class CartItemService {
       } else return item;
     });
 
-    await this.prisma.tag.update({
-      where: { id: tagId },
-      data: { availabilities: updatedAvailabilities },
-    });
+    // await this.prisma.tag.update({
+    //   where: { id: tagId },
+    //   data: { availabilities: updatedAvailabilities },
+    // });
 
     const cartItem = await this.getCartItemFromProduct(productId);
     if (cartItem) {

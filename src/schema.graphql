@@ -235,7 +235,7 @@ input CreateProductInput {
   slug: String!
   sortOrder: Int
   startDate: DateTime
-  tagIds: [String!]
+  tags: [String!]
   title: String!
   title_ar: String!
   type: ProductType!
@@ -245,10 +245,11 @@ input CreateProductInput {
 
 input CreateTagInput {
   active: Boolean!
-  availabilities: [ServiceAvailabilityInput!]
+  productIds: [String!]
   title: String!
   title_ar: String!
   vendorId: String!
+  workdays: [WorkDayInput!]!
 }
 
 input CreateVariantInput {
@@ -435,7 +436,6 @@ input PhoneVerify {
 }
 
 type Product {
-  Tags: [Tag!]
   active: Boolean!
   attendanceType: AttendanceType
   category: Category
@@ -460,6 +460,7 @@ type Product {
   sortOrder: Int
   startDate: DateTime!
   tagIds: [String!]!
+  tags: [Tag!]
   title: String!
   title_ar: String!
   type: ProductType!
@@ -490,7 +491,6 @@ enum ProductType {
 type Query {
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
-  getCart(cartId: String, customerId: String): Cart!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): [Category!]!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
@@ -501,7 +501,9 @@ type Query {
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
+  getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [String!]!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
+  getTagsByProduct(productId: String!): [Tag!]!
   getVariant(id: String!): VariantModel!
   getVariants(vendorId: String!): [VariantModel!]!
   getVendor(id: String!): Vendor!
@@ -521,19 +523,6 @@ enum Role {
 
 input SendOtpInput {
   phone: String!
-}
-
-type ServiceAvailability {
-  date: String!
-  endTime: String!
-  isAvailable: Boolean!
-  startTime: String!
-}
-
-input ServiceAvailabilityInput {
-  date: String!
-  endTime: String!
-  startTime: String!
 }
 
 type ShippingOffice {
@@ -561,8 +550,6 @@ input SortOrder {
 
 type Tag {
   active: Boolean!
-  availabilities: [ServiceAvailability!]!
-  categoryId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -572,8 +559,9 @@ type Tag {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor
-  vendorId: Vendor!
+  vendor: Vendor!
+  vendorId: String!
+  workdays: [WorkDay!]!
 }
 
 type Token {
@@ -634,7 +622,7 @@ input UpdateProductInput {
   slug: String
   sortOrder: Int
   startDate: DateTime
-  tagIds: [String!]
+  tags: [String!]
   title: String
   title_ar: String
   type: ProductType
@@ -643,9 +631,10 @@ input UpdateProductInput {
 
 input UpdateTagInput {
   active: Boolean
-  availabilities: [ServiceAvailabilityInput!]
+  productIds: [String!]
   title: String
   title_ar: String
+  workdays: [WorkDayInput!]
 }
 
 input UpdateUserInput {
@@ -708,8 +697,8 @@ type User {
 type Variant {
   id: ID!
   options: [VariantOptions!]
-  title: String!
-  title_ar: String!
+  title: String
+  title_ar: String
 }
 
 type VariantModel {
@@ -717,8 +706,8 @@ type VariantModel {
   createdAt: DateTime!
   id: ID!
   options: [VariantOptions!]
-  title: String!
-  title_ar: String!
+  title: String
+  title_ar: String
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
@@ -803,4 +792,26 @@ type WayBill {
 type WayBillItem {
   awb: String!
   awbFile: String!
+}
+
+enum Weekday {
+  Friday
+  Monday
+  Saturday
+  Sunday
+  Thursday
+  Tuesday
+  Wednesday
+}
+
+type WorkDay {
+  day: Weekday!
+  from: String!
+  to: String!
+}
+
+input WorkDayInput {
+  day: Weekday!
+  from: String!
+  to: String!
 }

@@ -53,7 +53,7 @@ export class CreateProductInput {
   noOfSeats?: number;
 
   @Field(() => [String], { nullable: true })
-  tagIds: string[];
+  tags: string[];
 
   @Field(() => Int)
   itemsInStock?: number;

@@ -45,14 +45,13 @@ Table Tag {
   title_ar String [not null]
   vendorId String [not null]
   vendor Vendor [not null]
+  products Product [not null]
+  productIds String[] [not null]
   active Boolean [not null, default: true]
-  availabilities ServiceAvailability[] [not null]
+  workdays WorkDay[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  CartItem CartItem [not null]
-  booking Booking [not null]
-  Product Product
-  productId String
+  bookings Booking [not null]
 }
 
 Table Category {
@@ -100,20 +99,18 @@ Table Product {
   type ProductType [not null]
   vendorId String [not null]
   vendor Vendor [not null]
-  active Boolean [not null, default: true]
-  minPreorderDays Int
-  Tags Tag [not null]
+  tagIds String[] [not null]
+  tags Tag [not null]
   category Category
   categoryId String
+  active Boolean [not null, default: true]
+  minPreorderDays Int
   noOfSeats Int
   itemsInStock Int
   variants Variant[] [not null]
   attributes ProductAttribute[] [not null]
   sortOrder Int [not null, default: 0]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
   CartItem CartItem [not null]
-  tagIds String[] [not null]
   attendanceType AttendanceType
   meetingLink String
   location String
@@ -122,7 +119,9 @@ Table Product {
   duration Int
   startDate DateTime [default: `now()`, not null]
   endDate DateTime [default: `now()`, not null]
-  booking Booking [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  Booking Booking [not null]
 }
 
 Table CartItem {
@@ -133,12 +132,11 @@ Table CartItem {
   Variant Variant[] [not null]
   quantity Int [not null, default: 1]
   tagId String
-  tag Tag
   slots BookingTime[] [not null]
   cartId String
-  Cart Cart
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  Cart Cart
 }
 
 Table Cart {
@@ -173,15 +171,15 @@ Table Order {
 Table Booking {
   id String [pk]
   cartId String [not null]
-  Cart Cart [not null]
+  cart Cart [not null]
   orderId String
-  Order Order
+  order Order
   productId String [not null]
-  Product Product [not null]
+  product Product [not null]
   vendorId String [not null]
-  Vendor Vendor [not null]
+  vendor Vendor [not null]
   tagId String [not null]
-  Tag Tag [not null]
+  tag Tag [not null]
   status BookingStatus [not null]
   times BookingTime[] [not null]
   holdTimestamp DateTime [default: `now()`]
@@ -205,6 +203,16 @@ Enum PaymentMethods {
   ONLINE
   BANK_TRANSFER
   STORE
+}
+
+Enum Weekday {
+  Sunday
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
 }
 
 Enum ProductType {
@@ -238,7 +246,7 @@ Ref: Vendor.ownerId - User.id
 
 Ref: Tag.vendorId > Vendor.id
 
-Ref: Tag.productId > Product.id
+Ref: Tag.productIds > Product.id
 
 Ref: Category.vendorId > Vendor.id
 
@@ -246,11 +254,11 @@ Ref: Coupon.vendorId > Vendor.id
 
 Ref: Product.vendorId > Vendor.id
 
+Ref: Product.tagIds > Tag.id
+
 Ref: Product.categoryId > Category.id
 
 Ref: CartItem.productId > Product.id
-
-Ref: CartItem.tagId > Tag.id
 
 Ref: CartItem.cartId > Cart.id
 

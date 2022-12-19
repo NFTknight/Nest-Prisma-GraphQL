@@ -41,7 +41,8 @@ export class Product extends BaseModel {
   tagIds: string[];
 
   @Field(() => [Tag], { nullable: true })
-  Tags?: Tag[];
+  tags?: Tag[];
+
   @Field(() => Int)
   noOfSeats?: number;
 

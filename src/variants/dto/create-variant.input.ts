@@ -11,10 +11,10 @@ export class CreateVariantInput {
   title?: string;
 
   @Field()
-  vendorId: string;
+  title_ar?: string;
 
   @Field()
-  title_ar?: string;
+  vendorId: string;
 
   @Field(() => [VariantOptionsInput])
   options?: VariantOptionsInput[];

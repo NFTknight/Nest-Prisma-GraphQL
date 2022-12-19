@@ -1,6 +1,12 @@
 import { IsNotEmpty } from 'class-validator';
-import { InputType, Field } from '@nestjs/graphql';
-import { ServiceAvailabilityInput } from 'src/common/dto/service-availability.input';
+import { InputType, Field, registerEnumType } from '@nestjs/graphql';
+import { WorkDay } from '../models/workday.model';
+import { Weekday } from '@prisma/client';
+
+registerEnumType(Weekday, {
+  name: 'Weekday',
+});
+
 @InputType()
 export class CreateTagInput {
   @Field()
@@ -19,6 +25,9 @@ export class CreateTagInput {
   @IsNotEmpty()
   active: boolean;
 
-  @Field(() => [ServiceAvailabilityInput])
-  availabilities?: ServiceAvailabilityInput[];
+  @Field(() => [WorkDay])
+  workdays: WorkDay[];
+
+  @Field(() => [String], { nullable: true })
+  productIds: string[];
 }

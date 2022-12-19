@@ -39,19 +39,19 @@ export class BookingsService {
   async createBooking(data: CreateBookingInput): Promise<Booking> {
     const { vendorId, cartId, productId, tagId, ...rest } = data;
     // if the cart/product or order does not exist, this function will throw an error.
-    await this.cartService.getCart(data.cartId);
-    await this.productService.getProduct(data.productId);
-    await this.vendorService.getVendor(data.vendorId);
-    await this.tagService.getTag(data.tagId);
+    await this.cartService.getCart(cartId);
+    await this.productService.getProduct(productId);
+    await this.vendorService.getVendor(vendorId);
+    await this.tagService.getTag(tagId);
     // if all of these exist we can successfully create the booking.
 
     return this.prisma.booking.create({
       data: {
         ...rest,
-        Vendor: { connect: { id: vendorId } },
-        Cart: { connect: { id: cartId } },
-        Tag: { connect: { id: tagId } },
-        Product: { connect: { id: productId } },
+        vendor: { connect: { id: vendorId } },
+        cart: { connect: { id: cartId } },
+        tag: { connect: { id: tagId } },
+        product: { connect: { id: productId } },
       },
     });
   }

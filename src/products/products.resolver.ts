@@ -13,11 +13,11 @@ import { CategoriesService } from 'src/categories/categories.service';
 import { Vendor } from '@prisma/client';
 import { Category } from 'src/categories/models/category.model';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateProductInput } from '../dto/create-product.input';
-import { UpdateProductInput } from '../dto/update-product.input';
-import { Product } from '../models/product.model';
-import { ProductsService } from '../services/products.service';
-import { PaginatedProducts } from '../models/paginated-products.model';
+import { CreateProductInput } from './dto/create-product.input';
+import { UpdateProductInput } from './dto/update-product.input';
+import { Product } from './models/product.model';
+import { ProductsService } from './services/products.service';
+import { PaginatedProducts } from './models/paginated-products.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { PrismaService } from 'nestjs-prisma';
 import makePrismaSelection from 'src/common/helpers/makePrismaSelection';
@@ -145,13 +145,8 @@ export class ProductsResolver {
     return this.categoriesService.getCategory(product.categoryId);
   }
 
-  @ResolveField('Tags')
-  Tags(@Parent() product: Product): Promise<Tag[]> {
-    return this.tagService.getTags(product.vendorId);
+  @ResolveField('tags', () => [Tag], { nullable: true })
+  tags(@Parent() product: Product): Promise<Tag[]> {
+    return this.tagService.getTagsByProduct(product.id);
   }
-
-  // @ResolveField('variants')
-  // variants(@Parent() product: Product): Promise<ProductVariant[]> {
-  //   return this.productVariantsService.getProductVariants(product.id);
-  // }
 }
