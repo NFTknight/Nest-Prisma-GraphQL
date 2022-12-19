@@ -211,39 +211,40 @@ type TimeSlot {
 }
 
 model Product {
-  id               String             @id @default(auto()) @map("_id") @db.ObjectId
-  slug             String
-  sku              String?
-  title            String
-  title_ar         String
-  description      String
-  description_ar   String
-  image            String
-  type             ProductType
-  vendorId         String             @db.ObjectId
-  vendor           Vendor             @relation(fields: [vendorId], references: [id])
-  active           Boolean            @default(true)
-  minPreorderDays  Int?
-  Tags             Tag[]
-  category         Category?          @relation(fields: [categoryId], references: [id])
-  categoryId       String?            @db.ObjectId
-  noOfSeats        Int?
-  itemsInStock     Int?
-  variants         Variant[]
-  attributes       ProductAttribute[]
-  sortOrder        Int                @default(0)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  CartItem         CartItem[]
-  tagIds           String[]           @db.ObjectId
-  attendanceType   AttendanceType?
-  meetingLink      String?
-  location         String?
-  endTime          Boolean?           @default(false)
-  customerLocation Boolean?           @default(false)
-  duration         Int?
-  startDate        DateTime           @default(now())
-  endDate          DateTime           @default(now())
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  slug                String
+  sku                 String?
+  title               String
+  title_ar            String
+  description         String
+  description_ar      String
+  image               String
+  type                ProductType
+  vendorId            String             @db.ObjectId
+  vendor              Vendor             @relation(fields: [vendorId], references: [id])
+  active              Boolean            @default(true)
+  minPreorderDays     Int?
+  Tags                Tag[]
+  workshopBookedCount Int?
+  category            Category?          @relation(fields: [categoryId], references: [id])
+  categoryId          String?            @db.ObjectId
+  noOfSeats           Int?
+  itemsInStock        Int?
+  variants            Variant[]
+  attributes          ProductAttribute[]
+  sortOrder           Int                @default(0)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  CartItem            CartItem[]
+  tagIds              String[]           @db.ObjectId
+  attendanceType      AttendanceType?
+  meetingLink         String?
+  location            String?
+  endTime             Boolean?           @default(false)
+  customerLocation    Boolean?           @default(false)
+  duration            Int?
+  startDate           DateTime           @default(now())
+  endDate             DateTime           @default(now())
 
   booking Booking[]
 }
