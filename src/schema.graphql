@@ -207,6 +207,11 @@ input CreateCustomerInput {
   phone: String!
 }
 
+input CreateFormInput {
+  content: String!
+  vendorId: String!
+}
+
 input CreateOrderInput {
   cartId: String!
   customerInfo: CreateCustomerInput!
@@ -292,6 +297,19 @@ enum DeliveryMethods {
   SMSA
 }
 
+type Form {
+  Vendor: Vendor!
+  content: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendorId: String!
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -313,6 +331,7 @@ type Mutation {
   createCart(vendorId: String!): CartItem!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
+  createForm(data: CreateFormInput!): Form!
   createOrder(data: CreateOrderInput!): Order!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
@@ -321,6 +340,7 @@ type Mutation {
   deleteBooking(id: String!): Booking!
   deleteCategory(id: String!): Category!
   deleteCoupon(id: String!): Coupon!
+  deleteForm(id: String!): Form!
   deleteOrder(id: String!): Order!
   deleteProduct(id: String!): Product!
   deleteTag(id: String!): Tag!
@@ -336,6 +356,7 @@ type Mutation {
   updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
+  updateForm(data: UpdateFormInput!, id: String!): Form!
   updateOrder(data: UpdateOrderInput!, id: String!): Order!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateTag(data: UpdateTagInput!, id: String!): Tag!
@@ -497,6 +518,8 @@ type Query {
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
   getCustomerCart(customerId: String!): Cart!
+  getForm(id: String!): Form!
+  getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
   getProduct(id: String!): Product!
@@ -608,6 +631,11 @@ input UpdateCouponInput {
   discount: Float!
 }
 
+input UpdateFormInput {
+  content: String
+  vendorId: String
+}
+
 input UpdateOrderInput {
   cartId: String
   deliveryMethod: DeliveryMethods
@@ -639,8 +667,7 @@ input UpdateProductInput {
   title: String
   title_ar: String
   type: ProductType
-  variants: [CreateVariantInput!]
-  vendorId: String
+  variants: [String!]
   workshopBookedCount: Int
 }
 

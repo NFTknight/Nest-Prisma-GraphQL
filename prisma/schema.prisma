@@ -49,6 +49,7 @@ model Vendor {
   coupons    Coupon[]
   orders     Order[]
   booking    Booking[]
+  forms      Form[]
 
   ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
@@ -228,6 +229,8 @@ model Product {
   workshopBookedCount Int?
   category            Category?          @relation(fields: [categoryId], references: [id])
   categoryId          String?            @db.ObjectId
+  form                Form?              @relation(fields: [formId], references: [id])
+  formId              String?            @db.ObjectId
   noOfSeats           Int?
   itemsInStock        Int?
   variants            Variant[]
@@ -354,6 +357,16 @@ model Booking {
   status        BookingStatus
   times         BookingTime[]
   holdTimestamp DateTime?     @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Form {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  content       String
+  vendorId      String        @db.ObjectId
+  Vendor        Vendor        @relation(fields: [vendorId], references: [id])
+  products      Product[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
