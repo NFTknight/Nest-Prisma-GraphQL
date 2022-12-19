@@ -708,8 +708,8 @@ type User {
 type Variant {
   id: ID!
   options: [VariantOptions!]
-  title: String!
-  title_ar: String!
+  title: String
+  title_ar: String
 }
 
 type VariantModel {
@@ -717,8 +717,8 @@ type VariantModel {
   createdAt: DateTime!
   id: ID!
   options: [VariantOptions!]
-  title: String!
-  title_ar: String!
+  title: String
+  title_ar: String
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!

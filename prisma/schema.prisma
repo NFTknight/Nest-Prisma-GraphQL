@@ -184,8 +184,8 @@ type ServiceAvailability {
 
 type Variant {
   id        String           @db.ObjectId
-  title     String
-  title_ar  String
+  title     String?
+  title_ar  String?
   options   VariantOptions[]
 }
 
