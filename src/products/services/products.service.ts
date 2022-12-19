@@ -9,7 +9,6 @@ import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
 import { Product, Prisma } from '@prisma/client';
-import { omit } from 'lodash';
 
 @Injectable()
 export class ProductsService {
@@ -30,32 +29,35 @@ export class ProductsService {
     const error = CreateProductValidator(data);
     if (error) throw new BadRequestException(error);
 
-    const { vendorId, categoryId, variants, ...rest } = data;
+    const { vendorId, categoryId, variants, tags, ...rest } = data;
 
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(vendorId);
-
-    let vars: any = [];
-    if (variants && variants.length > 0) {
-      vars = await this.prisma.variantModel.findMany({
-        where: { id: { in: variants } },
-      });
-    }
 
     // if vendor exists we can successfully create the product.
     const prod = await this.prisma.product.create({
       data: {
         ...rest,
-        variants: { set: vars.map((v) => omit(v, 'vendorId')) },
+        tagIds: tags ? { set: tags } : undefined,
+        variants,
         vendor: { connect: { id: vendorId } },
         category: categoryId ? { connect: { id: categoryId } } : undefined,
       },
     });
+
+    if (tags && tags.length > 0) {
+      await this.prisma.tag.updateMany({
+        where: { id: { in: tags } },
+        data: { productIds: { push: prod.id } },
+      });
+    }
+
     return prod;
   }
 
   async updateProduct(id: string, data: UpdateProductInput): Promise<Product> {
-    const { categoryId, variants, ...restData } = data;
+    const product = await this.prisma.product.findUnique({ where: { id } });
+    const { categoryId, tags, ...restData } = data;
     const updateData: Prisma.ProductUpdateArgs['data'] = {
       ...restData,
     };
@@ -64,11 +66,32 @@ export class ProductsService {
       updateData.category = { connect: { id: categoryId } };
     }
 
-    if (variants && variants.length > 0) {
-      const vars = await this.prisma.variantModel.findMany({
-        where: { id: { in: variants } },
+    if (tags && tags.length > 0) {
+      updateData.tagIds = { set: tags };
+      const tagItems = await this.prisma.tag.findMany({
+        where: {
+          vendorId: product.vendorId,
+        },
       });
-      updateData.variants = { set: vars.map((v) => omit(v, 'vendorId')) };
+
+      for (const tag of tagItems) {
+        // remove the product from the tags that are not in the new list
+        if (!tags.includes(tag.id)) {
+          await this.prisma.tag.update({
+            where: { id: tag.id },
+            data: {
+              productIds: { set: tag.productIds.filter((p) => p !== id) },
+            },
+          });
+        }
+        // add the product to the tags that are in the new list
+        else if (!tag.productIds.includes(id)) {
+          await this.prisma.tag.update({
+            where: { id: tag.id },
+            data: { productIds: { push: id } },
+          });
+        }
+      }
     }
 
     return this.prisma.product.update({
@@ -78,6 +101,19 @@ export class ProductsService {
   }
 
   async deleteProduct(id: string): Promise<Product> {
+    const prod = await this.prisma.product.findUnique({
+      where: { id },
+      include: { tags: true },
+    });
+
+    // remove the product from the tags
+    for (const tag of prod.tags) {
+      await this.prisma.tag.update({
+        where: { id: tag.id },
+        data: { productIds: { set: tag.productIds.filter((p) => p !== id) } },
+      });
+    }
+
     return await this.prisma.product.delete({ where: { id } });
   }
 }

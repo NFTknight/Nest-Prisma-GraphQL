@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
 import { BookingStatus } from '@prisma/client';
-import { BookingTimeInput } from './booking-time.input';
+import { BookingSlotInput } from './booking-time.input';
 
 @InputType()
 export class CreateBookingInput {
@@ -24,7 +24,7 @@ export class CreateBookingInput {
   @Field(() => BookingStatus)
   status: BookingStatus;
 
-  @Field(() => [BookingTimeInput])
+  @Field(() => [BookingSlotInput])
   @IsNotEmpty()
-  times: BookingTimeInput[];
+  slots: BookingSlotInput[];
 }

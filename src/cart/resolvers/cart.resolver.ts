@@ -19,14 +19,6 @@ export class CartResolver {
   ) {}
 
   @Query(() => Cart)
-  getCart(
-    @Args('cartId', { nullable: true }) cartId: string,
-    @Args('customerId', { nullable: true }) customerId: string
-  ): Promise<Cart> {
-    return this.cartService.getCart(cartId, customerId);
-  }
-
-  @Query(() => Cart)
   getCustomerCart(@Args('customerId') customerId: string): Promise<Cart> {
     return this.cartService.getCartByCustomer(customerId);
   }

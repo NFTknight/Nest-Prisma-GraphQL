@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { BookingTimeInput } from 'src/bookings/dto/booking-time.input';
+import { BookingSlotInput } from 'src/bookings/dto/booking-time.input';
 
 @InputType()
 export class AddToCartInput {
@@ -8,8 +8,9 @@ export class AddToCartInput {
   @IsNotEmpty()
   productId: string;
 
-  @Field({ nullable: true })
-  productVariant?: string;
+  @Field()
+  @IsNotEmpty()
+  sku: string;
 
   @Field({ nullable: true })
   cartId?: string;
@@ -24,6 +25,6 @@ export class AddToCartInput {
   @Field()
   tagId?: string;
 
-  @Field(() => [BookingTimeInput])
-  slots?: BookingTimeInput[];
+  @Field(() => [BookingSlotInput])
+  slots?: BookingSlotInput[];
 }
