@@ -7,10 +7,10 @@ export class ProductVariantInput {
   id: string;
 
   @Field()
-  title: string;
+  title?: string;
 
   @Field()
-  title_ar: string;
+  title_ar?: string;
 
   @Field(() => [VariantOptionsInput])
   options?: VariantOptionsInput[];
