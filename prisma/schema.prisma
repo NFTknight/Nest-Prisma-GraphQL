@@ -189,6 +189,10 @@ enum AttendanceType {
   PHYSICAL
 }
 
+type BadgeType {
+  label AttendanceType
+}
+
 type VariantOption {
   default  Boolean?
   sku      String
@@ -230,6 +234,7 @@ model Product {
   sortOrder        Int             @default(0)
   CartItem         CartItem[]
   attendanceType   AttendanceType?
+  badge            BadgeType?
   meetingLink      String?
   location         String?
   endTime          Boolean?        @default(false)

@@ -34,6 +34,10 @@ type Auth {
   user: User!
 }
 
+type BadgeType {
+  label: AttendanceType!
+}
+
 type Booking {
   Cart: Cart
   Order: Order
@@ -428,6 +432,7 @@ input PhoneVerify {
 type Product {
   active: Boolean!
   attendanceType: AttendanceType
+  badge: BadgeType
   category: Category
   categoryId: String
 
