@@ -159,6 +159,7 @@ model Category {
   vendorId  String    @db.ObjectId
   Vendor    Vendor    @relation(fields: [vendorId], references: [id])
   tagIds    String[]
+  slug      String?
   active    Boolean   @default(true)
   sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
