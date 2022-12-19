@@ -7,13 +7,23 @@ import type {
   CorsConfig,
   NestConfig,
 } from 'src/common/configs/config.interface';
+import { BadRequestException } from '@nestjs/common/exceptions';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('bootstrap');
 
   // Validation
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors) => {
+        const keys = Object.keys(errors[0].constraints);
+        if (keys.length) {
+          return new BadRequestException(errors[0].constraints[keys[0]]);
+        }
+      },
+    })
+  );
 
   // enable shutdown hook
   const prismaService: PrismaService = app.get(PrismaService);
