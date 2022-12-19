@@ -96,7 +96,9 @@ export class ProductsResolver {
       skip: ['vendor', 'category', 'Tags'],
     });
 
-    const select = makePrismaSelection(selectedFields);
+    const select = Object.keys(makePrismaSelection(selectedFields)).length
+      ? makePrismaSelection(selectedFields)
+      : undefined;
 
     const list = await this.prismaService.product.findMany({
       where,
@@ -149,9 +151,4 @@ export class ProductsResolver {
   Tags(@Parent() product: Product): Promise<Tag[]> {
     return this.tagService.getTags(product.vendorId);
   }
-
-  // @ResolveField('variants')
-  // variants(@Parent() product: Product): Promise<ProductVariant[]> {
-  //   return this.productVariantsService.getProductVariants(product.id);
-  // }
 }
