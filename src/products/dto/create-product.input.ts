@@ -76,6 +76,9 @@ export class CreateProductInput {
   @Field(() => Int)
   duration?: number;
 
+  @Field(() => String, { nullable: true })
+  formId?: string;
+
   startDate?: Date;
   endDate?: Date;
 }

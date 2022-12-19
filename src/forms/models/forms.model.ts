@@ -8,5 +8,5 @@ export class Form extends BaseModel {
 
   vendorId: string;
   @Field(() => Vendor, { nullable: false })
-  Vendor?: Vendor;
+  vendor?: Vendor;
 }

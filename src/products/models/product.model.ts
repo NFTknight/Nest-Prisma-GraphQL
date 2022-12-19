@@ -6,6 +6,7 @@ import { ProductType, AttendanceType } from 'prisma/prisma-client';
 import { Tag } from 'src/tags/models/tag.model';
 import './product-type.enum';
 import { Variant } from './variant.model';
+import { Form } from 'src/forms/models/forms.model';
 
 @ObjectType()
 export class Product extends BaseModel {
@@ -57,6 +58,11 @@ export class Product extends BaseModel {
 
   @Field(() => AttendanceType, { nullable: true })
   attendanceType?: AttendanceType;
+
+  formId?: string;
+
+  @Field(() => Form, { nullable: true })
+  form?: Form;
 
   meetingLink?: string;
   location?: string;

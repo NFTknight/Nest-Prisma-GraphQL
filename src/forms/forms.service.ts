@@ -43,7 +43,7 @@ export class FormService {
     return await this.prisma.form.create({
       data: {
         ...rest,
-        Vendor: { connect: { id: vendorId } },
+        vendor: { connect: { id: vendorId } },
       },
     });
   }

@@ -357,7 +357,7 @@ model Form {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   content       String
   vendorId      String        @db.ObjectId
-  Vendor        Vendor        @relation(fields: [vendorId], references: [id])
+  vendor        Vendor        @relation(fields: [vendorId], references: [id])
   products      Product[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt

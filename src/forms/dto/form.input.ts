@@ -1,4 +1,4 @@
-import { InputType } from '@nestjs/graphql';
+import { InputType, PartialType } from '@nestjs/graphql';
 
 @InputType()
 export class CreateFormInput {
@@ -7,7 +7,4 @@ export class CreateFormInput {
 }
 
 @InputType()
-export class UpdateFormInput {
-  content?: string;
-  vendorId?: string;
-}
+export class UpdateFormInput extends PartialType(CreateFormInput) {}

@@ -59,8 +59,8 @@ export class FormResolver {
     return this.formService.deleteForm(id);
   }
 
-  @ResolveField('Vendor')
-  Vendor(@Parent() order: Form): Promise<Vendor> {
+  @ResolveField('vendor')
+  vendor(@Parent() order: Form): Promise<Vendor> {
     return this.vendorService.getVendor(order.vendorId);
   }
 }
