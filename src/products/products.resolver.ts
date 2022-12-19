@@ -83,7 +83,7 @@ export class ProductsResolver {
     };
   }
 
-  @UseGuards(GqlAuthGuard)
+  // @UseGuards(GqlAuthGuard)
   @Mutation(() => Product)
   createProduct(@Args('data') data: CreateProductInput): Promise<Product> {
     return this.productService.createProduct(data);
