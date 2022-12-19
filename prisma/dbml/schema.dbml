@@ -61,6 +61,7 @@ Table Category {
   vendorId String [not null]
   Vendor Vendor [not null]
   tagIds String[] [not null]
+  slug String
   active Boolean [not null, default: true]
   sortOrder Int [not null, default: 0]
   createdAt DateTime [default: `now()`, not null]

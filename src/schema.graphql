@@ -116,6 +116,7 @@ type Category {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  slug: String
   sortOrder: Int!
   tagIds: [String!]!
   title: String!
@@ -183,6 +184,7 @@ input CreateBookingInput {
 
 input CreateCategoryInput {
   active: Boolean!
+  slug: String
   sortOrder: Int!
   tagIds: [String!]!
   title: String!

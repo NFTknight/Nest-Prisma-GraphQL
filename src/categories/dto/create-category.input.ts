@@ -22,6 +22,9 @@ export class CreateCategoryInput {
   @IsNotEmpty()
   active: boolean;
 
+  @Field()
+  slug?: string;
+
   @Field(() => Int)
   sortOrder: number;
 }
