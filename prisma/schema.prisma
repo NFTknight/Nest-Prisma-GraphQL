@@ -153,18 +153,18 @@ type WorkDay {
 }
 
 model Category {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  title_ar  String
-  vendorId  String    @db.ObjectId
-  Vendor    Vendor    @relation(fields: [vendorId], references: [id])
-  tagIds    String[]
-  slug      String?
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  title_ar String
+  vendorId String  @db.ObjectId
+  vendor   Vendor  @relation(fields: [vendorId], references: [id])
+  slug     String?
+
   active    Boolean   @default(true)
   sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Product   Product[]
+  products  Product[]
 }
 
 model Coupon {

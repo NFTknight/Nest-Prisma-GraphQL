@@ -109,21 +109,20 @@ type CartItem {
 }
 
 type Category {
-  Tags: [Tag!]!
-  Vendor: Vendor!
   active: Boolean!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  products: [Product!]!
   slug: String
   sortOrder: Int!
-  tagIds: [String!]!
   title: String!
   title_ar: String!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendor: Vendor!
   vendorId: String!
 }
 
@@ -186,7 +185,6 @@ input CreateCategoryInput {
   active: Boolean!
   slug: String
   sortOrder: Int!
-  tagIds: [String!]!
   title: String!
   title_ar: String!
   vendorId: String!
@@ -572,8 +570,8 @@ input UpdateBookingInput {
 
 input UpdateCategoryInput {
   active: Boolean
+  slug: String
   sortOrder: Int
-  tagIds: [String!]
   title: String
   title_ar: String
 }

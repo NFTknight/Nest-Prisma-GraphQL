@@ -61,8 +61,8 @@ export class CategoriesResolver {
     return this.categoriesService.deleteCategory(id);
   }
 
-  @ResolveField('Vendor')
-  Vendor(@Parent() category: Category): Promise<Vendor> {
+  @ResolveField('vendor', () => Vendor)
+  vendor(@Parent() category: Category): Promise<Vendor> {
     return this.vendorService.getVendor(category.vendorId);
   }
 }
