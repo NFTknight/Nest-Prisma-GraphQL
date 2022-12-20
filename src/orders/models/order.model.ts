@@ -7,6 +7,12 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { CustomerInfo } from './customer-info.model';
 
 @ObjectType()
+export class FormResponse {
+  productId: string;
+  answers: string;
+}
+
+@ObjectType()
 export class Order extends BaseModel {
   @Field(() => CustomerInfo, { nullable: true })
   customerInfo: CustomerInfo;
@@ -32,4 +38,7 @@ export class Order extends BaseModel {
 
   @Field(() => PaymentMethods)
   paymentMethod?: PaymentMethods;
+
+  @Field(() => [FormResponse])
+  formResponses?: FormResponse[];
 }

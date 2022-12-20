@@ -25,6 +25,7 @@ export class CartService {
     if (cartId) {
       return await this.prisma.cart.findUnique({
         where: { id: cartId },
+        include: { items: true },
       });
     } else {
       return await this.createNewCart(customerId);

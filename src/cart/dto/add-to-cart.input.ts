@@ -25,6 +25,9 @@ export class AddToCartInput {
   @Field()
   tagId?: string;
 
+  @Field()
+  answers?: string;
+
   @Field(() => [BookingSlotInput])
   slots?: BookingSlotInput[];
 }

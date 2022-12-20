@@ -10,6 +10,7 @@ import {
 import { Tag } from 'src/tags/models/tag.model';
 import './product-type.enum';
 import { Variant } from './variant.model';
+import { Form } from 'src/forms/models/forms.model';
 
 @ObjectType()
 export class BadgeType implements Btype {
@@ -67,6 +68,10 @@ export class Product extends BaseModel {
 
   @Field(() => AttendanceType, { nullable: true })
   attendanceType?: AttendanceType;
+
+  formId?: string;
+  @Field(() => Form, { nullable: true })
+  form?: Form;
 
   @Field(() => BadgeType, { nullable: true })
   badge?: BadgeType;

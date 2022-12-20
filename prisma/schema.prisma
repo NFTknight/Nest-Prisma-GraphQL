@@ -49,6 +49,7 @@ model Vendor {
   coupons    Coupon[]
   orders     Order[]
   booking    Booking[]
+  forms      Form[]
 
   ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
@@ -226,6 +227,9 @@ model Product {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?   @db.ObjectId
 
+  formId     String?            @db.ObjectId
+  form       Form?              @relation(fields: [formId], references: [id])
+
   active           Boolean         @default(true)
   minPreorderDays  Int?
   noOfSeats        Int?
@@ -253,6 +257,7 @@ model CartItem {
 
   productId String  @db.ObjectId
   product   Product @relation(fields: [productId], references: [id])
+  answers   String?
 
   sku String
 
@@ -287,6 +292,11 @@ model Cart {
   booking   Booking[]
 }
 
+type FormResponse {
+  productId String
+  answers   String
+}
+
 model Order {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   orderId String
@@ -297,6 +307,7 @@ model Order {
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
+  formResponses  FormResponse[]
   status         OrderStatus
   vendorId       String           @db.ObjectId
   Vendor         Vendor           @relation(fields: [vendorId], references: [id])
@@ -351,6 +362,16 @@ model Booking {
   status        BookingStatus
   slots         BookingTime[]
   holdTimestamp DateTime?     @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Form {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  content       String
+  vendorId      String        @db.ObjectId
+  vendor        Vendor        @relation(fields: [vendorId], references: [id])
+  products      Product[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }

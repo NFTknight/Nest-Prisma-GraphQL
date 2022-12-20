@@ -30,7 +30,7 @@ export class CartItemService {
   }
 
   async addProductToCart(data: AddToCartInput): Promise<CartItem> {
-    const { productId, sku, quantity, cartId } = data;
+    const { productId, sku, quantity, cartId, answers } = data;
     if (!cartId) {
       throw new BadRequestException('No cart created');
     }
@@ -45,13 +45,13 @@ export class CartItemService {
     } else {
       // if the cart item does not exist, create the item
       return this.prisma.cartItem.create({
-        data: { productId, sku, quantity, cartId },
+        data: { productId, sku, quantity, cartId, answers },
       });
     }
   }
 
   async addWorkspaceToCart(data: AddToCartInput): Promise<CartItem> {
-    const { productId, sku, quantity, cartId } = data;
+    const { productId, sku, quantity, cartId, answers } = data;
     if (!cartId) {
       throw new BadRequestException('No cart created');
     }
@@ -66,14 +66,23 @@ export class CartItemService {
     } else {
       // if the cart item does not exist, create the item
       return this.prisma.cartItem.create({
-        data: { productId, sku, quantity, cartId },
+        data: { productId, sku, quantity, cartId, answers },
       });
     }
   }
 
   // TODO revisit HOLD booking logic
   async addServiceToCart(data: AddToCartInput): Promise<CartItem> {
-    const { productId, sku, quantity, cartId, slots, vendorId, tagId } = data;
+    const {
+      productId,
+      sku,
+      quantity,
+      cartId,
+      slots,
+      vendorId,
+      tagId,
+      answers,
+    } = data;
     if (!cartId) {
       throw new BadRequestException('No cart created');
     }
@@ -117,6 +126,7 @@ export class CartItemService {
           tagId,
           slots,
           cartId,
+          answers,
         },
       });
     }
