@@ -35,7 +35,7 @@ export class Booking extends BaseModel {
   status: BookingStatus;
 
   @Field(() => [BookingTime], { nullable: true })
-  times?: BookingTime[];
+  slots?: BookingTime[];
 
   @Field(() => Date, { nullable: true })
   holdTimestamp?: Date;
