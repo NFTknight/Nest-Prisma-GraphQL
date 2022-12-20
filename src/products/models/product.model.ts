@@ -2,11 +2,20 @@ import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
-import { ProductType, AttendanceType } from 'prisma/prisma-client';
+import {
+  ProductType,
+  AttendanceType,
+  BadgeType as Btype,
+} from 'prisma/prisma-client';
 import { Tag } from 'src/tags/models/tag.model';
 import './product-type.enum';
 import { Variant } from './variant.model';
 
+@ObjectType()
+export class BadgeType implements Btype {
+  @Field(() => AttendanceType)
+  label: AttendanceType;
+}
 @ObjectType()
 export class Product extends BaseModel {
   slug: string;
@@ -57,6 +66,9 @@ export class Product extends BaseModel {
 
   @Field(() => AttendanceType, { nullable: true })
   attendanceType?: AttendanceType;
+
+  @Field(() => BadgeType, { nullable: true })
+  badge?: BadgeType;
 
   meetingLink?: string;
   location?: string;

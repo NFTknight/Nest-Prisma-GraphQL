@@ -24,7 +24,7 @@ import { TagsService } from 'src/tags/tags.service';
 import { Tag } from 'src/tags/models/tag.model';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
-
+import { AttendanceType } from '@prisma/client';
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(
@@ -68,11 +68,25 @@ export class ProductsResolver {
       where['categoryId'] = categoryId;
     }
 
-    const list = await this.prismaService.product.findMany({
+    const products = await this.prismaService.product.findMany({
       where,
       skip,
       take,
       orderBy,
+    });
+
+    const list = products.map((product) => {
+      if (product.meetingLink) {
+        if (product.badge)
+          product.badge = { ...product.badge, label: AttendanceType.ONLINE };
+        else product.badge = { label: AttendanceType.ONLINE };
+      } else if (product.location) {
+        if (product.badge)
+          product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
+        else product.badge = { label: AttendanceType.PHYSICAL };
+      }
+
+      return product;
     });
 
     const totalCount = await this.prismaService.product.count({ where });

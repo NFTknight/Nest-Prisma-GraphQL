@@ -102,6 +102,7 @@ Table Product {
   sortOrder Int [not null, default: 0]
   CartItem CartItem [not null]
   attendanceType AttendanceType
+  badge BadgeType
   meetingLink String
   location String
   endTime Boolean [default: false]
