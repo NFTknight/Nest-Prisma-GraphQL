@@ -78,7 +78,6 @@ type BookingTime {
 }
 
 type Cart {
-  answers: String
   appliedCoupon: String!
 
   """Identifies the date and time when the object was created."""
@@ -95,6 +94,7 @@ type Cart {
 
 type CartItem {
   Product: Product
+  answers: String
   cartId: String!
 
   """Identifies the date and time when the object was created."""
@@ -305,6 +305,11 @@ type Form {
   vendorId: String!
 }
 
+type FormResponse {
+  answers: String!
+  productId: String!
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -369,6 +374,7 @@ type Order {
   createdAt: DateTime!
   customerInfo: CustomerInfo
   deliveryMethod: DeliveryMethods
+  formResponses: [FormResponse!]
   id: ID!
   orderId: String!
   paymentMethod: PaymentMethods
