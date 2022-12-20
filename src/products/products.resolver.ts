@@ -77,10 +77,15 @@ export class ProductsResolver {
 
     const list = products.map((product) => {
       if (product.meetingLink) {
-        product.badge.label = AttendanceType.ONLINE;
+        if (product.badge)
+          product.badge = { ...product.badge, label: AttendanceType.ONLINE };
+        else product.badge = { label: AttendanceType.ONLINE };
       } else if (product.location) {
-        product.badge.label = AttendanceType.PHYSICAL;
+        if (product.badge)
+          product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
+        else product.badge = { label: AttendanceType.PHYSICAL };
       }
+
       return product;
     });
 
