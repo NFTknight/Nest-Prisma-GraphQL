@@ -1,30 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
+import axios from 'axios';
 import { PrismaService } from 'nestjs-prisma';
+
 import { CartService } from 'src/cart/services/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { OrdersFilterInput } from 'src/common/filter/filter.input';
-// import { SHIPPING_CONSTANT } from 'src/constant/shipping';
-// import { ShippingConfig } from 'src/common/configs/config.interface';
-// import axios from 'axios';
 import { WayBill } from 'src/shipping/models/waybill.model';
-// import { ShippingService } from 'src/shipping/shipping.service';
+
+import { CreateOrderInput } from './dto/create-order.input';
+import { UpdateOrderInput } from './dto/update-order.input';
 @Injectable()
 export class OrdersService {
   constructor(
-    // private readonly shippingConfig: ShippingConfig,
     private readonly prisma: PrismaService,
     private readonly cartService: CartService,
     private readonly vendorService: VendorsService,
-    private readonly emailService: SendgridService // private readonly shippingService: ShippingService
+    private readonly emailService: SendgridService
   ) {}
 
   async getOrder(id: string): Promise<Order> {
@@ -112,35 +110,61 @@ export class OrdersService {
     }
 
     const order = await this.getOrder(id);
-    let wayBillResponse: WayBill = null;
+    let wayBillData: WayBill = null;
+    const { vendorId, customerInfo } = order;
+    const url = `${process.env.SMSA_API_URL}/api/shipment/b2c/new`;
+
     if (
       order.status === OrderStatus.PENDING &&
-      order.deliveryMethod === DeliveryMethods.SMSA
+      order.deliveryMethod === DeliveryMethods.SMSA &&
+      !order.wayBill
     ) {
-      // const url = `${this.shippingConfig.url}/api/shipment/b2c/new`;
-      // wayBillResponse = await axios({
-      //   method: 'post',
-      //   url: url,
-      //   data: SHIPPING_CONSTANT,
-      // });
-      //adding dummy data for now as we need Shipping detail of customer.
-      wayBillResponse = {
-        sawb: '231200021000',
-        createDate: '2021-01-01T10:40:53',
-        shipmentParcelsCount: 1,
-        waybills: [
-          {
-            awb: '231200021879',
-            awbFile: 'JVBERi0xLjQKJeLjz9MKMSA...',
-          },
-        ],
+      const vendorData = await this.vendorService.getVendor(vendorId);
+
+      const WayBillRequestObject = {
+        ConsigneeAddress: {
+          ContactName: `${customerInfo?.firstName || ''} ${
+            customerInfo?.lastName || ''
+          }`,
+          ContactPhoneNumber: customerInfo.phone,
+          Country: 'SA',
+          City: 'Jeddah',
+          AddressLine1: customerInfo?.address || 'Ar Rawdah, Jeddah 23434',
+        },
+        ShipperAddress: {
+          ContactName: vendorData.name || 'Company Name',
+          ContactPhoneNumber: vendorData.info.phone || '06012312312',
+          Country: 'SA',
+          City: 'Riyadh',
+          AddressLine1: vendorData.info.address || 'Ar Rawdah, Jeddah 23434',
+        },
+        OrderNumber: order?.orderId,
+        DeclaredValue: 10,
+        CODAmount: 30,
+        Parcels: 1,
+        ShipDate: new Date().toISOString(),
+        ShipmentCurrency: 'SAR',
+        Weight: 15,
+        WeightUnit: 'KG',
+        ContentDescription: 'Shipment contents description',
       };
+
+      const wayBillResponse = await axios({
+        method: 'post',
+        headers: {
+          ApiKey: process.env.SMSA_API_KEY,
+        },
+        url,
+        data: WayBillRequestObject,
+      });
+
+      wayBillData = wayBillResponse?.data;
     }
 
     const res = await this.prisma.order.update({
       where: { id },
-      data: wayBillResponse.sawb
-        ? { ...data, wayBill: wayBillResponse, updatedAt: new Date() }
+      data: wayBillData?.sawb
+        ? { ...data, wayBill: wayBillData, updatedAt: new Date() }
         : { ...data, updatedAt: new Date() },
     });
 
