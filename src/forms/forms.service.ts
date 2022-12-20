@@ -17,7 +17,6 @@ export class FormService {
     const form = await this.prisma.form.findUnique({
       where: { id },
     });
-    console.log(JSON.stringify(form));
     if (!form) throw new NotFoundException('Form not Found.');
 
     return form;

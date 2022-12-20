@@ -251,6 +251,7 @@ model CartItem {
 
   productId String  @db.ObjectId
   product   Product @relation(fields: [productId], references: [id])
+  answers   String?
 
   sku String
 

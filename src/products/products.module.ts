@@ -4,6 +4,7 @@ import { ProductsResolver } from './products.resolver';
 import { VendorsModule } from 'src/vendors/vendors.module';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { TagModule } from 'src/tags/tags.module';
+import { FormService } from 'src/forms/forms.service';
 
 // import { ProductVariantsService } from './services/product-variants.service';
 // import { ProductVariantsResolver } from './resolvers/product-variants.resolver';
@@ -13,6 +14,7 @@ import { TagModule } from 'src/tags/tags.module';
   providers: [
     ProductsResolver,
     ProductsService,
+    FormService,
     // ProductVariantsResolver,
     // ProductVariantsService,
   ],

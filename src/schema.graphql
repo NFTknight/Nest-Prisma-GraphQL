@@ -10,6 +10,7 @@ input AddDeliveryAreasInput {
 }
 
 input AddToCartInput {
+  answers: String
   cartId: String
   productId: String!
   quantity: Int
@@ -77,6 +78,7 @@ type BookingTime {
 }
 
 type Cart {
+  answers: String
   appliedCoupon: String!
 
   """Identifies the date and time when the object was created."""

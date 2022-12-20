@@ -121,6 +121,7 @@ Table CartItem {
   id String [pk]
   productId String [not null]
   product Product [not null]
+  answers String
   sku String [not null]
   quantity Int [not null, default: 1]
   tagId String
