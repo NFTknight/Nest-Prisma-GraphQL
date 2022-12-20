@@ -7,8 +7,6 @@ export class Cart extends BaseModel {
   @Field(() => [CartItem])
   items?: CartItem[];
 
-  answers?: string;
-
   customerId: string;
 
   appliedCoupon: string;

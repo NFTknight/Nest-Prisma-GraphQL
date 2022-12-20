@@ -153,6 +153,7 @@ Table Order {
   customerInfo CustomerInfo [not null]
   deliveryMethod DeliveryMethods
   paymentMethod PaymentMethods
+  formResponses FormResponse[] [not null]
   status OrderStatus [not null]
   vendorId String [not null]
   Vendor Vendor [not null]

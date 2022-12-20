@@ -286,6 +286,11 @@ model Cart {
   booking   Booking[]
 }
 
+type FormResponse {
+  productId String
+  answers   String
+}
+
 model Order {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   orderId String
@@ -296,6 +301,7 @@ model Order {
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
+  formResponses  FormResponse[]
   status         OrderStatus
   vendorId       String           @db.ObjectId
   Vendor         Vendor           @relation(fields: [vendorId], references: [id])
