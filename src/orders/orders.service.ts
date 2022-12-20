@@ -28,7 +28,6 @@ export class OrdersService {
         booking: true,
       },
     });
-    console.log(JSON.stringify(order));
     if (!order) throw new NotFoundException('Order Not Found.');
 
     return order;
@@ -78,7 +77,8 @@ export class OrdersService {
     } else {
       orderId = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
     }
-    orderId = orderId + '-' + Math.random().toString(36).substring(2, 10);
+    orderId =
+      orderId + '-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
     const newData = { ...data, orderId };
 
