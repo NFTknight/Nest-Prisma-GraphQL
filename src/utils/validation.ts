@@ -1,4 +1,5 @@
 import { ProductType, AttendanceType } from '@prisma/client';
+import { isNil } from 'lodash';
 import { CreateProductInput } from 'src/products/dto/create-product.input';
 
 export const CreateProductValidator = (input: CreateProductInput) => {
@@ -6,8 +7,7 @@ export const CreateProductValidator = (input: CreateProductInput) => {
   const { type, minPreorderDays, attendanceType, meetingLink, location } =
     input;
   if (type === ProductType.PRODUCT) {
-    if (minPreorderDays === undefined || minPreorderDays === null)
-      error = 'Min Preorder Days field is required';
+    if (isNil(minPreorderDays)) error = 'Min Preorder Days field is required';
   } else {
     if (attendanceType === AttendanceType.ONLINE && !meetingLink)
       error = 'Meeting link is required for online attendance';

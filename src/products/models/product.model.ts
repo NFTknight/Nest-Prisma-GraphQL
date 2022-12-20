@@ -1,12 +1,11 @@
-import { Field, ObjectType, Int, Float } from '@nestjs/graphql';
+import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { ProductType, AttendanceType } from 'prisma/prisma-client';
-import { VariantModel } from '../../variants/models/variant.model';
-import { ServiceAvailability } from 'src/common/models/service-availability.model';
 import { Tag } from 'src/tags/models/tag.model';
 import './product-type.enum';
+import { Variant } from './variant.model';
 
 @ObjectType()
 export class Product extends BaseModel {
@@ -23,6 +22,7 @@ export class Product extends BaseModel {
   image: string;
 
   vendorId: string;
+
   @Field(() => Vendor, { nullable: false })
   vendor?: Vendor;
 
@@ -35,18 +35,19 @@ export class Product extends BaseModel {
 
   minPreorderDays?: number;
 
-  @Field(() => [VariantModel], { nullable: true })
-  variants?: VariantModel[];
-
-  @Field(() => [ServiceAvailability], { nullable: true })
-  availabilities?: ServiceAvailability[];
+  @Field(() => [Variant], { nullable: true })
+  variants?: Variant[];
 
   tagIds: string[];
 
   @Field(() => [Tag], { nullable: true })
-  Tags?: Tag[];
+  tags?: Tag[];
+
   @Field(() => Int)
   noOfSeats?: number;
+
+  @Field(() => Int)
+  workshopBookedCount?: number;
 
   @Field(() => Int)
   itemsInStock?: number;

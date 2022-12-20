@@ -1,12 +1,7 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { BookingTime } from 'src/bookings/models/booking-time.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Product } from 'src/products/models/product.model';
-
-@ObjectType()
-class TimeSlot {
-  startTime: Date;
-  endTime: Date;
-}
 
 @ObjectType()
 export class CartItem extends BaseModel {
@@ -21,6 +16,6 @@ export class CartItem extends BaseModel {
 
   tagId?: string;
 
-  @Field(() => [TimeSlot])
-  slots?: TimeSlot[];
+  @Field(() => [BookingTime])
+  slots?: BookingTime[];
 }

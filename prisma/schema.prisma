@@ -45,10 +45,10 @@ model Vendor {
 
   products   Product[]
   categories Category[]
-  carts      Cart[]
   tags       Tag[]
   coupons    Coupon[]
   orders     Order[]
+  booking    Booking[]
 
   ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
@@ -117,30 +117,54 @@ type VendorBankInfo {
 }
 
 model Tag {
-  id             String                @id @default(auto()) @map("_id") @db.ObjectId
-  title          String
-  title_ar       String
-  vendorId       String                @db.ObjectId
-  vendor         Vendor                @relation(fields: [vendorId], references: [id])
-  active         Boolean               @default(true)
-  availabilities ServiceAvailability[]
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  CartItem       CartItem[]
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  title_ar String
+
+  vendorId String @db.ObjectId
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  products   Product[] @relation(fields: [productIds], references: [id])
+  productIds String[]  @db.ObjectId
+
+  active   Boolean   @default(true)
+  workdays WorkDay[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+}
+
+enum Weekday {
+  Sunday
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+}
+
+type WorkDay {
+  day  Weekday
+  from String
+  to   String
 }
 
 model Category {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  title_ar  String
-  vendorId  String    @db.ObjectId
-  Vendor    Vendor    @relation(fields: [vendorId], references: [id])
-  tagIds    String[]
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  title_ar String
+  vendorId String  @db.ObjectId
+  vendor   Vendor  @relation(fields: [vendorId], references: [id])
+  slug     String?
+
   active    Boolean   @default(true)
   sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Product   Product[]
+  products  Product[]
 }
 
 model Coupon {
@@ -165,43 +189,13 @@ enum AttendanceType {
   PHYSICAL
 }
 
-type ProductAttribute {
-  key      String
-  key_ar   String
-  value    String
-  value_ar String
-}
-
-type ServiceAvailability {
-  days      String[]
-  startTime String
-  endTime   String
-}
-
-type Variant {
-  id        String
-  vendorId  String
-  title     String
-  title_ar  String
-  options   VariantOptions[]
-  createdAt DateTime
-  updatedAt DateTime
-}
-
-type VariantOptions {
-  sku      String?
-  price    Float?
+type VariantOption {
+  default  Boolean?
+  sku      String
+  price    Float
   image    String?
-  title    String?
-  title_ar String?
-}
-
-model VariantModel {
-  id       String           @id @default(auto()) @map("_id") @db.ObjectId
-  vendorId String
-  title    String?
-  title_ar String?
-  options  VariantOptions[]
+  title    String
+  title_ar String
 }
 
 type TimeSlot {
@@ -210,63 +204,63 @@ type TimeSlot {
 }
 
 model Product {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  slug            String
-  sku             String?
-  title           String
-  title_ar        String
-  description     String
-  description_ar  String
-  image           String
-  type            ProductType
-  vendorId        String      @db.ObjectId
-  vendor          Vendor      @relation(fields: [vendorId], references: [id])
-  active          Boolean     @default(true)
-  minPreorderDays Int?
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  slug           String
+  title          String
+  title_ar       String
+  description    String
+  description_ar String
+  image          String
+  type           ProductType
 
-  category         Category?             @relation(fields: [categoryId], references: [id])
-  categoryId       String?               @db.ObjectId
+  vendorId String @db.ObjectId
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  tagIds String[] @db.ObjectId
+  tags   Tag[]    @relation(fields: [tagIds], references: [id])
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?   @db.ObjectId
+
+  active           Boolean         @default(true)
+  minPreorderDays  Int?
   noOfSeats        Int?
   itemsInStock     Int?
-  availabilities   ServiceAvailability[]
-  variants         Variant[]
-  attributes       ProductAttribute[]
-  sortOrder        Int                   @default(0)
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  variants         VariantOption[]
+  sortOrder        Int             @default(0)
   CartItem         CartItem[]
-  tagIds           String[]              @db.ObjectId
   attendanceType   AttendanceType?
   meetingLink      String?
   location         String?
-  endTime          Boolean?              @default(false)
-  customerLocation Boolean?              @default(false)
+  endTime          Boolean?        @default(false)
+  customerLocation Boolean?        @default(false)
   duration         Int?
-  startDate        DateTime              @default(now())
-  endDate          DateTime              @default(now())
+  startDate        DateTime        @default(now())
+  endDate          DateTime        @default(now())
 
-  booking Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Booking   Booking[]
 }
 
 model CartItem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  productId      String  @db.ObjectId
-  product        Product @relation(fields: [productId], references: [id])
-  productVariant String?
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
 
-  Variant Variant[]
+  sku String
 
-  quantity Int        @default(1)
-  tagId    String?    @db.ObjectId
-  tag      Tag?       @relation(fields: [tagId], references: [id])
-  slots    TimeSlot[]
+  quantity Int     @default(1)
+  tagId    String? @db.ObjectId
+
+  slots BookingTime[]
 
   cartId String? @db.ObjectId
-  Cart   Cart?   @relation(fields: [cartId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Cart      Cart?    @relation(fields: [cartId], references: [id])
 }
 
 model Cart {
@@ -274,16 +268,13 @@ model Cart {
 
   items CartItem[]
 
-  vendorId String @db.ObjectId
-  vendor   Vendor @relation(fields: [vendorId], references: [id])
+  customerId String @unique
 
   totalPrice Float
 
   appliedCoupon String?
 
   finalPrice Float
-
-  checkedOut Boolean @default(false)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -333,10 +324,12 @@ type CustomerInfo {
 }
 
 enum OrderStatus {
+  CREATED
   PENDING
   COMPLETED
   CONFIRMED
   REJECTED
+  FAILED
 }
 
 enum BookingStatus {
@@ -346,17 +339,25 @@ enum BookingStatus {
   REJECTED
 }
 
+type BookingTime {
+  from DateTime
+  to   DateTime
+}
+
 model Booking {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  startDate     DateTime      @default(now())
-  endDate       DateTime      @default(now())
   cartId        String        @db.ObjectId
-  Cart          Cart          @relation(fields: [cartId], references: [id])
-  orderId       String        @db.ObjectId
-  Order         Order         @relation(fields: [orderId], references: [id])
+  cart          Cart          @relation(fields: [cartId], references: [id])
+  orderId       String?       @db.ObjectId
+  order         Order?        @relation(fields: [orderId], references: [id])
   productId     String        @db.ObjectId
-  Product       Product       @relation(fields: [productId], references: [id])
+  product       Product       @relation(fields: [productId], references: [id])
+  vendorId      String        @db.ObjectId
+  vendor        Vendor        @relation(fields: [vendorId], references: [id])
+  tagId         String        @db.ObjectId
+  tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
+  slots         BookingTime[]
   holdTimestamp DateTime?     @default(now())
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt

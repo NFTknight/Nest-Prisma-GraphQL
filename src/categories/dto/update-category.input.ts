@@ -1,19 +1,7 @@
-import { InputType, Field, Int } from '@nestjs/graphql';
+import { InputType, PartialType, OmitType } from '@nestjs/graphql';
+import { CreateCategoryInput } from './create-category.input';
 
 @InputType()
-export class UpdateCategoryInput {
-  @Field()
-  title?: string;
-
-  @Field()
-  title_ar?: string;
-
-  @Field(() => [String])
-  tagIds?: string[];
-
-  @Field()
-  active?: boolean;
-
-  @Field(() => Int)
-  sortOrder?: number;
-}
+export class UpdateCategoryInput extends PartialType(
+  OmitType(CreateCategoryInput, ['vendorId'])
+) {}

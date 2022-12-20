@@ -1,13 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
 import { BookingStatus } from '@prisma/client';
+import { BookingSlotInput } from './booking-time.input';
 
 @InputType()
 export class CreateBookingInput {
-  @Field()
-  @IsNotEmpty()
-  orderId: string;
-
   @Field()
   @IsNotEmpty()
   cartId: string;
@@ -16,9 +13,18 @@ export class CreateBookingInput {
   @IsNotEmpty()
   productId: string;
 
+  @Field()
+  @IsNotEmpty()
+  vendorId: string;
+
+  @Field()
+  @IsNotEmpty()
+  tagId: string;
+
   @Field(() => BookingStatus)
   status: BookingStatus;
 
-  startDate?: Date;
-  endDate?: Date;
+  @Field(() => [BookingSlotInput])
+  @IsNotEmpty()
+  slots: BookingSlotInput[];
 }

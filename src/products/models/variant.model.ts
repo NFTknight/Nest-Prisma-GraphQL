@@ -1,21 +1,22 @@
-import { Field, ObjectType, Int, Float } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Variant {
-  identifier: string;
+  @Field()
+  default?: boolean;
+
+  @Field()
   title: string;
+
+  @Field()
   title_ar: string;
 
-  @Field(() => [String], { nullable: true })
-  options?: string[];
-
-  @Field(() => [String], { nullable: true })
-  options_ar?: string[];
-
-  @Field(() => String)
-  image: string;
-
-  @Field(() => Float)
-  price: number;
+  @Field()
   sku: string;
+
+  @Field()
+  price: number;
+
+  @Field()
+  image?: string;
 }
