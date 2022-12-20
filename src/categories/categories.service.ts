@@ -7,6 +7,8 @@ import { Category } from './models/category.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { Product } from '@prisma/client';
+
 @Injectable()
 export class CategoriesService {
   constructor(
@@ -74,5 +76,13 @@ export class CategoriesService {
 
   async deleteCategory(id: string): Promise<Category> {
     return await this.prisma.category.delete({ where: { id } });
+  }
+
+  async getProducts(categoryId: string): Promise<Product[]> {
+    return this.prisma.product.findMany({
+      where: {
+        categoryId,
+      },
+    });
   }
 }

@@ -60,13 +60,13 @@ Table Category {
   title String [not null]
   title_ar String [not null]
   vendorId String [not null]
-  Vendor Vendor [not null]
-  tagIds String[] [not null]
+  vendor Vendor [not null]
+  slug String
   active Boolean [not null, default: true]
   sortOrder Int [not null, default: 0]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  Product Product [not null]
+  products Product [not null]
 }
 
 Table Coupon {
@@ -105,6 +105,7 @@ Table Product {
   sortOrder Int [not null, default: 0]
   CartItem CartItem [not null]
   attendanceType AttendanceType
+  badge BadgeType
   meetingLink String
   location String
   endTime Boolean [default: false]

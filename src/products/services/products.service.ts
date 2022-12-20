@@ -8,7 +8,7 @@ import { CreateProductValidator } from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
-import { Product, Prisma } from '@prisma/client';
+import { Product, Prisma, AttendanceType } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -21,6 +21,15 @@ export class ProductsService {
     const product = await this.prisma.product.findUnique({ where: { id } });
 
     if (!product) throw new NotFoundException('Product Not Found.');
+    if (product.meetingLink) {
+      if (product.badge)
+        product.badge = { ...product.badge, label: AttendanceType.ONLINE };
+      else product.badge = { label: AttendanceType.ONLINE };
+    } else if (product.location) {
+      if (product.badge)
+        product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
+      else product.badge = { label: AttendanceType.PHYSICAL };
+    }
 
     return product;
   }
