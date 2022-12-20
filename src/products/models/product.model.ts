@@ -42,6 +42,7 @@ export class Product extends BaseModel {
 
   active: boolean;
 
+  @Field(() => Int)
   minPreorderDays?: number;
 
   @Field(() => [Variant], { nullable: true })

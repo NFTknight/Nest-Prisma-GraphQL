@@ -44,7 +44,7 @@ export class CreateProductInput {
   @IsNotEmpty()
   active: boolean;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   minPreorderDays?: number;
 
   @Field(() => [VariantInput])
