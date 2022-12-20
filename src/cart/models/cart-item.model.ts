@@ -9,6 +9,8 @@ export class CartItem extends BaseModel {
   Product?: Product;
   productVariant?: string;
 
+  answers?: string;
+
   @Field(() => Int)
   quantity: number;
 

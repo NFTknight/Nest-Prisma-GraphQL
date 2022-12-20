@@ -16,6 +16,7 @@ import { WayBill } from 'src/shipping/models/waybill.model';
 
 import { CreateOrderInput } from './dto/create-order.input';
 import { UpdateOrderInput } from './dto/update-order.input';
+import { FormResponse } from './models/order.model';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -69,7 +70,15 @@ export class OrdersService {
 
   async createOrder(data: CreateOrderInput): Promise<Order> {
     // if the vendor does not exist, this function will throw an error.
-    await this.cartService.getCart(data.cartId);
+    const cart = await this.cartService.getCart(data.cartId);
+    const customerAnswers: FormResponse[] = [];
+    cart.items.map((item) => {
+      if (item?.answers)
+        customerAnswers.push({
+          productId: item.productId,
+          answers: item.answers,
+        });
+    });
     const vendor = await this.vendorService.getVendor(data.vendorId);
 
     // get order ID from vendor
@@ -84,7 +93,7 @@ export class OrdersService {
     }
     orderId = orderId + '-' + Math.random().toString(36).substring(2, 10);
 
-    const newData = { ...data, orderId };
+    const newData = { ...data, orderId, formResponses: customerAnswers };
 
     // if vendor and cart exists we can successfully create the order.
     const res = await this.prisma.order.create({ data: newData });

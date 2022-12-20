@@ -33,6 +33,7 @@ Table Vendor {
   coupons Coupon [not null]
   orders Order [not null]
   booking Booking [not null]
+  forms Form [not null]
   ownerId String [unique, not null]
   owner User
   createdAt DateTime [default: `now()`, not null]
@@ -94,6 +95,8 @@ Table Product {
   tags Tag [not null]
   category Category
   categoryId String
+  formId String
+  form Form
   active Boolean [not null, default: true]
   minPreorderDays Int
   noOfSeats Int
@@ -102,6 +105,7 @@ Table Product {
   sortOrder Int [not null, default: 0]
   CartItem CartItem [not null]
   attendanceType AttendanceType
+  badge BadgeType
   meetingLink String
   location String
   endTime Boolean [default: false]
@@ -118,6 +122,7 @@ Table CartItem {
   id String [pk]
   productId String [not null]
   product Product [not null]
+  answers String
   sku String [not null]
   quantity Int [not null, default: 1]
   tagId String
@@ -149,6 +154,7 @@ Table Order {
   customerInfo CustomerInfo [not null]
   deliveryMethod DeliveryMethods
   paymentMethod PaymentMethods
+  formResponses FormResponse[] [not null]
   status OrderStatus [not null]
   vendorId String [not null]
   Vendor Vendor [not null]
@@ -173,6 +179,16 @@ Table Booking {
   status BookingStatus [not null]
   slots BookingTime[] [not null]
   holdTimestamp DateTime [default: `now()`]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Form {
+  id String [pk]
+  content String [not null]
+  vendorId String [not null]
+  vendor Vendor [not null]
+  products Product [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -248,6 +264,8 @@ Ref: Product.tagIds > Tag.id
 
 Ref: Product.categoryId > Category.id
 
+Ref: Product.formId > Form.id
+
 Ref: CartItem.productId > Product.id
 
 Ref: CartItem.cartId > Cart.id
@@ -265,3 +283,5 @@ Ref: Booking.productId > Product.id
 Ref: Booking.vendorId > Vendor.id
 
 Ref: Booking.tagId > Tag.id
+
+Ref: Form.vendorId > Vendor.id

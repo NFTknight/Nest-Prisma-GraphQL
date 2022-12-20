@@ -7,7 +7,7 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { CategoriesService } from 'src/categories/categories.service';
-import { Prisma, Vendor } from '@prisma/client';
+import { Form, Prisma, Vendor } from '@prisma/client';
 import { Category } from 'src/categories/models/category.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from './dto/create-product.input';
@@ -24,7 +24,8 @@ import { TagsService } from 'src/tags/tags.service';
 import { Tag } from 'src/tags/models/tag.model';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
-
+import { FormService } from 'src/forms/forms.service';
+import { AttendanceType } from '@prisma/client';
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(
@@ -32,7 +33,8 @@ export class ProductsResolver {
     private readonly productService: ProductsService,
     private readonly vendorService: VendorsService,
     private readonly categoriesService: CategoriesService,
-    private readonly tagService: TagsService
+    private readonly tagService: TagsService,
+    private readonly formService: FormService
   ) {}
 
   @Query(() => Product)
@@ -68,11 +70,25 @@ export class ProductsResolver {
       where['categoryId'] = categoryId;
     }
 
-    const list = await this.prismaService.product.findMany({
+    const products = await this.prismaService.product.findMany({
       where,
       skip,
       take,
       orderBy,
+    });
+
+    const list = products.map((product) => {
+      if (product.meetingLink) {
+        if (product.badge)
+          product.badge = { ...product.badge, label: AttendanceType.ONLINE };
+        else product.badge = { label: AttendanceType.ONLINE };
+      } else if (product.location) {
+        if (product.badge)
+          product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
+        else product.badge = { label: AttendanceType.PHYSICAL };
+      }
+
+      return product;
     });
 
     const totalCount = await this.prismaService.product.count({ where });
@@ -117,5 +133,9 @@ export class ProductsResolver {
   @ResolveField('tags', () => [Tag], { nullable: true })
   tags(@Parent() product: Product): Promise<Tag[]> {
     return this.tagService.getTagsByProduct(product.id);
+  }
+  @ResolveField('form')
+  form(@Parent() product: Product): Promise<Form> {
+    return this.formService.getForm(product.formId);
   }
 }

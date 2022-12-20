@@ -8,7 +8,7 @@ import { CreateProductValidator } from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
-import { Product, Prisma } from '@prisma/client';
+import { Product, Prisma, AttendanceType } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -21,6 +21,15 @@ export class ProductsService {
     const product = await this.prisma.product.findUnique({ where: { id } });
 
     if (!product) throw new NotFoundException('Product Not Found.');
+    if (product.meetingLink) {
+      if (product.badge)
+        product.badge = { ...product.badge, label: AttendanceType.ONLINE };
+      else product.badge = { label: AttendanceType.ONLINE };
+    } else if (product.location) {
+      if (product.badge)
+        product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
+      else product.badge = { label: AttendanceType.PHYSICAL };
+    }
 
     return product;
   }
@@ -29,7 +38,7 @@ export class ProductsService {
     const error = CreateProductValidator(data);
     if (error) throw new BadRequestException(error);
 
-    const { vendorId, categoryId, variants, tags, ...rest } = data;
+    const { vendorId, categoryId, variants, tags, formId, ...rest } = data;
 
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(vendorId);
@@ -42,6 +51,7 @@ export class ProductsService {
         variants,
         vendor: { connect: { id: vendorId } },
         category: categoryId ? { connect: { id: categoryId } } : undefined,
+        form: formId ? { connect: { id: formId } } : undefined,
       },
     });
 
@@ -57,13 +67,16 @@ export class ProductsService {
 
   async updateProduct(id: string, data: UpdateProductInput): Promise<Product> {
     const product = await this.prisma.product.findUnique({ where: { id } });
-    const { categoryId, tags, ...restData } = data;
+    const { categoryId, tags, formId, ...restData } = data;
     const updateData: Prisma.ProductUpdateArgs['data'] = {
       ...restData,
     };
 
     if (categoryId) {
       updateData.category = { connect: { id: categoryId } };
+    }
+    if (formId) {
+      updateData.form = { connect: { id: formId } };
     }
 
     if (tags && tags.length > 0) {

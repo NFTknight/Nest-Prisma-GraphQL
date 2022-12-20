@@ -49,6 +49,7 @@ model Vendor {
   coupons    Coupon[]
   orders     Order[]
   booking    Booking[]
+  forms      Form[]
 
   ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
@@ -189,6 +190,10 @@ enum AttendanceType {
   PHYSICAL
 }
 
+type BadgeType {
+  label AttendanceType
+}
+
 type VariantOption {
   default  Boolean?
   sku      String
@@ -222,6 +227,9 @@ model Product {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?   @db.ObjectId
 
+  formId     String?            @db.ObjectId
+  form       Form?              @relation(fields: [formId], references: [id])
+
   active           Boolean         @default(true)
   minPreorderDays  Int?
   noOfSeats        Int?
@@ -230,6 +238,7 @@ model Product {
   sortOrder        Int             @default(0)
   CartItem         CartItem[]
   attendanceType   AttendanceType?
+  badge            BadgeType?
   meetingLink      String?
   location         String?
   endTime          Boolean?        @default(false)
@@ -248,6 +257,7 @@ model CartItem {
 
   productId String  @db.ObjectId
   product   Product @relation(fields: [productId], references: [id])
+  answers   String?
 
   sku String
 
@@ -292,6 +302,9 @@ type WayBill {
     createDate String
     shipmentParcelsCount Int
     waybills Waybills[]
+type FormResponse {
+  productId String
+  answers   String
 }
 
 model Order {
@@ -304,6 +317,7 @@ model Order {
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
+  formResponses  FormResponse[]
   status         OrderStatus
   vendorId       String           @db.ObjectId
   Vendor         Vendor           @relation(fields: [vendorId], references: [id])
@@ -359,6 +373,16 @@ model Booking {
   status        BookingStatus
   slots         BookingTime[]
   holdTimestamp DateTime?     @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Form {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  content       String
+  vendorId      String        @db.ObjectId
+  vendor        Vendor        @relation(fields: [vendorId], references: [id])
+  products      Product[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
