@@ -40,6 +40,9 @@ export class Order extends BaseModel {
   @Field(() => PaymentMethods)
   paymentMethod?: PaymentMethods;
 
+  @Field(() => WayBill, { nullable: true })
+  wayBill?: WayBill;
+
   @Field(() => [FormResponse])
   formResponses?: FormResponse[];
   @Field(() => WayBill, { nullable: true })

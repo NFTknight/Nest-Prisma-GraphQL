@@ -10,7 +10,6 @@ import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { OrdersFilterInput } from 'src/common/filter/filter.input';
-
 import { WayBill } from 'src/shipping/models/waybill.model';
 import { ShippingService } from 'src/shipping/shipping.service';
 
