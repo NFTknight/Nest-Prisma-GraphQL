@@ -1,25 +1,34 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Order, OrderStatus } from '@prisma/client';
+import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
+
 import { CartService } from 'src/cart/services/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { OrdersFilterInput } from 'src/common/filter/filter.input';
+import { WayBill } from 'src/shipping/models/waybill.model';
+import { ShippingService } from 'src/shipping/shipping.service';
+
+import { CreateOrderInput } from './dto/create-order.input';
+import {
+  CreateShipmentInput,
+  UpdateOrderInput,
+} from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
+
 @Injectable()
 export class OrdersService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly cartService: CartService,
-    private readonly vendorService: VendorsService,
-    private readonly emailService: SendgridService
+    private readonly emailService: SendgridService,
+    private readonly prisma: PrismaService,
+    private readonly shippingService: ShippingService,
+    private readonly vendorService: VendorsService
   ) {}
 
   async getOrder(id: string): Promise<Order> {
@@ -119,9 +128,55 @@ export class OrdersService {
       await this.cartService.getCart(data.cartId);
     }
 
+    const order = await this.getOrder(id);
+    let wayBillData: WayBill = null;
+    const { vendorId, customerInfo } = order;
+
+    if (
+      order.status === OrderStatus.PENDING &&
+      order.deliveryMethod === DeliveryMethods.SMSA &&
+      !order.wayBill
+    ) {
+      const vendorData = await this.vendorService.getVendor(vendorId);
+
+      const WayBillRequestObject: CreateShipmentInput = {
+        ConsigneeAddress: {
+          ContactName: `${customerInfo?.firstName || ''} ${
+            customerInfo?.lastName || ''
+          }`,
+          ContactPhoneNumber: customerInfo.phone,
+          Country: 'SA',
+          City: 'Jeddah',
+          AddressLine1: customerInfo?.address || 'Ar Rawdah, Jeddah 23434',
+        },
+        ShipperAddress: {
+          ContactName: vendorData.name || 'Company Name',
+          ContactPhoneNumber: vendorData.info.phone || '06012312312',
+          Country: 'SA',
+          City: 'Riyadh',
+          AddressLine1: vendorData.info.address || 'Ar Rawdah, Jeddah 23434',
+        },
+        OrderNumber: order?.orderId,
+        DeclaredValue: 10,
+        CODAmount: 30,
+        Parcels: 1,
+        ShipDate: new Date().toISOString(),
+        ShipmentCurrency: 'SAR',
+        Weight: 15,
+        WeightUnit: 'KG',
+        ContentDescription: 'Shipment contents description',
+      };
+
+      wayBillData = await this.shippingService.createShipment(
+        WayBillRequestObject
+      );
+    }
+
     const res = await this.prisma.order.update({
       where: { id },
-      data: { ...data, updatedAt: new Date() },
+      data: wayBillData?.sawb
+        ? { ...data, wayBill: wayBillData, updatedAt: new Date() }
+        : { ...data, updatedAt: new Date() },
     });
 
     // Email notification to vendor and customer if order is confirmed or rejected

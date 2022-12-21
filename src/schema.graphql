@@ -388,6 +388,7 @@ type Order {
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
+  wayBill: WayBill
 }
 
 """
