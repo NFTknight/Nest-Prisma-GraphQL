@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Order, OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
-import { CartService } from 'src/cart/services/cart.service';
+import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from 'src/vendors/models/vendor.model';
@@ -77,6 +77,7 @@ export class OrdersService {
     const vendor = await this.vendorService.getVendor(data.vendorId);
 
     // get order ID from vendor
+    // TODO - Move this to helper function
     let orderId = '';
     const vendorStrArr = vendor.name.split(' ');
     if (vendorStrArr.length === 1) {
@@ -89,10 +90,15 @@ export class OrdersService {
     orderId =
       orderId + '-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
-    const newData = { ...data, orderId, formResponses: customerAnswers };
+    const newData = {
+      ...data,
+      orderId,
+      formResponses: customerAnswers,
+      vendorId: vendor.id,
+    };
 
     // if vendor and cart exists we can successfully create the order.
-    const res = await this.prisma.order.create({ data: newData });
+    const res = await this.prisma.order.create({ data: newData } as any);
 
     // Email notification to vendor and customer when order is created
     if (res.id) {

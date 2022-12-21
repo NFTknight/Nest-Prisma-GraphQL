@@ -7,7 +7,7 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { Cart } from 'src/cart/models/cart.model';
-import { CartService } from 'src/cart/services/cart.service';
+import { CartService } from 'src/cart/cart.service';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateOrderInput } from './dto/create-order.input';

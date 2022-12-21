@@ -56,6 +56,7 @@ model Vendor {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  cart      Cart[]
 }
 
 type Certificate {
@@ -227,16 +228,16 @@ model Product {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?   @db.ObjectId
 
-  formId     String?            @db.ObjectId
-  form       Form?              @relation(fields: [formId], references: [id])
+  formId String? @db.ObjectId
+  form   Form?   @relation(fields: [formId], references: [id])
 
   active           Boolean         @default(true)
   minPreorderDays  Int?
   noOfSeats        Int?
+  bookedSeats      Int?            @default(0)
   itemsInStock     Int?
   variants         VariantOption[]
   sortOrder        Int             @default(0)
-  CartItem         CartItem[]
   attendanceType   AttendanceType?
   badge            BadgeType?
   meetingLink      String?
@@ -252,44 +253,28 @@ model Product {
   Booking   Booking[]
 }
 
-model CartItem {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  productId String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id])
+type CartItem {
+  productId String        @db.ObjectId
   answers   String?
-
-  sku String
-
-  quantity Int     @default(1)
-  tagId    String? @db.ObjectId
-
-  slots BookingTime[]
-
-  cartId String? @db.ObjectId
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Cart      Cart?    @relation(fields: [cartId], references: [id])
+  sku       String
+  price     Float
+  quantity  Int           @default(1)
+  tagId     String?       @db.ObjectId
+  slots     BookingTime[]
 }
 
 model Cart {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  items CartItem[]
-
-  customerId String @unique
-
-  totalPrice Float
-
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  items         CartItem[]
+  customerId    String     @unique
   appliedCoupon String?
-
-  finalPrice Float
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Order     Order[]
-  booking   Booking[]
+  totalPrice    Float
+  finalPrice    Float
+  vendorId      String     @db.ObjectId
+  vendor        Vendor     @relation(fields: [vendorId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  bookings      Booking[]
 }
 
 type FormResponse {
@@ -298,20 +283,23 @@ type FormResponse {
 }
 
 model Order {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  orderId String
-
-  cartId String @db.ObjectId
-  Cart   Cart   @relation(fields: [cartId], references: [id])
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderId    String
+  customerId String      @unique
+  cartId     String      @db.ObjectId
+  totalPrice Float
+  finalPrice Float
+  items      CartItem[]
+  status     OrderStatus
 
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
   formResponses  FormResponse[]
-  status         OrderStatus
-  vendorId       String           @db.ObjectId
-  Vendor         Vendor           @relation(fields: [vendorId], references: [id])
-  booking        Booking[]
+
+  vendorId String    @db.ObjectId
+  vendor   Vendor    @relation(fields: [vendorId], references: [id])
+  booking  Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -367,11 +355,11 @@ model Booking {
 }
 
 model Form {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  content       String
-  vendorId      String        @db.ObjectId
-  vendor        Vendor        @relation(fields: [vendorId], references: [id])
-  products      Product[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  vendorId  String    @db.ObjectId
+  vendor    Vendor    @relation(fields: [vendorId], references: [id])
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

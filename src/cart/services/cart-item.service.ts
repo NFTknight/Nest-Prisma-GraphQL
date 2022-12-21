@@ -1,154 +1,102 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BookingStatus } from '@prisma/client';
+import { findIndex } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
+import { Product } from 'src/products/models/product.model';
 import { ProductsService } from '../../products/services/products.service';
-import { AddToCartInput } from '../dto/add-to-cart.input';
-import { CartItem } from '../models/cart-item.model';
-import { CartService } from './cart.service';
+import { CartItemInput } from '../dto/cart.input';
+import { Cart } from '../models/cart.model';
 
 @Injectable()
 export class CartItemService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cartService: CartService,
     private readonly productService: ProductsService
   ) {}
 
-  async getCartItems(cartId: string): Promise<CartItem[]> {
-    return this.prisma.cartItem.findMany({ where: { cartId } });
-  }
+  addProduct(product: Product, cart: Cart, item: CartItemInput) {
+    const { sku, quantity } = item;
+    const newCart = { ...cart };
 
-  async getCartItemFromProduct(
-    productId: string,
-    sku?: string
-  ): Promise<CartItem> {
-    return (
-      await this.prisma.cartItem.findMany({
-        where: { productId, sku },
-      })
-    )[0];
-  }
+    const productVariant = product.variants.find(
+      (variant) => variant.sku === sku
+    );
 
-  async addProductToCart(data: AddToCartInput): Promise<CartItem> {
-    const { productId, sku, quantity, cartId, answers } = data;
-    if (!cartId) {
-      throw new BadRequestException('No cart created');
-    }
-    const product = await this.productService.getProduct(productId);
-    if (product.variants.findIndex((item) => item.sku === sku) === -1) {
-      // throws exception when there is no product with such productVariant
-      throw new BadRequestException('No SKU found on the product');
-    }
-    const cartItem = await this.getCartItemFromProduct(productId, sku);
-    if (cartItem) {
-      return this.updateQuantity(cartItem.id, cartItem.quantity + quantity);
+    const existingProductIndex = findIndex(newCart.items, {
+      productId: product.id,
+      sku: productVariant.sku,
+    });
+
+    if (existingProductIndex !== -1) {
+      // if the cart item exists, update the quantity
+      newCart.items[existingProductIndex].quantity += quantity;
     } else {
       // if the cart item does not exist, create the item
-      return this.prisma.cartItem.create({
-        data: { productId, sku, quantity, cartId, answers },
+      newCart.items.push({
+        ...item,
+        price: productVariant.price,
       });
     }
+
+    // update the cart price
+    newCart.totalPrice = newCart.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    newCart.updatedAt = new Date();
+
+    return newCart;
   }
 
-  async addWorkspaceToCart(data: AddToCartInput): Promise<CartItem> {
-    const { productId, sku, quantity, cartId, answers } = data;
-    if (!cartId) {
-      throw new BadRequestException('No cart created');
+  async addWorkshopToCart(
+    product: Product,
+    cart: Cart,
+    item: CartItemInput
+  ): Promise<Cart> {
+    const newCart = this.addProduct(product, cart, item);
+
+    const newBookedSeats = product.bookedSeats + item.quantity;
+    if (newBookedSeats > product.noOfSeats) {
+      throw new BadRequestException(
+        `The number of booked seats (${newBookedSeats}) exceeds the number of seats available (${product.noOfSeats})`
+      );
     }
-    const product = await this.productService.getProduct(productId);
-    if (sku && product.variants.findIndex((item) => item.sku === sku) === -1) {
-      // throws exception when there is no product with such productVariant
-      throw new BadRequestException('No variant found on the product');
-    }
-    const cartItem = await this.getCartItemFromProduct(productId, sku);
-    if (cartItem) {
-      return this.updateQuantity(cartItem.id, quantity);
-    } else {
-      // if the cart item does not exist, create the item
-      return this.prisma.cartItem.create({
-        data: { productId, sku, quantity, cartId, answers },
-      });
-    }
+
+    // update the booked seats
+    await this.prisma.product.update({
+      where: { id: product.id },
+      data: {
+        bookedSeats: {
+          increment: item.quantity,
+        },
+      },
+    });
+
+    return newCart;
   }
 
   // TODO revisit HOLD booking logic
-  async addServiceToCart(data: AddToCartInput): Promise<CartItem> {
-    const {
-      productId,
-      sku,
-      quantity,
-      cartId,
-      slots,
-      vendorId,
-      tagId,
-      answers,
-    } = data;
-    if (!cartId) {
-      throw new BadRequestException('No cart created');
-    }
+  async addServiceToCart(
+    product: Product,
+    cart: Cart,
+    item: CartItemInput
+  ): Promise<Cart> {
+    const newCart = this.addProduct(product, cart, item);
 
     // create booking
     await this.prisma.booking.create({
       data: {
         status: BookingStatus.HOLD,
-        slots,
-        tag: { connect: { id: tagId } },
-        vendor: { connect: { id: vendorId } },
-        cart: { connect: { id: cartId } },
-        product: { connect: { id: productId } },
+        slots: item.slots,
+        tag: { connect: { id: item.tagId } },
+        vendor: { connect: { id: product.vendorId } },
+        cart: { connect: { id: cart.id } },
+        product: { connect: { id: product.id } },
+        holdTimestamp: new Date(),
       },
     });
 
-    const tag = await this.prisma.tag.findUnique({
-      where: { id: tagId },
-    });
-
-    // await this.prisma.tag.update({
-    //   where: { id: tagId },
-    //   data: { availabilities: updatedAvailabilities },
-    // });
-
-    const cartItem = await this.getCartItemFromProduct(productId);
-    if (cartItem) {
-      // if the cart item exists
-      // just update tagId, slots
-      return this.prisma.cartItem.update({
-        where: { id: cartItem.id },
-        data: { tagId, slots },
-      });
-    } else {
-      // otherwise, add the service item to the cart
-      return this.prisma.cartItem.create({
-        data: {
-          productId,
-          sku,
-          quantity,
-          tagId,
-          slots,
-          cartId,
-          answers,
-        },
-      });
-    }
-  }
-
-  async removeItemFromCart(cartItemId: string): Promise<CartItem> {
-    const removedItem = await this.prisma.cartItem.delete({
-      where: { id: cartItemId },
-    });
-    // update cart price
-    return removedItem;
-  }
-
-  async updateQuantity(
-    cartItemId: string,
-    quantity: number
-  ): Promise<CartItem> {
-    const updatedItem = await this.prisma.cartItem.update({
-      where: { id: cartItemId },
-      data: { quantity },
-    });
-    // update cart price
-    return updatedItem;
+    return newCart;
   }
 }

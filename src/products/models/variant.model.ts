@@ -1,9 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { VariantOption } from '@prisma/client';
 
 @ObjectType()
-export class Variant {
-  @Field()
-  default?: boolean;
+export class Variant implements VariantOption {
+  @Field({ nullable: true })
+  default: boolean;
 
   @Field()
   title: string;
@@ -18,5 +19,5 @@ export class Variant {
   price: number;
 
   @Field()
-  image?: string;
+  image: string;
 }
