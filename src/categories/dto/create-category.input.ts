@@ -23,5 +23,5 @@ export class CreateCategoryInput {
   slug?: string;
 
   @Field(() => Int)
-  sortOrder: number;
+  sortOrder?: number;
 }

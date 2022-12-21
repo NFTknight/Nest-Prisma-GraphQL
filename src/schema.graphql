@@ -190,7 +190,7 @@ input CreateBookingInput {
 input CreateCategoryInput {
   active: Boolean!
   slug: String
-  sortOrder: Int!
+  sortOrder: Int
   title: String!
   title_ar: String!
   vendorId: String!
