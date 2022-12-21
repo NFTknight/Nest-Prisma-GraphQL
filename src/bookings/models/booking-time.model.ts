@@ -1,8 +1,8 @@
 import { ObjectType } from '@nestjs/graphql';
-import { BookingTime as BTime } from 'prisma/prisma-client';
+import { BookingTime as IBookingTime } from 'prisma/prisma-client';
 
 @ObjectType()
-export class BookingTime implements BTime {
+export class BookingTime implements IBookingTime {
   from: Date;
   to: Date;
 }

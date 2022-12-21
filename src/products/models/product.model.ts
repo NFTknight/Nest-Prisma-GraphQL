@@ -2,6 +2,7 @@ import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
+import { Product as IProduct } from '@prisma/client';
 import {
   ProductType,
   AttendanceType,
@@ -18,7 +19,7 @@ export class BadgeType implements Btype {
   label: AttendanceType;
 }
 @ObjectType()
-export class Product extends BaseModel {
+export class Product extends BaseModel implements IProduct {
   slug: string;
   title: string;
   title_ar: string;
@@ -36,51 +37,60 @@ export class Product extends BaseModel {
   @Field(() => Vendor, { nullable: false })
   vendor?: Vendor;
 
-  categoryId?: string;
+  categoryId: string;
 
   @Field(() => Category, { nullable: true })
   category?: Category;
 
   active: boolean;
 
-  @Field(() => Int)
-  minPreorderDays?: number;
+  @Field(() => Int, { nullable: true })
+  minPreorderDays: number;
 
   @Field(() => [Variant], { nullable: true })
-  variants?: Variant[];
+  variants: Variant[];
 
   tagIds: string[];
 
   @Field(() => [Tag], { nullable: true })
   tags?: Tag[];
 
-  @Field(() => Int)
-  noOfSeats?: number;
+  @Field(() => Int, { nullable: true })
+  noOfSeats: number;
 
-  @Field(() => Int)
-  workshopBookedCount?: number;
+  @Field(() => Int, { nullable: true })
+  bookedSeats: number;
 
-  @Field(() => Int)
-  itemsInStock?: number;
+  @Field(() => Int, { nullable: true })
+  itemsInStock: number;
 
-  @Field(() => Int)
-  sortOrder?: number;
+  @Field(() => Int, { nullable: true })
+  sortOrder: number;
 
   @Field(() => AttendanceType, { nullable: true })
-  attendanceType?: AttendanceType;
+  attendanceType: AttendanceType;
 
-  formId?: string;
+  formId: string;
   @Field(() => Form, { nullable: true })
   form?: Form;
 
   @Field(() => BadgeType, { nullable: true })
-  badge?: BadgeType;
+  badge: BadgeType;
 
-  meetingLink?: string;
-  location?: string;
-  endTime?: boolean;
-  customerLocation?: boolean;
-  duration?: number;
+  @Field({ nullable: true })
+  meetingLink: string;
+
+  @Field({ nullable: true })
+  location: string;
+
+  @Field({ nullable: true })
+  endTime: boolean;
+
+  @Field({ nullable: true })
+  customerLocation: boolean;
+
+  @Field({ nullable: true })
+  duration: number;
 
   startDate: Date;
   endDate: Date;

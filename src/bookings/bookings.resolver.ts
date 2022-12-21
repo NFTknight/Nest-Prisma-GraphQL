@@ -7,7 +7,7 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { Cart } from 'src/cart/models/cart.model';
-import { CartService } from 'src/cart/services/cart.service';
+import { CartService } from 'src/cart/cart.service';
 import { Order } from 'src/orders/models/order.model';
 import { OrdersService } from 'src/orders/orders.service';
 import { ProductsService } from 'src/products/services/products.service';
@@ -74,10 +74,12 @@ export class BookingResolver {
   cart(@Parent() booking: Booking): Promise<Cart> {
     return this.cartService.getCart(booking.cartId);
   }
+
   @ResolveField('product')
   product(@Parent() booking: Booking) {
     return this.productService.getProduct(booking.productId);
   }
+
   @ResolveField('order', () => Order)
   order(@Parent() booking: Booking): Promise<Order> {
     return this.orderService.getOrder(booking.orderId);

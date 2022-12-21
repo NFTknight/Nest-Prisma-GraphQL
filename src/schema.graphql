@@ -9,17 +9,6 @@ input AddDeliveryAreasInput {
   label_ar: String!
 }
 
-input AddToCartInput {
-  answers: String
-  cartId: String
-  productId: String!
-  quantity: Int
-  sku: String!
-  slots: [BookingSlotInput!]
-  tagId: String
-  vendorId: String!
-}
-
 """Attendance Type"""
 enum AttendanceType {
   ONLINE
@@ -81,37 +70,44 @@ type BookingTime {
   to: DateTime!
 }
 
+input BookingTimeInput {
+  from: DateTime!
+  to: DateTime!
+}
+
 type Cart {
-  appliedCoupon: String!
+  appliedCoupon: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   customerId: String!
   finalPrice: Float!
   id: ID!
-  items: [CartItem!]
+  items: [CartItem!]!
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendorId: String!
 }
 
 type CartItem {
-  Product: Product
   answers: String
-  cartId: String!
-
-  """Identifies the date and time when the object was created."""
-  createdAt: DateTime!
-  id: ID!
+  price: Float!
   productId: String!
-  productVariant: String
   quantity: Int!
+  sku: String!
   slots: [BookingTime!]
   tagId: String
+}
 
-  """Identifies the date and time when the object was last updated."""
-  updatedAt: DateTime!
+input CartItemInput {
+  answers: String
+  productId: String!
+  quantity: Int = 1
+  sku: String!
+  slots: [BookingTimeInput!]
+  tagId: String
 }
 
 type Category {
@@ -326,19 +322,21 @@ input LoginInput {
 
 type Mutation {
   addDeliveryAreas(areas: [AddDeliveryAreasInput!]!, id: String!): Vendor!
-  addProductToCart(data: AddToCartInput!): CartItem!
-  addServiceToCart(data: AddToCartInput!): CartItem!
-  addWorkshopToCart(data: AddToCartInput!): CartItem!
+  addItemToCart(cartId: String!, data: CartItemInput!): Cart!
+  addProductToCart(cartId: String!, data: CartItemInput!): Cart!
+  addServiceToCart(cartId: String!, data: CartItemInput!): Cart!
+  addWorkshopToCart(cartId: String!, data: CartItemInput!): Cart!
   changePassword(data: ChangePasswordInput!): User!
   checkout(cartId: String!): Cart!
   createBooking(data: CreateBookingInput!): Booking!
-  createCart(vendorId: String!): CartItem!
+  createCart(customerId: String!, vendorId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
   createForm(data: CreateFormInput!): Form!
   createOrder(data: CreateOrderInput!): Order!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
+  createUser(data: SignupInput!): Auth!
   createVendor(data: CreateVendorInput!): Vendor!
   deleteBooking(id: String!): Booking!
   deleteCategory(id: String!): Category!
@@ -352,11 +350,11 @@ type Mutation {
   login(data: LoginInput!): Auth!
   phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
-  removeItemFromCart(cartItemId: String!): CartItem!
+  removeCartItem(cartId: String!, productId: String!, sku: String!): Cart!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
   updateBooking(data: UpdateBookingInput!, id: String!): Booking!
-  updateCartItemQuantity(cartItemId: String!, quantity: Int!): CartItem!
+  updateCartItem(cartId: String!, data: CartItemInput!): Cart!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
   updateForm(data: UpdateFormInput!, id: String!): Form!
@@ -464,8 +462,9 @@ type Product {
   active: Boolean!
   attendanceType: AttendanceType
   badge: BadgeType
+  bookedSeats: Int
   category: Category
-  categoryId: String
+  categoryId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -476,7 +475,7 @@ type Product {
   endDate: DateTime!
   endTime: Boolean
   form: Form
-  formId: String
+  formId: String!
   id: ID!
   image: String!
   itemsInStock: Int
@@ -498,7 +497,6 @@ type Product {
   variants: [Variant!]
   vendor: Vendor!
   vendorId: String!
-  workshopBookedCount: Int
 }
 
 input ProductFilterInput {
@@ -729,7 +727,7 @@ type User {
 
 type Variant {
   default: Boolean
-  image: String
+  image: String!
   price: Int!
   sku: String!
   title: String!

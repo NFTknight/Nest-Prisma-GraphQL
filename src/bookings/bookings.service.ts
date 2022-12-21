@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { CartService } from 'src/cart/services/cart.service';
+import { CartService } from 'src/cart/cart.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { OrdersService } from 'src/orders/orders.service';
 import { CreateBookingInput } from './dto/create-booking.input';

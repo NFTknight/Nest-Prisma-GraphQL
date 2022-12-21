@@ -1,23 +1,31 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
+import { IsNotEmpty } from 'class-validator';
 import { BookingTime } from 'src/bookings/models/booking-time.model';
-import { BaseModel } from 'src/common/models/base.model';
-import { Product } from 'src/products/models/product.model';
+import { CartItem as ICartItem } from '@prisma/client';
 
 @ObjectType()
-export class CartItem extends BaseModel {
+export class CartItem implements ICartItem {
+  @Field()
+  @IsNotEmpty()
   productId: string;
-  Product?: Product;
-  productVariant?: string;
 
-  answers?: string;
+  @Field()
+  @IsNotEmpty()
+  sku: string;
+
+  @Field(() => Float)
+  @IsNotEmpty()
+  price: number;
+
+  @Field({ nullable: true })
+  answers: string;
 
   @Field(() => Int)
   quantity: number;
 
-  cartId: string;
+  @Field({ nullable: true })
+  tagId: string;
 
-  tagId?: string;
-
-  @Field(() => [BookingTime])
-  slots?: BookingTime[];
+  @Field(() => [BookingTime], { nullable: true })
+  slots: BookingTime[];
 }
