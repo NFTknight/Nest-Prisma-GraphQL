@@ -20,6 +20,7 @@ export class UpdateOrderInput {
   deliveryMethod?: DeliveryMethods;
 }
 
+@InputType()
 export class AddressEntity {
   ContactName: string;
   ContactPhoneNumber: string;
