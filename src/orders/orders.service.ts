@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
-import axios from 'axios';
 import { PrismaService } from 'nestjs-prisma';
 
 import { CartService } from 'src/cart/services/cart.service';
@@ -13,17 +12,23 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { OrdersFilterInput } from 'src/common/filter/filter.input';
 import { WayBill } from 'src/shipping/models/waybill.model';
+import { ShippingService } from 'src/shipping/shipping.service';
 
 import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
+import {
+  CreateShipmentInput,
+  UpdateOrderInput,
+} from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
+
 @Injectable()
 export class OrdersService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly cartService: CartService,
-    private readonly vendorService: VendorsService,
-    private readonly emailService: SendgridService
+    private readonly emailService: SendgridService,
+    private readonly prisma: PrismaService,
+    private readonly shippingService: ShippingService,
+    private readonly vendorService: VendorsService
   ) {}
 
   async getOrder(id: string): Promise<Order> {
@@ -33,7 +38,6 @@ export class OrdersService {
         booking: true,
       },
     });
-    console.log(JSON.stringify(order));
     if (!order) throw new NotFoundException('Order Not Found.');
 
     return order;
@@ -126,7 +130,6 @@ export class OrdersService {
     const order = await this.getOrder(id);
     let wayBillData: WayBill = null;
     const { vendorId, customerInfo } = order;
-    const url = `${process.env.SMSA_API_URL}/api/shipment/b2c/new`;
 
     if (
       order.status === OrderStatus.PENDING &&
@@ -135,7 +138,7 @@ export class OrdersService {
     ) {
       const vendorData = await this.vendorService.getVendor(vendorId);
 
-      const WayBillRequestObject = {
+      const WayBillRequestObject: CreateShipmentInput = {
         ConsigneeAddress: {
           ContactName: `${customerInfo?.firstName || ''} ${
             customerInfo?.lastName || ''
@@ -163,16 +166,9 @@ export class OrdersService {
         ContentDescription: 'Shipment contents description',
       };
 
-      const wayBillResponse = await axios({
-        method: 'post',
-        headers: {
-          ApiKey: process.env.SMSA_API_KEY,
-        },
-        url,
-        data: WayBillRequestObject,
-      });
-
-      wayBillData = wayBillResponse?.data;
+      wayBillData = await this.shippingService.createShipment(
+        WayBillRequestObject
+      );
     }
 
     const res = await this.prisma.order.update({

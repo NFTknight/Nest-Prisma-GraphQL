@@ -227,8 +227,8 @@ model Product {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?   @db.ObjectId
 
-  formId     String?            @db.ObjectId
-  form       Form?              @relation(fields: [formId], references: [id])
+  formId String? @db.ObjectId
+  form   Form?   @relation(fields: [formId], references: [id])
 
   active           Boolean         @default(true)
   minPreorderDays  Int?
@@ -293,15 +293,17 @@ model Cart {
 }
 
 type Waybills {
-  awb String
+  awb     String
   awbFile String
 }
 
 type WayBill {
-    sawb String
-    createDate String
-    shipmentParcelsCount Int
-    waybills Waybills[]
+  sawb                 String
+  createDate           String
+  shipmentParcelsCount Int
+  waybills             Waybills[]
+}
+
 type FormResponse {
   productId String
   answers   String
@@ -322,7 +324,7 @@ model Order {
   vendorId       String           @db.ObjectId
   Vendor         Vendor           @relation(fields: [vendorId], references: [id])
   booking        Booking[]
-  wayBill        WayBill? 
+  wayBill        WayBill?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -378,11 +380,11 @@ model Booking {
 }
 
 model Form {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  content       String
-  vendorId      String        @db.ObjectId
-  vendor        Vendor        @relation(fields: [vendorId], references: [id])
-  products      Product[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  vendorId  String    @db.ObjectId
+  vendor    Vendor    @relation(fields: [vendorId], references: [id])
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
