@@ -12,7 +12,6 @@ import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { VendorsView, VendorView } from './vendors.module';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
-import { SortOrder } from 'src/common/sort-order/sort-order.input';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
