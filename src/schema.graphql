@@ -369,18 +369,23 @@ type Mutation {
 }
 
 type Order {
+  appliedCoupon: String
   cart: Cart!
   cartId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
+  customerId: String
   customerInfo: CustomerInfo
   deliveryMethod: DeliveryMethods
+  finalPrice: Float
   formResponses: [FormResponse!]
   id: ID!
+  items: [CartItem!]
   orderId: String!
   paymentMethod: PaymentMethods
   status: OrderStatus!
+  totalPrice: Float
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!

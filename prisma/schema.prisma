@@ -270,8 +270,8 @@ model Cart {
   appliedCoupon String?
   totalPrice    Float
   finalPrice    Float
-  vendorId      String     @db.ObjectId
-  vendor        Vendor     @relation(fields: [vendorId], references: [id])
+  vendorId      String?
+  vendor        Vendor?     @relation(fields: [vendorId], references: [id])
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   bookings      Booking[]
@@ -297,10 +297,10 @@ type WayBill {
 model Order {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   orderId    String
-  customerId String      @unique
   cartId     String      @db.ObjectId
-  totalPrice Float
-  finalPrice Float
+  totalPrice Float?
+  finalPrice Float?
+  appliedCoupon String?
   items      CartItem[]
   status     OrderStatus
 
