@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { BaseModel } from 'src/common/models/base.model';
 import { SendgridModule } from 'src/sendgrid/sendgrid.module';
 import { VendorsResolver } from './vendors.resolver';
 import { VendorsService } from './vendors.service';
@@ -11,6 +10,15 @@ import { VendorsService } from './vendors.service';
   exports: [VendorsService],
 })
 export class VendorsModule {}
+
+@ObjectType()
+export class VendorsView {
+  @Field(() => [VendorView], { nullable: true })
+  list: VendorView[];
+
+  @Field(() => Int)
+  totalCount: number;
+}
 
 @ObjectType()
 export class VendorView {

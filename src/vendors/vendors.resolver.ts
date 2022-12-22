@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { VendorsService } from './vendors.service';
 import { Vendor } from './models/vendor.model';
+import { PrismaService } from 'nestjs-prisma';
 import { CreateVendorInput } from './dto/create-vendor.input';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { UseGuards } from '@nestjs/common';
@@ -8,11 +9,17 @@ import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserEntity } from 'src/common/decorators/user.decorator';
 import { User } from 'src/users/models/user.model';
 import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
-import { VendorView } from './vendors.module';
+import { VendorsView, VendorView } from './vendors.module';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
-  constructor(private vendorsService: VendorsService) {}
+  constructor(
+    private vendorsService: VendorsService,
+    private readonly prismaService: PrismaService
+  ) {}
 
   @Query(() => [Vendor])
   async getVendors(): Promise<Vendor[]> {
@@ -32,6 +39,27 @@ export class VendorsResolver {
   @Query(() => VendorView)
   getVendorView(@Args('vendorId') vendorId: string): Promise<VendorView> {
     return this.vendorsService.getVendorView(vendorId);
+  }
+
+  @Query(() => VendorsView)
+  async getVendorsView(
+    @Args('pagination', { nullable: true }) pg: PaginationArgs
+  ) {
+    const { skip, take } = getPaginationArgs(pg);
+    const vendors = await this.prismaService.vendor.findMany({
+      skip,
+      take,
+    });
+    const list = vendors.map(async (vendor: Vendor) => {
+      const vendorView = await this.vendorsService.getVendorView(vendor.id);
+      return vendorView;
+    });
+
+    const totalCount = await this.prismaService.vendor.count();
+    return {
+      list: list,
+      totalCount: totalCount,
+    };
   }
 
   @UseGuards(GqlAuthGuard)

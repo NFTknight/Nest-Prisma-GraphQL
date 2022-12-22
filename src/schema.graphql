@@ -533,6 +533,7 @@ type Query {
   getVendorBySlug(slug: String!): Vendor!
   getVendorView(vendorId: String!): VendorView!
   getVendors: [Vendor!]!
+  getVendorsView(pagination: PaginationArgs): VendorsView!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
@@ -804,6 +805,11 @@ type VendorView {
   numberOrders: Int!
   numberProducts: Int!
   numberServices: Int!
+}
+
+type VendorsView {
+  list: [VendorView!]
+  totalCount: Int!
 }
 
 type WayBill {
