@@ -130,8 +130,6 @@ export class OrdersService {
       vendor = await this.vendorService.getVendor(data.vendorId);
     }
 
-    // ---- READ ----
-    // this was not doing anything... please uncomment if any functionality is related.
     let cartItem: Cart | null = null;
 
     const order = await this.getOrder(id);
