@@ -46,6 +46,7 @@ export class Order extends BaseModel {
 
   @Field(() => [FormResponse])
   formResponses?: FormResponse[];
+<<<<<<< HEAD
 
   @Field(() => [CartItem], { nullable: true })
   items?: CartItem[];
@@ -61,4 +62,6 @@ export class Order extends BaseModel {
 
   @Field(() => Float, { nullable: true })
   finalPrice?: number;
+=======
+>>>>>>> main
 }
