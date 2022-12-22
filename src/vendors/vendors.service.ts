@@ -11,6 +11,7 @@ import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from '@prisma/client';
+import { VendorView } from './vendors.module';
 
 @Injectable()
 export class VendorsService {
@@ -62,6 +63,48 @@ export class VendorsService {
     if (!vendor) throw new NotFoundException('Vendor Not Found');
 
     return vendor;
+  }
+
+  async getVendorView(vendorId: string): Promise<VendorView> {
+    const numberProducts = await this.prisma.product.count({
+      where: { vendorId },
+    });
+    const numberOrders = await this.prisma.order.count({
+      where: { vendorId },
+    });
+    const numberServices = await this.prisma.product.count({
+      where: { vendorId: vendorId, type: 'SERVICE' },
+    });
+    const numberBookings = await this.prisma.booking.count({
+      where: { vendorId },
+    });
+    const numberCategories = await this.prisma.category.count({
+      where: { vendorId },
+    });
+    const numberCoupons = await this.prisma.coupon.count({
+      where: { vendorId },
+    });
+    const vendor = await this.prisma.vendor.findUnique({
+      where: { id: vendorId },
+    });
+    const ownerId = vendor.ownerId;
+    const vendorOwner = await this.prisma.user.findUnique({
+      where: { id: ownerId },
+    });
+    const accountManager = vendorOwner.firstName
+      ? vendorOwner.firstName
+      : '' + ' ' + vendorOwner.lastName
+      ? vendorOwner.lastName
+      : '';
+    return {
+      numberProducts,
+      numberOrders,
+      numberServices,
+      numberBookings,
+      numberCategories,
+      numberCoupons,
+      accountManager,
+    };
   }
 
   async getVendorByUserId(id: string): Promise<Vendor> {

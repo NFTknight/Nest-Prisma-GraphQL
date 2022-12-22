@@ -518,7 +518,7 @@ type Query {
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
-  getCustomerCart(customerId: String!): Cart!
+  getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
@@ -531,6 +531,7 @@ type Query {
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
+  getVendorView(vendorId: String!): VendorView!
   getVendors: [Vendor!]!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
@@ -793,6 +794,16 @@ type VendorSettings {
   deliveryAreas: [DeliveryAreas!]!
   deliveryMethods: [DeliveryMethods!]!
   paymentMethods: [PaymentMethods!]!
+}
+
+type VendorView {
+  accountManager: String!
+  numberBookings: Int!
+  numberCategories: Int!
+  numberCoupons: Int!
+  numberOrders: Int!
+  numberProducts: Int!
+  numberServices: Int!
 }
 
 type WayBill {

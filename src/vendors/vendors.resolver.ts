@@ -8,6 +8,7 @@ import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserEntity } from 'src/common/decorators/user.decorator';
 import { User } from 'src/users/models/user.model';
 import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
+import { VendorView } from './vendors.module';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -26,6 +27,11 @@ export class VendorsResolver {
   @Query(() => Vendor)
   getVendorBySlug(@Args('slug') slug: string) {
     return this.vendorsService.getVendorBySlug(slug);
+  }
+
+  @Query(() => VendorView)
+  getVendorView(@Args('vendorId') vendorId: string): Promise<VendorView> {
+    return this.vendorsService.getVendorView(vendorId);
   }
 
   @UseGuards(GqlAuthGuard)
