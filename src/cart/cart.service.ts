@@ -32,10 +32,11 @@ export class CartService {
     });
   }
 
-  async getCartByCustomer(customerId: string): Promise<Cart> {
-    return this.prisma.cart.findUnique({
+  async getCartByCustomer(customerId: string, vendorId: string): Promise<Cart> {
+    return this.prisma.cart.findFirst({
       where: {
         customerId: customerId,
+        vendorId: vendorId,
       },
     });
   }

@@ -16,8 +16,11 @@ export class CartResolver {
   }
 
   @Query(() => Cart)
-  getCustomerCart(@Args('customerId') customerId: string): Promise<Cart> {
-    return this.cartService.getCartByCustomer(customerId);
+  getCustomerCart(
+    @Args('customerId') customerId: string,
+    @Args('vendorId') vendorId: string
+  ): Promise<Cart> {
+    return this.cartService.getCartByCustomer(customerId, vendorId);
   }
 
   @Mutation(() => Cart)
