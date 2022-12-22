@@ -148,4 +148,17 @@ export class CartService {
 
     return;
   }
+
+  async getCartAndDelete(cartId: string) {
+    const cart = await this.prisma.cart.findUnique({
+      where: { id: cartId },
+    });
+
+    const deleteData = await this.prisma.cart.delete({
+      where: { id: cartId },
+    });
+    console.log({ deleteData });
+
+    return cart;
+  }
 }

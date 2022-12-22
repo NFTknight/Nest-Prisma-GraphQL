@@ -1,6 +1,7 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { DeliveryMethods, OrderStatus, PaymentMethods } from '@prisma/client';
 import { IsString } from 'class-validator';
+import { CartItem } from 'src/cart/models/cart-item.model';
 import { Cart } from 'src/cart/models/cart.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { WayBill } from 'src/shipping/models/waybill.model';
@@ -45,4 +46,19 @@ export class Order extends BaseModel {
 
   @Field(() => [FormResponse])
   formResponses?: FormResponse[];
+
+  @Field(() => [CartItem], { nullable: true })
+  items?: CartItem[];
+
+  @Field({ nullable: true })
+  customerId?: string;
+
+  @Field({ nullable: true })
+  appliedCoupon?: string;
+
+  @Field(() => Float, { nullable: true })
+  totalPrice?: number;
+
+  @Field(() => Float, { nullable: true })
+  finalPrice?: number;
 }

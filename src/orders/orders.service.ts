@@ -19,6 +19,7 @@ import {
   UpdateOrderInput,
 } from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
+import { Cart } from 'src/cart/models/cart.model';
 
 @Injectable()
 export class OrdersService {
@@ -128,10 +129,8 @@ export class OrdersService {
       // if the vendor does not exist, this function will throw an error.
       vendor = await this.vendorService.getVendor(data.vendorId);
     }
-    if (data.cartId) {
-      // if the order does not exist, this function will throw an error.
-      await this.cartService.getCart(data.cartId);
-    }
+
+    let cartItem: Cart | null = null;
 
     const order = await this.getOrder(id);
     let wayBillData: WayBill = null;
@@ -142,6 +141,11 @@ export class OrdersService {
       order.deliveryMethod === DeliveryMethods.SMSA &&
       !order.wayBill
     ) {
+      if (data.cartId) {
+        // if the order does not exist, this function will throw an error.
+        cartItem = await this.cartService.getCart(data.cartId);
+      }
+
       const vendorData = await this.vendorService.getVendor(vendorId);
 
       const WayBillRequestObject: CreateShipmentInput = {
@@ -176,12 +180,24 @@ export class OrdersService {
         WayBillRequestObject
       );
     }
+    const cartObject = {
+      finalPrice: cartItem?.finalPrice || 0,
+      totalPrice: cartItem?.totalPrice || 0,
+      items: cartItem?.items,
+      appliedCoupon: cartItem?.appliedCoupon,
+    };
+
+    let updatingOrderObject: any = data;
+    if (cartItem?.finalPrice) {
+      updatingOrderObject = { ...updatingOrderObject, ...cartObject };
+    }
+    if (wayBillData?.sawb) {
+      updatingOrderObject = { ...updatingOrderObject, wayBill: wayBillData };
+    }
 
     const res = await this.prisma.order.update({
       where: { id },
-      data: wayBillData?.sawb
-        ? { ...data, wayBill: wayBillData, updatedAt: new Date() }
-        : { ...data, updatedAt: new Date() },
+      data: { ...updatingOrderObject, updatedAt: new Date() },
     });
 
     // Email notification to vendor and customer if order is confirmed or rejected

@@ -126,8 +126,8 @@ Table Cart {
   appliedCoupon String
   totalPrice Float [not null]
   finalPrice Float [not null]
-  vendorId String [not null]
-  vendor Vendor [not null]
+  vendorId String
+  vendor Vendor
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   bookings Booking [not null]
@@ -136,10 +136,10 @@ Table Cart {
 Table Order {
   id String [pk]
   orderId String [not null]
-  customerId String [unique, not null]
   cartId String [not null]
-  totalPrice Float [not null]
-  finalPrice Float [not null]
+  totalPrice Float
+  finalPrice Float
+  appliedCoupon String
   items CartItem[] [not null]
   status OrderStatus [not null]
   customerInfo CustomerInfo [not null]
