@@ -154,10 +154,11 @@ export class CartService {
       where: { id: cartId },
     });
 
-    const deleteData = await this.prisma.cart.delete({
-      where: { id: cartId },
+    // cart deletion
+    await this.prisma.$runCommandRaw({
+      delete: 'Cart',
+      deletes: [{ q: { _id: { $eq: { $oid: cartId } } }, limit: 1 }],
     });
-    console.log({ deleteData });
 
     return cart;
   }

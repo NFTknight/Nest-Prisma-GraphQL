@@ -141,11 +141,6 @@ export class OrdersService {
       order.deliveryMethod === DeliveryMethods.SMSA &&
       !order.wayBill
     ) {
-      if (data.cartId) {
-        // if the order does not exist, this function will throw an error.
-        cartItem = await this.cartService.getCart(data.cartId);
-      }
-
       const vendorData = await this.vendorService.getVendor(vendorId);
 
       const WayBillRequestObject: CreateShipmentInput = {
@@ -179,6 +174,11 @@ export class OrdersService {
       wayBillData = await this.shippingService.createShipment(
         WayBillRequestObject
       );
+    }
+
+    if (data.cartId && order.status === OrderStatus.PENDING) {
+      // if the order does not exist, this function will throw an error.
+      cartItem = await this.cartService.getCartAndDelete(data.cartId);
     }
     const cartObject = {
       finalPrice: cartItem?.finalPrice || 0,

@@ -29,22 +29,20 @@ type BadgeType {
 }
 
 type Booking {
-  Cart: Cart
-  Order: Order
-  Tag: Tag
-  cart: Cart!
+  cart: Cart
   cartId: String!
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   holdTimestamp: DateTime
   id: ID!
-  order: Order!
+  order: Order
   orderId: String
   product: Product
   productId: String!
   slots: [BookingTime!]
   status: BookingStatus!
+  tag: Tag
   tagId: String!
 
   """Identifies the date and time when the object was last updated."""
@@ -523,7 +521,7 @@ type Query {
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
-  getCustomerCart(customerId: String!): Cart!
+  getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
