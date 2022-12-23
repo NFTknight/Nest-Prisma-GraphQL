@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Cart } from './models/cart.model';
 import { CartService } from './cart.service';
-import { CartItemInput } from './dto/cart.input';
+import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 
 @Resolver(Cart)
 export class CartResolver {
@@ -87,5 +87,18 @@ export class CartResolver {
   @Mutation(() => Cart)
   checkout(@Args('cartId') cartId: string) {
     //
+  }
+
+  @Mutation(() => Cart)
+  async updateCart(
+    @Args('cartId') cartId: string,
+    @Args('data') data: CartUpdateInput
+  ) {
+    let cart: Cart | null = await this.cartService.getCart(cartId);
+
+    if (cart) {
+      cart = await this.cartService.updateCart(cartId, data);
+    }
+    return cart;
   }
 }

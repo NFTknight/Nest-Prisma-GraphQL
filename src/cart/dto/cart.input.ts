@@ -1,6 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
-import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { InputType, Field, Int, Float } from '@nestjs/graphql';
 import { BookingTime } from 'src/bookings/models/booking-time.model';
+import { DeliveryMethods, PaymentMethods } from '@prisma/client';
 
 @InputType()
 export class BookingTimeInput implements BookingTime {
@@ -37,4 +38,49 @@ export class CartItemInput {
 
   @Field(() => [BookingTimeInput], { nullable: true })
   slots: BookingTimeInput[];
+}
+@InputType()
+class CustomerInput {
+  @Field()
+  firstName: string;
+
+  @Field()
+  lastName: string;
+
+  @Field()
+  address?: string;
+
+  @Field()
+  phone: string;
+
+  @Field()
+  @IsEmail()
+  email: string;
+
+  @Field()
+  city?: string;
+}
+
+@InputType()
+export class CartUpdateInput {
+  @Field(() => [CartItemInput], { nullable: true })
+  items?: CartItemInput[];
+
+  @Field({ nullable: true })
+  appliedCoupon?: string;
+
+  @Field(() => Float, { nullable: true })
+  totalPrice?: number;
+
+  @Field(() => Float, { nullable: true })
+  finalPrice?: number;
+
+  @Field(() => CustomerInput, { nullable: true })
+  customerInfo?: CustomerInput;
+
+  @Field(() => PaymentMethods, { nullable: true })
+  paymentMethod?: PaymentMethods;
+
+  @Field(() => DeliveryMethods, { nullable: true })
+  deliveryMethod?: DeliveryMethods;
 }

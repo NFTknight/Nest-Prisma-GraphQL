@@ -161,4 +161,12 @@ export class CartService {
 
     return cart;
   }
+
+  //this should not type any, but this was generating error on assigning it a type
+  async updateCart(cartId: string, data: any) {
+    return this.prisma.cart.update({
+      where: { id: cartId },
+      data: data,
+    });
+  }
 }

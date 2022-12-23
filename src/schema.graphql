@@ -113,6 +113,16 @@ input CartItemInput {
   tagId: String
 }
 
+input CartUpdateInput {
+  appliedCoupon: String
+  customerInfo: CustomerInput
+  deliveryMethod: DeliveryMethods
+  finalPrice: Float
+  items: [CartItemInput!]
+  paymentMethod: PaymentMethods
+  totalPrice: Float
+}
+
 type Category {
   active: Boolean!
 
@@ -276,6 +286,15 @@ type CustomerInfo {
   phone: String!
 }
 
+input CustomerInput {
+  address: String
+  city: String
+  email: String!
+  firstName: String!
+  lastName: String!
+  phone: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -357,6 +376,7 @@ type Mutation {
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
   updateBooking(data: UpdateBookingInput!, id: String!): Booking!
+  updateCart(cartId: String!, data: CartUpdateInput!): Cart!
   updateCartItem(cartId: String!, data: CartItemInput!): Cart!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
