@@ -35,8 +35,8 @@ export class CartService {
   async getCartByCustomer(customerId: string, vendorId: string): Promise<Cart> {
     return this.prisma.cart.findFirst({
       where: {
-        customerId: customerId,
-        vendorId: vendorId,
+        customerId: customerId.toString(),
+        vendorId: vendorId.toString(),
       },
     });
   }

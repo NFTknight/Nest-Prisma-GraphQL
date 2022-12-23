@@ -523,7 +523,7 @@ type Query {
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
-  getCustomerCart(customerId: String!): Cart!
+  getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
