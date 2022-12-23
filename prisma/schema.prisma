@@ -275,6 +275,11 @@ model Cart {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   bookings      Booking[]
+
+  customerInfo   CustomerInfo?
+  deliveryMethod DeliveryMethods?
+  paymentMethod  PaymentMethods?
+
 }
 
 type FormResponse {

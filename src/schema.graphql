@@ -81,9 +81,12 @@ type Cart {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   customerId: String!
+  customerInfo: CustomerInfo
+  deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
   items: [CartItem!]!
+  paymentMethod: PaymentMethods
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -523,7 +526,7 @@ type Query {
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
-  getCustomerCart(customerId: String!): Cart!
+  getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
