@@ -16,11 +16,20 @@ export class CartResolver {
   }
 
   @Query(() => Cart)
-  getCustomerCart(
+  async getCustomerCart(
     @Args('customerId') customerId: string,
     @Args('vendorId') vendorId: string
   ): Promise<Cart> {
-    return this.cartService.getCartByCustomer(customerId, vendorId);
+    let cart: Cart = await this.cartService.getCartByCustomer(
+      customerId,
+      vendorId
+    );
+
+    if (!cart) {
+      cart = await this.cartService.createNewCart(vendorId, customerId);
+    }
+
+    return cart;
   }
 
   @Mutation(() => Cart)
