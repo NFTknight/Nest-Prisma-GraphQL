@@ -66,36 +66,53 @@ export class VendorsService {
   }
 
   async getVendorView(vendorId: string): Promise<VendorView> {
-    const numberProducts = await this.prisma.product.count({
+    const numberProductsPromise = this.prisma.product.count({
       where: { vendorId },
     });
-    const numberOrders = await this.prisma.order.count({
+    const numberOrdersPromise = this.prisma.order.count({
       where: { vendorId },
     });
-    const numberServices = await this.prisma.product.count({
+
+    const numberServicesPromise = this.prisma.product.count({
       where: { vendorId: vendorId, type: 'SERVICE' },
     });
-    const numberBookings = await this.prisma.booking.count({
+    const numberBookingsPromise = this.prisma.booking.count({
       where: { vendorId },
     });
-    const numberCategories = await this.prisma.category.count({
+    const numberCategoriesPromise = this.prisma.category.count({
       where: { vendorId },
     });
-    const numberCoupons = await this.prisma.coupon.count({
+    const numberCouponsPromise = this.prisma.coupon.count({
       where: { vendorId },
     });
-    const vendor = await this.prisma.vendor.findUnique({
+    const vendorPromise = this.prisma.vendor.findUnique({
       where: { id: vendorId },
     });
+    const [
+      numberProducts,
+      numberOrders,
+      numberServices,
+      numberBookings,
+      numberCategories,
+      numberCoupons,
+      vendor,
+    ] = await Promise.all([
+      numberProductsPromise,
+      numberOrdersPromise,
+      numberServicesPromise,
+      numberBookingsPromise,
+      numberCategoriesPromise,
+      numberCouponsPromise,
+      vendorPromise,
+    ]);
+
     const ownerId = vendor.ownerId;
     const vendorOwner = await this.prisma.user.findUnique({
       where: { id: ownerId },
     });
-    const accountManager = vendorOwner.firstName
-      ? vendorOwner.firstName
-      : '' + ' ' + vendorOwner.lastName
-      ? vendorOwner.lastName
-      : '';
+    const accountManager =
+      (vendorOwner.firstName || '') + ' ' + (vendorOwner.lastName || '');
+
     return {
       numberProducts,
       numberOrders,
