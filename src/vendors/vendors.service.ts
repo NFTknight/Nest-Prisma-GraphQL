@@ -11,7 +11,7 @@ import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from '@prisma/client';
-import { VendorView } from './vendors.module';
+import { VendorView } from './models/vendor.model';
 
 @Injectable()
 export class VendorsService {
@@ -106,6 +106,8 @@ export class VendorsService {
       vendorPromise,
     ]);
 
+    const vendorName = vendor?.name || '';
+    const vendorUrl = vendor?.info?.addressUrl || '';
     const ownerId = vendor.ownerId;
     const vendorOwner = await this.prisma.user.findUnique({
       where: { id: ownerId },
@@ -114,6 +116,8 @@ export class VendorsService {
       (vendorOwner.firstName || '') + ' ' + (vendorOwner.lastName || '');
 
     return {
+      vendorName,
+      vendorUrl,
       numberProducts,
       numberOrders,
       numberServices,

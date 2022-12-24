@@ -798,13 +798,15 @@ type VendorSettings {
 }
 
 type VendorView {
-  accountManager: String!
-  numberBookings: Int!
-  numberCategories: Int!
-  numberCoupons: Int!
-  numberOrders: Int!
+  accountManager: String
+  numberBookings: Int
+  numberCategories: Int
+  numberCoupons: Int
+  numberOrders: Int
   numberProducts: Int!
-  numberServices: Int!
+  numberServices: Int
+  vendorName: String
+  vendorUrl: String
 }
 
 type VendorsView {
