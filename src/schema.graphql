@@ -95,13 +95,43 @@ type Cart {
 }
 
 type CartItem {
+  active: Boolean
   answers: String
+  attendanceType: AttendanceType
+  badge: BadgeType
+  bookedSeats: Int
+  category: Category
+  categoryId: String
+  customerLocation: Boolean
+  description: String
+  description_ar: String
+  duration: Int
+  endDate: DateTime
+  endTime: Boolean
+  form: Form
+  formId: String
+  image: String
+  itemsInStock: Int
+  location: String
+  meetingLink: String
+  minPreorderDays: Int
+  noOfSeats: Int
   price: Float!
   productId: String!
   quantity: Int!
   sku: String!
   slots: [BookingTime!]
+  slug: String
+  sortOrder: Int
+  startDate: DateTime
   tagId: String
+  tagIds: [String!]
+  tags: [Tag!]
+  title: String
+  title_ar: String
+  type: ProductType
+  variants: [Variant!]
+  vendor: Vendor!
 }
 
 input CartItemInput {
