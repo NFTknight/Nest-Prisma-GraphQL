@@ -35,7 +35,7 @@ export class OrdersService {
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: {
-        booking: true,
+        bookings: true,
       },
     });
     if (!order) throw new NotFoundException('Order Not Found.');

@@ -270,16 +270,17 @@ model Cart {
   appliedCoupon String?
   totalPrice    Float
   finalPrice    Float
-  vendorId      String?
-  vendor        Vendor?     @relation(fields: [vendorId], references: [id])
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  bookings      Booking[]
+  vendorId      String?    @db.ObjectId
+  vendor        Vendor?    @relation(fields: [vendorId], references: [id])
+
+  bookings Booking[]
 
   customerInfo   CustomerInfo?
   deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 type FormResponse {
@@ -300,14 +301,14 @@ type WayBill {
 }
 
 model Order {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  orderId    String
-  cartId     String      @db.ObjectId
-  totalPrice Float?
-  finalPrice Float?
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderId       String
+  cartId        String      @db.ObjectId
+  totalPrice    Float?
+  finalPrice    Float?
   appliedCoupon String?
-  items      CartItem[]
-  status     OrderStatus
+  items         CartItem[]
+  status        OrderStatus
 
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?
@@ -316,7 +317,7 @@ model Order {
 
   vendorId String    @db.ObjectId
   vendor   Vendor    @relation(fields: [vendorId], references: [id])
-  booking  Booking[]
+  bookings Booking[]
   wayBill  WayBill?
 
   createdAt DateTime @default(now())
