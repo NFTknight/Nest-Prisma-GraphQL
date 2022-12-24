@@ -9,7 +9,7 @@ import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserEntity } from 'src/common/decorators/user.decorator';
 import { User } from 'src/users/models/user.model';
 import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
-import { VendorsView, VendorView } from './vendors.module';
+import { VendorsView, VendorView } from './models/vendor.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 
@@ -53,7 +53,6 @@ export class VendorsResolver {
       const vendorView = await this.vendorsService.getVendorView(vendor.id);
       return vendorView;
     });
-
     const totalCount = await this.prismaService.vendor.count();
     return {
       list: list,
