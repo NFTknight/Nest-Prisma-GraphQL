@@ -589,7 +589,9 @@ type Query {
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
+  getVendorView(vendorId: String!): VendorView!
   getVendors: [Vendor!]!
+  getVendorsView(pagination: PaginationArgs): VendorsView!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
@@ -851,6 +853,21 @@ type VendorSettings {
   deliveryAreas: [DeliveryAreas!]!
   deliveryMethods: [DeliveryMethods!]!
   paymentMethods: [PaymentMethods!]!
+}
+
+type VendorView {
+  accountManager: String!
+  numberBookings: Int!
+  numberCategories: Int!
+  numberCoupons: Int!
+  numberOrders: Int!
+  numberProducts: Int!
+  numberServices: Int!
+}
+
+type VendorsView {
+  list: [VendorView!]
+  totalCount: Int!
 }
 
 type WayBill {
