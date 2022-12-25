@@ -27,7 +27,7 @@ export class OrdersResolver {
   ) {}
 
   @Query(() => Order)
-  getOrder(@Args('id') id: string): Promise<Order> {
+  getOrder(@Args('id') id: string) {
     return this.ordersService.getOrder(id);
   }
 
@@ -54,20 +54,17 @@ export class OrdersResolver {
   }
 
   @Mutation(() => Order)
-  createOrder(@Args('data') data: CreateOrderInput): Promise<Order> {
+  createOrder(@Args('data') data: CreateOrderInput) {
     return this.ordersService.createOrder(data);
   }
 
   @Mutation(() => Order)
-  updateOrder(
-    @Args('id') id: string,
-    @Args('data') data: UpdateOrderInput
-  ): Promise<Order> {
+  updateOrder(@Args('id') id: string, @Args('data') data: UpdateOrderInput) {
     return this.ordersService.updateOrder(id, data);
   }
 
   @Mutation(() => Order)
-  deleteOrder(@Args('id') id: string): Promise<Order> {
+  deleteOrder(@Args('id') id: string) {
     return this.ordersService.deleteOrder(id);
   }
 

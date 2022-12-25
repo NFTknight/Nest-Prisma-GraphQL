@@ -1,7 +1,7 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { BaseModel } from 'src/common/models/base.model';
 import { CartItem } from './cart-item.model';
-import { Cart as ICart } from '@prisma/client';
+import { Cart as PrismaCart } from '@prisma/client';
 import { CustomerInfo } from 'src/orders/models/customer-info.model';
 import {
   DeliveryMethods,
@@ -10,7 +10,7 @@ import {
 } from '@prisma/client';
 
 @ObjectType()
-export class Cart extends BaseModel implements ICart {
+export class Cart extends BaseModel implements PrismaCart {
   @Field(() => [CartItem])
   items: CartItem[];
 

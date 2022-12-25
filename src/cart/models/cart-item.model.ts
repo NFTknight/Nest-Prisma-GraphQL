@@ -3,7 +3,7 @@ import { IsNotEmpty } from 'class-validator';
 import { BookingTime } from 'src/bookings/models/booking-time.model';
 import {
   AttendanceType,
-  CartItem as ICartItem,
+  CartItem as PrismaCartItem,
   ProductType,
 } from '@prisma/client';
 import { BadgeType } from 'src/products/models/product.model';
@@ -14,7 +14,7 @@ import { Category } from 'src/categories/models/category.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 
 @ObjectType()
-export class CartItem implements ICartItem {
+export class CartItem implements PrismaCartItem {
   // this is something important
 
   slug?: string;

@@ -172,4 +172,22 @@ export class VendorsService {
       where: { id },
     });
   }
+
+  async getVendorOrderPrefix(vendorId: string) {
+    const vendor = await this.prisma.vendor.findUnique({
+      where: { id: vendorId },
+      select: { name: true },
+    });
+
+    let prefix = '';
+    const vendorStrArr = vendor.name.split(' ');
+    if (vendorStrArr.length === 1) {
+      prefix = vendor.name.slice(0, 2).toUpperCase();
+    } else if (vendorStrArr.length === 2) {
+      prefix = vendorStrArr[0][0] + vendorStrArr[1][0];
+    } else {
+      prefix = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
+    }
+    return prefix;
+  }
 }
