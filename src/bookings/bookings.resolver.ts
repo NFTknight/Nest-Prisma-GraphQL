@@ -8,8 +8,6 @@ import {
 } from '@nestjs/graphql';
 import { Cart } from 'src/cart/models/cart.model';
 import { CartService } from 'src/cart/cart.service';
-import { Order } from 'src/orders/models/order.model';
-import { OrdersService } from 'src/orders/orders.service';
 import { ProductsService } from 'src/products/services/products.service';
 
 import { BookingsService } from './bookings.service';
@@ -22,7 +20,6 @@ export class BookingResolver {
   constructor(
     private readonly cartService: CartService,
     private readonly productService: ProductsService,
-    private readonly orderService: OrdersService,
     private readonly bookingService: BookingsService
   ) {}
 
@@ -78,10 +75,5 @@ export class BookingResolver {
   @ResolveField('product')
   product(@Parent() booking: Booking) {
     return this.productService.getProduct(booking.productId);
-  }
-
-  @ResolveField('order', () => Order)
-  order(@Parent() booking: Booking): Promise<Order> {
-    return this.orderService.getOrder(booking.orderId);
   }
 }

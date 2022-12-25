@@ -7,6 +7,7 @@ import { BaseModel } from 'src/common/models/base.model';
 import { WayBill } from 'src/shipping/models/waybill.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { CustomerInfo } from './customer-info.model';
+import { Order as PrismaOrder } from '@prisma/client';
 
 @ObjectType()
 export class FormResponse {
@@ -15,50 +16,47 @@ export class FormResponse {
 }
 
 @ObjectType()
-export class Order extends BaseModel {
-  @Field(() => CustomerInfo, { nullable: true })
-  customerInfo: CustomerInfo;
-
+export class Order extends BaseModel implements PrismaOrder {
   @IsString()
   orderId: string;
 
   @IsString()
   cartId: string;
-  @Field(() => Cart, { nullable: false })
-  cart?: Cart;
+  @Field(() => Cart, { nullable: true })
+  cart: Cart;
 
   @IsString()
   vendorId: string;
-  @Field(() => Vendor, { nullable: false })
-  vendor?: Vendor;
+  @Field(() => Vendor, { nullable: true })
+  vendor: Vendor;
 
   @Field(() => OrderStatus, { nullable: false })
   status: OrderStatus;
 
-  @Field(() => DeliveryMethods)
-  deliveryMethod?: DeliveryMethods;
+  @Field(() => DeliveryMethods, { nullable: true })
+  deliveryMethod: DeliveryMethods;
 
-  @Field(() => PaymentMethods)
-  paymentMethod?: PaymentMethods;
+  @Field(() => PaymentMethods, { nullable: true })
+  paymentMethod: PaymentMethods;
+
+  @Field(() => CustomerInfo, { nullable: true })
+  customerInfo: CustomerInfo;
 
   @Field(() => WayBill, { nullable: true })
-  wayBill?: WayBill;
+  wayBill: WayBill;
 
-  @Field(() => [FormResponse])
-  formResponses?: FormResponse[];
-
-  @Field(() => [CartItem], { nullable: true })
-  items?: CartItem[];
+  @Field(() => [CartItem])
+  items: CartItem[];
 
   @Field({ nullable: true })
-  customerId?: string;
+  customerId: string;
 
   @Field({ nullable: true })
-  appliedCoupon?: string;
+  appliedCoupon: string;
 
-  @Field(() => Float, { nullable: true })
-  totalPrice?: number;
+  @Field(() => Float)
+  totalPrice: number;
 
-  @Field(() => Float, { nullable: true })
-  finalPrice?: number;
+  @Field(() => Float)
+  finalPrice: number;
 }

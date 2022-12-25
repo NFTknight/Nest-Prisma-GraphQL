@@ -39,7 +39,6 @@ type Booking {
   createdAt: DateTime!
   holdTimestamp: DateTime
   id: ID!
-  order: Order!
   orderId: String
   product: Product
   productId: String!
@@ -147,10 +146,8 @@ input CartUpdateInput {
   appliedCoupon: String
   customerInfo: CustomerInput
   deliveryMethod: DeliveryMethods
-  finalPrice: Float
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
-  totalPrice: Float
 }
 
 type Category {
@@ -242,15 +239,6 @@ input CreateCouponInput {
   vendorId: String!
 }
 
-input CreateCustomerInput {
-  address: String
-  city: String
-  email: String!
-  firstName: String!
-  lastName: String!
-  phone: String!
-}
-
 input CreateFormInput {
   content: String!
   vendorId: String!
@@ -258,11 +246,9 @@ input CreateFormInput {
 
 input CreateOrderInput {
   cartId: String!
-  customerInfo: CreateCustomerInput!
   deliveryMethod: DeliveryMethods
   paymentMethod: PaymentMethods
   status: OrderStatus!
-  vendorId: String!
 }
 
 input CreateProductInput {
@@ -357,11 +343,6 @@ type Form {
   vendorId: String!
 }
 
-type FormResponse {
-  answers: String!
-  productId: String!
-}
-
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -379,9 +360,8 @@ type Mutation {
   addServiceToCart(cartId: String!, data: CartItemInput!): Cart!
   addWorkshopToCart(cartId: String!, data: CartItemInput!): Cart!
   changePassword(data: ChangePasswordInput!): User!
-  checkout(cartId: String!): Cart!
+  checkoutCart(cartId: String!): Order!
   createBooking(data: CreateBookingInput!): Booking!
-  createCart(customerId: String!, vendorId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
   createForm(data: CreateFormInput!): Form!
@@ -423,7 +403,7 @@ type Mutation {
 
 type Order {
   appliedCoupon: String
-  cart: Cart!
+  cart: Cart
   cartId: String!
 
   """Identifies the date and time when the object was created."""
@@ -431,18 +411,17 @@ type Order {
   customerId: String
   customerInfo: CustomerInfo
   deliveryMethod: DeliveryMethods
-  finalPrice: Float
-  formResponses: [FormResponse!]
+  finalPrice: Float!
   id: ID!
-  items: [CartItem!]
+  items: [CartItem!]!
   orderId: String!
   paymentMethod: PaymentMethods
   status: OrderStatus!
-  totalPrice: Float
+  totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor!
+  vendor: Vendor
   vendorId: String!
   wayBill: WayBill
 }

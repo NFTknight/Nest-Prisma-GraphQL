@@ -3,15 +3,26 @@ import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
 import { CartItemInput } from './dto/cart.input';
-import { Prisma, ProductType } from '@prisma/client';
+import {
+  OrderStatus,
+  PaymentMethods,
+  Prisma,
+  ProductType,
+} from '@prisma/client';
 import { CartItemService } from './services/cart-item.service';
 import { find, omit } from 'lodash';
+import { VendorsService } from 'src/vendors/vendors.service';
+import { nanoid } from 'nanoid';
+import { SendgridService } from 'src/sendgrid/sendgrid.service';
+import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 
 @Injectable()
 export class CartService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cartItemService: CartItemService
+    private readonly cartItemService: CartItemService,
+    private readonly vendorService: VendorsService,
+    private readonly emailService: SendgridService
   ) {}
 
   async createNewCart(vendorId: string, customerId: string): Promise<Cart> {
@@ -168,5 +179,70 @@ export class CartService {
       where: { id: cartId },
       data: data,
     });
+  }
+
+  async checkoutCartAndCreateOrder(cartId: string) {
+    // TODO - add payment gateway
+
+    const cart = await this.getCart(cartId);
+
+    switch (cart.paymentMethod) {
+      case PaymentMethods.ONLINE:
+        // send request to my fatura
+        break;
+      case PaymentMethods.BANK_TRANSFER:
+      case PaymentMethods.CASH:
+      case PaymentMethods.STORE:
+      default:
+        break;
+    }
+    const { vendorId } = cart;
+
+    const vendorPrefix = await this.vendorService.getVendorOrderPrefix(
+      vendorId
+    );
+    const vendor = await this.vendorService.getVendor(vendorId);
+
+    const orderId = `${vendorPrefix}-${nanoid(8)}`.toUpperCase();
+
+    const res = await this.prisma.order.create({
+      data: {
+        orderId,
+        items: cart.items,
+        customerId: cart.customerId,
+        customerInfo: cart.customerInfo,
+        paymentMethod: cart.paymentMethod,
+        appliedCoupon: cart.appliedCoupon,
+        ...(cart.deliveryMethod && {
+          deliveryMethod: cart.deliveryMethod,
+        }),
+        finalPrice: cart.totalPrice,
+        totalPrice: cart.totalPrice,
+        status: OrderStatus.CREATED,
+        vendor: {
+          connect: {
+            id: vendorId,
+          },
+        },
+        cart: {
+          connect: {
+            id: cartId,
+          },
+        },
+      },
+    });
+
+    // Email notification to vendor and customer when order is created
+    if (res.id) {
+      this.emailService.send(
+        SendEmails(ORDER_OPTIONS.PURCHASED, res?.customerInfo?.email)
+      );
+      if (vendor?.info?.email)
+        this.emailService.send(
+          SendEmails(ORDER_OPTIONS.RECEIVED, vendor?.info?.email)
+        );
+    }
+
+    return res;
   }
 }

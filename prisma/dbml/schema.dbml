@@ -122,7 +122,7 @@ Table Product {
 Table Cart {
   id String [pk]
   items CartItem[] [not null]
-  customerId String [unique, not null]
+  customerId String [not null]
   appliedCoupon String
   totalPrice Float [not null]
   finalPrice Float [not null]
@@ -134,23 +134,29 @@ Table Cart {
   paymentMethod PaymentMethods
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  Order Order [not null]
+
+  indexes {
+    (customerId, vendorId) [unique]
+  }
 }
 
 Table Order {
   id String [pk]
   orderId String [not null]
-  cartId String [not null]
-  totalPrice Float
-  finalPrice Float
+  cartId String
+  cart Cart
+  totalPrice Float [not null]
+  finalPrice Float [not null]
   appliedCoupon String
   items CartItem[] [not null]
   status OrderStatus [not null]
+  customerId String [not null]
   customerInfo CustomerInfo [not null]
   deliveryMethod DeliveryMethods
-  paymentMethod PaymentMethods
-  formResponses FormResponse[] [not null]
-  vendorId String [not null]
-  vendor Vendor [not null]
+  paymentMethod PaymentMethods [not null]
+  vendorId String
+  vendor Vendor
   bookings Booking [not null]
   wayBill WayBill
   createdAt DateTime [default: `now()`, not null]
@@ -260,6 +266,8 @@ Ref: Product.categoryId > Category.id
 Ref: Product.formId > Form.id
 
 Ref: Cart.vendorId > Vendor.id
+
+Ref: Order.cartId > Cart.id
 
 Ref: Order.vendorId > Vendor.id
 

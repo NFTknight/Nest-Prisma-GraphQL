@@ -266,12 +266,13 @@ type CartItem {
 model Cart {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
   items         CartItem[]
-  customerId    String     @unique
+  customerId    String
   appliedCoupon String?
   totalPrice    Float
   finalPrice    Float
-  vendorId      String?    @db.ObjectId
-  vendor        Vendor?    @relation(fields: [vendorId], references: [id])
+
+  vendorId String? @db.ObjectId
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
   bookings Booking[]
 
@@ -281,6 +282,9 @@ model Cart {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Order     Order[]
+
+  @@unique([customerId, vendorId])
 }
 
 type FormResponse {
@@ -301,22 +305,26 @@ type WayBill {
 }
 
 model Order {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  orderId       String
-  cartId        String      @db.ObjectId
-  totalPrice    Float?
-  finalPrice    Float?
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String
+
+  cartId String? @db.ObjectId
+  cart   Cart?   @relation(fields: [cartId], references: [id])
+
+  totalPrice    Float
+  finalPrice    Float
   appliedCoupon String?
   items         CartItem[]
   status        OrderStatus
+  customerId    String
 
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?
-  paymentMethod  PaymentMethods?
-  formResponses  FormResponse[]
+  paymentMethod  PaymentMethods
 
-  vendorId String    @db.ObjectId
-  vendor   Vendor    @relation(fields: [vendorId], references: [id])
+  vendorId String? @db.ObjectId
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
   bookings Booking[]
   wayBill  WayBill?
 

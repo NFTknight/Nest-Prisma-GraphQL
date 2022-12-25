@@ -39,8 +39,9 @@ export class CartItemInput {
   @Field(() => [BookingTimeInput], { nullable: true })
   slots: BookingTimeInput[];
 }
+
 @InputType()
-class CustomerInput {
+export class CustomerInput {
   @Field()
   firstName: string;
 
@@ -68,12 +69,6 @@ export class CartUpdateInput {
 
   @Field({ nullable: true })
   appliedCoupon?: string;
-
-  @Field(() => Float, { nullable: true })
-  totalPrice?: number;
-
-  @Field(() => Float, { nullable: true })
-  finalPrice?: number;
 
   @Field(() => CustomerInput, { nullable: true })
   customerInfo?: CustomerInput;
