@@ -330,6 +330,19 @@ enum DeliveryMethods {
   SMSA
 }
 
+type ExecutePayment {
+  CustomerReference: String!
+  InvoiceId: Int!
+  IsDirectPayment: Boolean!
+  PaymentURL: String!
+  RecurringId: String!
+}
+
+type ExecutePaymentError {
+  Error: String!
+  Name: String!
+}
+
 type Form {
   content: String!
 
@@ -360,7 +373,7 @@ type Mutation {
   addServiceToCart(cartId: String!, data: CartItemInput!): Cart!
   addWorkshopToCart(cartId: String!, data: CartItemInput!): Cart!
   changePassword(data: ChangePasswordInput!): User!
-  checkoutCart(cartId: String!): Order!
+  checkoutCart(cartId: String!, paymentSession: String): OrderPayment!
   createBooking(data: CreateBookingInput!): Booking!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
@@ -413,8 +426,10 @@ type Order {
   deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
+  invoiceId: String
   items: [CartItem!]!
   orderId: String!
+  payment: ExecutePayment
   paymentMethod: PaymentMethods
   status: OrderStatus!
   totalPrice: Float!
@@ -432,6 +447,34 @@ Possible directions in which to order a list of items when provided an `orderBy`
 enum OrderDirection {
   asc
   desc
+}
+
+type OrderPayment {
+  appliedCoupon: String
+  cart: Cart
+  cartId: String!
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  customerId: String
+  customerInfo: CustomerInfo
+  deliveryMethod: DeliveryMethods
+  errors: [ExecutePaymentError!]
+  finalPrice: Float!
+  id: ID!
+  invoiceId: String
+  items: [CartItem!]!
+  orderId: String!
+  payment: ExecutePayment
+  paymentMethod: PaymentMethods
+  status: OrderStatus!
+  totalPrice: Float!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  vendor: Vendor
+  vendorId: String!
+  wayBill: WayBill
 }
 
 """Order Status"""
