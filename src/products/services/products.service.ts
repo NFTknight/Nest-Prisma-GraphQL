@@ -8,7 +8,7 @@ import { CreateProductValidator } from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
-import { Product, Prisma, AttendanceType } from '@prisma/client';
+import { Product, Prisma, AttendanceType, CartItem } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -129,4 +129,38 @@ export class ProductsService {
 
     return await this.prisma.product.delete({ where: { id } });
   }
+
+  async updateProductVariantQuantities(data: CartItem[]): Promise<boolean> {
+    return Promise.all(
+      data.map(async ({ productId, sku, quantity }): Promise<boolean> => {
+        const product = await this.getProduct(productId);
+        const variants = product.variants.map((item) => {
+          if (item.sku === sku) {
+            console.log({ item: item, quantity });
+            if (item.quantity < quantity) {
+              throw new BadRequestException(
+                'Product Order quantity cannot be more than Product available quantity'
+              );
+            }
+            return { ...item, quantity: item.quantity - quantity };
+          }
+
+          return item;
+        });
+        return !!(await this.prisma.product.update({
+          where: { id: productId },
+          data: { variants },
+        }));
+      })
+    ).then((data) => {
+      return data.every((item) => item === true);
+    });
+
+    return false;
+  }
 }
+
+// Promise.all(arr.map(async (elem): Promise<number> => {
+//   await asyncFunction();
+//   return elem + 10;
+// }));

@@ -20,6 +20,7 @@ import {
 } from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
 import { Cart } from 'src/cart/models/cart.model';
+import { ProductsService } from 'src/products/services/products.service';
 
 @Injectable()
 export class OrdersService {
@@ -28,7 +29,8 @@ export class OrdersService {
     private readonly emailService: SendgridService,
     private readonly prisma: PrismaService,
     private readonly shippingService: ShippingService,
-    private readonly vendorService: VendorsService
+    private readonly vendorService: VendorsService,
+    private readonly productsService: ProductsService
   ) {}
 
   async getOrder(id: string): Promise<Order> {
@@ -140,11 +142,6 @@ export class OrdersService {
       order.deliveryMethod === DeliveryMethods.SMSA &&
       !order.wayBill
     ) {
-      if (data.cartId) {
-        // if the order does not exist, this function will throw an error.
-        cartItem = await this.cartService.getCart(data.cartId);
-      }
-
       const vendorData = await this.vendorService.getVendor(vendorId);
 
       const WayBillRequestObject: CreateShipmentInput = {
@@ -178,6 +175,12 @@ export class OrdersService {
       wayBillData = await this.shippingService.createShipment(
         WayBillRequestObject
       );
+    }
+
+    if (order.status === OrderStatus.PENDING) {
+      if (order.cartId) {
+        cartItem = await this.cartService.getCart(order.cartId);
+      }
     }
     const cartObject = {
       finalPrice: cartItem?.finalPrice || 0,
@@ -231,7 +234,11 @@ export class OrdersService {
       }
     }
 
-    return res;
+    await this.productsService.updateProductVariantQuantities(
+      cartItem?.items || []
+    );
+
+    return { ...res, ...updatingOrderObject, updatedAt: new Date() };
   }
 
   async deleteOrder(id: string): Promise<Order> {
