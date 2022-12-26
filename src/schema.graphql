@@ -29,21 +29,20 @@ type BadgeType {
 }
 
 type Booking {
-  Cart: Cart
-  Order: Order
-  Tag: Tag
-  cart: Cart!
-  cartId: String!
+  cart: Cart
+  cartId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   holdTimestamp: DateTime
   id: ID!
+  order: Order
   orderId: String
   product: Product
   productId: String!
   slots: [BookingTime!]
   status: BookingStatus!
+  tag: Tag
   tagId: String!
 
   """Identifies the date and time when the object was last updated."""

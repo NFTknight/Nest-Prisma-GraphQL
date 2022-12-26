@@ -364,8 +364,8 @@ type BookingTime {
 
 model Booking {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  cartId        String        @db.ObjectId
-  cart          Cart          @relation(fields: [cartId], references: [id])
+  cartId        String?       @db.ObjectId
+  cart          Cart?         @relation(fields: [cartId], references: [id], onDelete: SetNull)
   orderId       String?       @db.ObjectId
   order         Order?        @relation(fields: [orderId], references: [id])
   productId     String        @db.ObjectId

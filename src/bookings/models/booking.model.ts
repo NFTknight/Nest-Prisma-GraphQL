@@ -14,15 +14,15 @@ export class Booking extends BaseModel {
   orderId?: string;
 
   @Field(() => Order)
-  Order?: Order;
+  order?: Order;
 
-  cartId: string;
+  cartId?: string;
   @Field(() => Cart)
-  Cart?: Cart;
+  cart?: Cart;
 
   tagId: string;
   @Field(() => Tag)
-  Tag?: Tag;
+  tag?: Tag;
 
   @Field()
   vendorId: string;

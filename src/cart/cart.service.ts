@@ -37,7 +37,8 @@ export class CartService {
     });
   }
 
-  async getCart(cartId: string): Promise<Cart> {
+  async getCart(cartId: string): Promise<Cart | null> {
+    if (!cartId) return null;
     return await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
@@ -164,11 +165,10 @@ export class CartService {
     const cart = await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
-
-    const deleteData = await this.prisma.cart.delete({
+    // cart deletion
+    await this.prisma.cart.delete({
       where: { id: cartId },
     });
-    console.log({ deleteData });
 
     return cart;
   }
