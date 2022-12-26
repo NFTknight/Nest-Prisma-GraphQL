@@ -136,7 +136,6 @@ export class ProductsService {
         const product = await this.getProduct(productId);
         const variants = product.variants.map((item) => {
           if (item.sku === sku) {
-            console.log({ item: item, quantity });
             if (item.quantity < quantity) {
               throw new BadRequestException(
                 'Product Order quantity cannot be more than Product available quantity'
