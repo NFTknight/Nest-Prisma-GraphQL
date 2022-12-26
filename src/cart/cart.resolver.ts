@@ -2,16 +2,11 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Cart } from './models/cart.model';
 import { CartService } from './cart.service';
 import { CartItemInput, CartUpdateInput } from './dto/cart.input';
-import { Order } from 'src/orders/models/order.model';
-import { OrdersService } from 'src/orders/orders.service';
-import { OrderStatus } from '@prisma/client';
+import { OrderPayment } from 'src/orders/models/order-payment.model';
 
 @Resolver(Cart)
 export class CartResolver {
-  constructor(
-    private readonly cartService: CartService,
-    private readonly orderService: OrdersService
-  ) {}
+  constructor(private readonly cartService: CartService) {}
 
   @Query(() => Cart)
   async getCustomerCart(
@@ -104,8 +99,14 @@ export class CartResolver {
     return cart;
   }
 
-  @Mutation(() => Order)
-  checkoutCart(@Args('cartId') cartId: string) {
-    return this.cartService.checkoutCartAndCreateOrder(cartId);
+  @Mutation(() => OrderPayment)
+  checkoutCart(
+    @Args('cartId') cartId: string,
+    @Args('paymentSession', {
+      nullable: true,
+    })
+    paymentSession: string
+  ) {
+    return this.cartService.checkoutCartAndCreateOrder(cartId, paymentSession);
   }
 }
