@@ -26,7 +26,8 @@ export class CartService {
     });
   }
 
-  async getCart(cartId: string): Promise<Cart> {
+  async getCart(cartId: string): Promise<Cart | null> {
+    if (!cartId) return null;
     return await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
@@ -153,11 +154,9 @@ export class CartService {
     const cart = await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
-
     // cart deletion
-    await this.prisma.$runCommandRaw({
-      delete: 'Cart',
-      deletes: [{ q: { _id: { $eq: { $oid: cartId } } }, limit: 1 }],
+    await this.prisma.cart.delete({
+      where: { id: cartId },
     });
 
     return cart;

@@ -16,7 +16,7 @@ export class Booking extends BaseModel {
   @Field(() => Order)
   order?: Order;
 
-  cartId: string;
+  cartId?: string;
   @Field(() => Cart)
   cart?: Cart;
 
