@@ -11,7 +11,7 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
-import { Category } from './models/category.model';
+import { Categories, Category } from './models/category.model';
 import { CategoriesService } from './categories.service';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -28,7 +28,7 @@ export class CategoriesResolver {
     return this.categoriesService.getCategory(id);
   }
 
-  @Query(() => [Category])
+  @Query(() => Categories)
   getCategories(
     @Args('vendorId') vendorId: string,
     @Args('active', { nullable: true }) active: boolean | null,

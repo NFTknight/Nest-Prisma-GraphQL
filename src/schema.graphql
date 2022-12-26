@@ -149,6 +149,11 @@ input CartUpdateInput {
   paymentMethod: PaymentMethods
 }
 
+type Categories {
+  count: Int!
+  data: [Category!]!
+}
+
 type Category {
   active: Boolean!
 
@@ -595,7 +600,7 @@ enum ProductType {
 type Query {
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
-  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): [Category!]!
+  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): Categories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!

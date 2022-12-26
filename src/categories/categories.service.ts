@@ -3,7 +3,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
-import { Category } from './models/category.model';
+import { Categories, Category } from './models/category.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -30,7 +30,7 @@ export class CategoriesService {
     active: boolean | null,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Category[]> {
+  ): Promise<Categories> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
@@ -48,12 +48,16 @@ export class CategoriesService {
     if (typeof active === 'boolean') {
       where['active'] = active;
     }
-    return this.prisma.category.findMany({
-      where,
-      skip,
-      take,
-      orderBy,
-    });
+    const res = await this.prisma.$transaction([
+      this.prisma.category.count({ where: { vendorId: vendorId } }),
+      this.prisma.category.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+      }),
+    ]);
+    return { count: res[0], data: res[1] };
   }
 
   async createCategory(data: CreateCategoryInput): Promise<Category> {

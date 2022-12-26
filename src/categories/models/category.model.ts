@@ -21,3 +21,12 @@ export class Category extends BaseModel {
   sortOrder?: number;
   slug?: string;
 }
+
+@ObjectType()
+export class Categories {
+  @Field(() => [Category], { nullable: false })
+  data: Category[];
+
+  @Field(() => Int, { nullable: false })
+  count: number;
+}
