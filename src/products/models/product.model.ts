@@ -2,7 +2,7 @@ import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
-import { Product as IProduct } from '@prisma/client';
+import { Product as PrismaProduct } from '@prisma/client';
 import {
   ProductType,
   AttendanceType,
@@ -19,7 +19,7 @@ export class BadgeType implements Btype {
   label: AttendanceType;
 }
 @ObjectType()
-export class Product extends BaseModel implements IProduct {
+export class Product extends BaseModel implements PrismaProduct {
   slug: string;
   title: string;
   title_ar: string;

@@ -1,5 +1,5 @@
-import { HttpModule, HttpService } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { forwardRef, Module } from '@nestjs/common';
 import { CartModule } from 'src/cart/cart.module';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ShippingModule } from 'src/shipping/shipping.module';
@@ -9,7 +9,12 @@ import { OrdersResolver } from './order.resolver';
 import { OrdersService } from './orders.service';
 
 @Module({
-  imports: [VendorsModule, CartModule, ShippingModule, HttpModule],
+  imports: [
+    VendorsModule,
+    forwardRef(() => CartModule),
+    ShippingModule,
+    HttpModule,
+  ],
   providers: [OrdersService, OrdersResolver, SendgridService, ShippingService],
   exports: [OrdersService],
 })

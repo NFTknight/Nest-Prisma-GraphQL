@@ -1,26 +1,33 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Cart } from './models/cart.model';
 import { CartService } from './cart.service';
-import { CartItemInput } from './dto/cart.input';
+import { CartItemInput, CartUpdateInput } from './dto/cart.input';
+import { Order } from 'src/orders/models/order.model';
+import { OrdersService } from 'src/orders/orders.service';
+import { OrderStatus } from '@prisma/client';
 
 @Resolver(Cart)
 export class CartResolver {
-  constructor(private readonly cartService: CartService) {}
-
-  @Mutation(() => Cart)
-  async createCart(
-    @Args('vendorId') vendorId: string,
-    @Args('customerId') customerId: string
-  ) {
-    return this.cartService.createNewCart(vendorId, customerId);
-  }
+  constructor(
+    private readonly cartService: CartService,
+    private readonly orderService: OrdersService
+  ) {}
 
   @Query(() => Cart)
-  getCustomerCart(
-    @Args('customerId') customerId: string,
-    @Args('vendorId') vendorId: string
+  async getCustomerCart(
+    @Args('vendorId') vendorId: string,
+    @Args('customerId') customerId: string
   ): Promise<Cart> {
-    return this.cartService.getCartByCustomer(customerId, vendorId);
+    let cart: Cart = await this.cartService.getCartByCustomer(
+      customerId,
+      vendorId
+    );
+
+    if (!cart) {
+      cart = await this.cartService.createNewCart(vendorId, customerId);
+    }
+
+    return cart;
   }
 
   @Mutation(() => Cart)
@@ -85,7 +92,20 @@ export class CartResolver {
   }
 
   @Mutation(() => Cart)
-  checkout(@Args('cartId') cartId: string) {
-    //
+  async updateCart(
+    @Args('cartId') cartId: string,
+    @Args('data') data: CartUpdateInput
+  ) {
+    let cart: Cart | null = await this.cartService.getCart(cartId);
+
+    if (cart) {
+      cart = await this.cartService.updateCart(cartId, data);
+    }
+    return cart;
+  }
+
+  @Mutation(() => Order)
+  checkoutCart(@Args('cartId') cartId: string) {
+    return this.cartService.checkoutCartAndCreateOrder(cartId);
   }
 }

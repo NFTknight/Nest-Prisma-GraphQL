@@ -11,6 +11,7 @@ import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from '@prisma/client';
+import { VendorView } from './models/vendor.model';
 
 @Injectable()
 export class VendorsService {
@@ -64,6 +65,69 @@ export class VendorsService {
     return vendor;
   }
 
+  async getVendorView(vendorId: string): Promise<VendorView> {
+    const numberProductsPromise = this.prisma.product.count({
+      where: { vendorId },
+    });
+    const numberOrdersPromise = this.prisma.order.count({
+      where: { vendorId },
+    });
+
+    const numberServicesPromise = this.prisma.product.count({
+      where: { vendorId: vendorId, type: 'SERVICE' },
+    });
+    const numberBookingsPromise = this.prisma.booking.count({
+      where: { vendorId },
+    });
+    const numberCategoriesPromise = this.prisma.category.count({
+      where: { vendorId },
+    });
+    const numberCouponsPromise = this.prisma.coupon.count({
+      where: { vendorId },
+    });
+    const vendorPromise = this.prisma.vendor.findUnique({
+      where: { id: vendorId },
+    });
+    const [
+      numberProducts,
+      numberOrders,
+      numberServices,
+      numberBookings,
+      numberCategories,
+      numberCoupons,
+      vendor,
+    ] = await Promise.all([
+      numberProductsPromise,
+      numberOrdersPromise,
+      numberServicesPromise,
+      numberBookingsPromise,
+      numberCategoriesPromise,
+      numberCouponsPromise,
+      vendorPromise,
+    ]);
+
+    const vendorName = vendor?.name || '';
+    const vendorUrl = vendor?.info?.addressUrl || '';
+    const ownerId = vendor.ownerId;
+    const vendorOwner = await this.prisma.user.findUnique({
+      where: { id: ownerId },
+    });
+    const accountManager =
+      (vendorOwner.firstName || '') + ' ' + (vendorOwner.lastName || '');
+
+    return {
+      vendorName,
+      vendorUrl,
+      numberProducts,
+      numberOrders,
+      numberServices,
+      numberBookings,
+      numberCategories,
+      numberCoupons,
+      accountManager,
+    };
+  }
+
   async getVendorByUserId(id: string): Promise<Vendor> {
     const vendor = await this.prisma.vendor.findFirst({
       where: { ownerId: id },
@@ -107,5 +171,23 @@ export class VendorsService {
       },
       where: { id },
     });
+  }
+
+  async getVendorOrderPrefix(vendorId: string) {
+    const vendor = await this.prisma.vendor.findUnique({
+      where: { id: vendorId },
+      select: { name: true },
+    });
+
+    let prefix = '';
+    const vendorStrArr = vendor.name.split(' ');
+    if (vendorStrArr.length === 1) {
+      prefix = vendor.name.slice(0, 2).toUpperCase();
+    } else if (vendorStrArr.length === 2) {
+      prefix = vendorStrArr[0][0] + vendorStrArr[1][0];
+    } else {
+      prefix = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
+    }
+    return prefix;
   }
 }

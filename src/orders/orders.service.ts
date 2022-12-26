@@ -34,9 +34,6 @@ export class OrdersService {
   async getOrder(id: string): Promise<Order> {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: {
-        booking: true,
-      },
     });
     if (!order) throw new NotFoundException('Order Not Found.');
 
@@ -48,7 +45,7 @@ export class OrdersService {
     pg?: PaginationArgs,
     sortOrder?: SortOrder,
     filter?: OrdersFilterInput
-  ): Promise<Order[]> {
+  ) {
     try {
       const { skip, take } = getPaginationArgs(pg);
 
@@ -72,9 +69,10 @@ export class OrdersService {
     }
   }
 
-  async createOrder(data: CreateOrderInput): Promise<Order> {
+  async createOrder(data: CreateOrderInput) {
     // if the vendor does not exist, this function will throw an error.
     const cart = await this.cartService.getCart(data.cartId);
+    const { vendorId, paymentMethod, deliveryMethod } = cart;
     const customerAnswers: FormResponse[] = [];
     cart.items.map((item) => {
       if (item?.answers)
@@ -83,7 +81,7 @@ export class OrdersService {
           answers: item.answers,
         });
     });
-    const vendor = await this.vendorService.getVendor(data.vendorId);
+    const vendor = await this.vendorService.getVendor(vendorId);
 
     // get order ID from vendor
     // TODO - Move this to helper function
@@ -99,15 +97,16 @@ export class OrdersService {
     orderId =
       orderId + '-' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
-    const newData = {
+    const newData: CreateOrderInput = {
       ...data,
-      orderId,
-      formResponses: customerAnswers,
-      vendorId: vendor.id,
+      paymentMethod,
+      deliveryMethod,
     };
 
     // if vendor and cart exists we can successfully create the order.
-    const res = await this.prisma.order.create({ data: newData } as any);
+    const res = await this.prisma.order.create({
+      data: { ...newData, orderId, vendorId, customerAnswers },
+    } as any);
 
     // Email notification to vendor and customer when order is created
     if (res.id) {

@@ -79,9 +79,12 @@ type Cart {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   customerId: String!
+  customerInfo: CustomerInfo
+  deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
   items: [CartItem!]!
+  paymentMethod: PaymentMethods
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -90,13 +93,43 @@ type Cart {
 }
 
 type CartItem {
+  active: Boolean
   answers: String
+  attendanceType: AttendanceType
+  badge: BadgeType
+  bookedSeats: Int
+  category: Category
+  categoryId: String
+  customerLocation: Boolean
+  description: String
+  description_ar: String
+  duration: Int
+  endDate: DateTime
+  endTime: Boolean
+  form: Form
+  formId: String
+  image: String
+  itemsInStock: Int
+  location: String
+  meetingLink: String
+  minPreorderDays: Int
+  noOfSeats: Int
   price: Float!
   productId: String!
   quantity: Int!
   sku: String!
   slots: [BookingTime!]
+  slug: String
+  sortOrder: Int
+  startDate: DateTime
   tagId: String
+  tagIds: [String!]
+  tags: [Tag!]
+  title: String
+  title_ar: String
+  type: ProductType
+  variants: [Variant!]
+  vendor: Vendor!
 }
 
 input CartItemInput {
@@ -106,6 +139,14 @@ input CartItemInput {
   sku: String!
   slots: [BookingTimeInput!]
   tagId: String
+}
+
+input CartUpdateInput {
+  appliedCoupon: String
+  customerInfo: CustomerInput
+  deliveryMethod: DeliveryMethods
+  items: [CartItemInput!]
+  paymentMethod: PaymentMethods
 }
 
 type Category {
@@ -197,15 +238,6 @@ input CreateCouponInput {
   vendorId: String!
 }
 
-input CreateCustomerInput {
-  address: String
-  city: String
-  email: String!
-  firstName: String!
-  lastName: String!
-  phone: String!
-}
-
 input CreateFormInput {
   content: String!
   vendorId: String!
@@ -213,11 +245,9 @@ input CreateFormInput {
 
 input CreateOrderInput {
   cartId: String!
-  customerInfo: CreateCustomerInput!
   deliveryMethod: DeliveryMethods
   paymentMethod: PaymentMethods
   status: OrderStatus!
-  vendorId: String!
 }
 
 input CreateProductInput {
@@ -271,6 +301,15 @@ type CustomerInfo {
   phone: String!
 }
 
+input CustomerInput {
+  address: String
+  city: String
+  email: String!
+  firstName: String!
+  lastName: String!
+  phone: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -303,11 +342,6 @@ type Form {
   vendorId: String!
 }
 
-type FormResponse {
-  answers: String!
-  productId: String!
-}
-
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -325,9 +359,8 @@ type Mutation {
   addServiceToCart(cartId: String!, data: CartItemInput!): Cart!
   addWorkshopToCart(cartId: String!, data: CartItemInput!): Cart!
   changePassword(data: ChangePasswordInput!): User!
-  checkout(cartId: String!): Cart!
+  checkoutCart(cartId: String!): Order!
   createBooking(data: CreateBookingInput!): Booking!
-  createCart(customerId: String!, vendorId: String!): Cart!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
   createForm(data: CreateFormInput!): Form!
@@ -352,6 +385,7 @@ type Mutation {
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
   updateBooking(data: UpdateBookingInput!, id: String!): Booking!
+  updateCart(cartId: String!, data: CartUpdateInput!): Cart!
   updateCartItem(cartId: String!, data: CartItemInput!): Cart!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateCoupon(data: UpdateCouponInput!, id: String!): Coupon!
@@ -368,7 +402,7 @@ type Mutation {
 
 type Order {
   appliedCoupon: String
-  cart: Cart!
+  cart: Cart
   cartId: String!
 
   """Identifies the date and time when the object was created."""
@@ -376,18 +410,17 @@ type Order {
   customerId: String
   customerInfo: CustomerInfo
   deliveryMethod: DeliveryMethods
-  finalPrice: Float
-  formResponses: [FormResponse!]
+  finalPrice: Float!
   id: ID!
-  items: [CartItem!]
+  items: [CartItem!]!
   orderId: String!
   paymentMethod: PaymentMethods
   status: OrderStatus!
-  totalPrice: Float
+  totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor!
+  vendor: Vendor
   vendorId: String!
   wayBill: WayBill
 }
@@ -534,7 +567,9 @@ type Query {
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
+  getVendorView(vendorId: String!): VendorView!
   getVendors: [Vendor!]!
+  getVendorsView(pagination: PaginationArgs): VendorsView!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
@@ -796,6 +831,23 @@ type VendorSettings {
   deliveryAreas: [DeliveryAreas!]!
   deliveryMethods: [DeliveryMethods!]!
   paymentMethods: [PaymentMethods!]!
+}
+
+type VendorView {
+  accountManager: String
+  numberBookings: Int
+  numberCategories: Int
+  numberCoupons: Int
+  numberOrders: Int
+  numberProducts: Int!
+  numberServices: Int
+  vendorName: String
+  vendorUrl: String
+}
+
+type VendorsView {
+  list: [VendorView!]
+  totalCount: Int!
 }
 
 type WayBill {
