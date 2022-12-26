@@ -177,10 +177,9 @@ export class OrdersService {
       );
     }
 
-    if (order.status === OrderStatus.PENDING) {
-      if (order.cartId) {
-        cartItem = await this.cartService.getCart(order.cartId);
-      }
+    if (order.cartId && order.status === OrderStatus.PENDING) {
+      // if the order does not exist, this function will throw an error.
+      cartItem = await this.cartService.getCartAndDelete(order.cartId);
     }
     const cartObject = {
       finalPrice: cartItem?.finalPrice || 0,

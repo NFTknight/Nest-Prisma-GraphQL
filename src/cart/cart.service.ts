@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
@@ -15,6 +15,7 @@ import { VendorsService } from 'src/vendors/vendors.service';
 import { nanoid } from 'nanoid';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
+import { PaymentService } from 'src/payment/payment.service';
 
 @Injectable()
 export class CartService {
@@ -22,7 +23,8 @@ export class CartService {
     private readonly prisma: PrismaService,
     private readonly cartItemService: CartItemService,
     private readonly vendorService: VendorsService,
-    private readonly emailService: SendgridService
+    private readonly emailService: SendgridService,
+    private readonly paymentService: PaymentService
   ) {}
 
   async createNewCart(vendorId: string, customerId: string): Promise<Cart> {
@@ -37,7 +39,8 @@ export class CartService {
     });
   }
 
-  async getCart(cartId: string): Promise<Cart> {
+  async getCart(cartId: string): Promise<Cart | null> {
+    if (!cartId) return null;
     return await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
@@ -153,22 +156,14 @@ export class CartService {
     });
   }
 
-  async checkoutCart(cartId: string) {
-    const cart = await this.getCart(cartId);
-    // const cartItems = await this.cartItemService.getCartItems(cartId);
-
-    return;
-  }
-
   async getCartAndDelete(cartId: string) {
     const cart = await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
-
-    const deleteData = await this.prisma.cart.delete({
+    // cart deletion
+    await this.prisma.cart.delete({
       where: { id: cartId },
     });
-    console.log({ deleteData });
 
     return cart;
   }
@@ -181,21 +176,15 @@ export class CartService {
     });
   }
 
-  async checkoutCartAndCreateOrder(cartId: string) {
+  async checkoutCartAndCreateOrder(cartId: string, paymentSession?: string) {
     // TODO - add payment gateway
 
     const cart = await this.getCart(cartId);
 
-    switch (cart.paymentMethod) {
-      case PaymentMethods.ONLINE:
-        // send request to my fatura
-        break;
-      case PaymentMethods.BANK_TRANSFER:
-      case PaymentMethods.CASH:
-      case PaymentMethods.STORE:
-      default:
-        break;
+    if (cart.paymentMethod === PaymentMethods.ONLINE && !paymentSession) {
+      throw new BadRequestException('Payment session is required');
     }
+
     const { vendorId } = cart;
 
     const vendorPrefix = await this.vendorService.getVendorOrderPrefix(
@@ -232,6 +221,27 @@ export class CartService {
       },
     });
 
+    let payment = undefined;
+    let errors = undefined;
+
+    if (cart.paymentMethod === PaymentMethods.ONLINE) {
+      try {
+        payment = await this.paymentService.executePayment(
+          res.id,
+          paymentSession
+        );
+
+        await this.prisma.order.update({
+          where: { id: res.id },
+          data: {
+            invoiceId: payment.InvoiceId.toString(),
+          },
+        });
+      } catch (error) {
+        errors = error.response.data.ValidationErrors;
+      }
+    }
+
     // Email notification to vendor and customer when order is created
     if (res.id) {
       this.emailService.send(
@@ -243,6 +253,10 @@ export class CartService {
         );
     }
 
-    return res;
+    return {
+      ...res,
+      payment,
+      errors,
+    };
   }
 }

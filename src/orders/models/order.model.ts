@@ -54,6 +54,9 @@ export class Order extends BaseModel implements PrismaOrder {
   @Field({ nullable: true })
   appliedCoupon: string;
 
+  @Field({ nullable: true })
+  invoiceId: string;
+
   @Field(() => Float)
   totalPrice: number;
 
