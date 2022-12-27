@@ -15,10 +15,6 @@ export class ProductFilterInput implements Prisma.ProductWhereInput {
 
   @Field(() => AttendanceType)
   attendanceType?: AttendanceType;
-
-  title?: string;
-  slug?: string;
-  title_ar?: string;
 }
 
 @InputType()

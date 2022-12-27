@@ -605,9 +605,6 @@ type Product {
 
 input ProductFilterInput {
   attendanceType: AttendanceType
-  slug: String
-  title: String
-  title_ar: String
   type: ProductType
 }
 
