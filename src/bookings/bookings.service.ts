@@ -8,6 +8,9 @@ import { UpdateBookingInput } from './dto/update-booking.input';
 import { BookingStatus, Booking } from '@prisma/client';
 import { TagsService } from 'src/tags/tags.service';
 import { VendorsService } from 'src/vendors/vendors.service';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { PaginatedBookings } from './models/paginated-bookings.model';
 
 @Injectable()
 export class BookingsService {
@@ -28,12 +31,19 @@ export class BookingsService {
 
     return booking;
   }
-  async getBookings(where: any): Promise<Booking[]> {
-    const booking = await this.prisma.booking.findMany({ where });
+  async getBookings(
+    where: any,
+    pg?: PaginationArgs
+  ): Promise<PaginatedBookings> {
+    const { skip, take } = getPaginationArgs(pg);
+    const res = await this.prisma.$transaction([
+      this.prisma.booking.count({ where }),
+      this.prisma.booking.findMany({ where, skip, take }),
+    ]);
 
-    if (!booking) throw new NotFoundException('Bookings Not Found.');
+    if (!res[1]) throw new NotFoundException('Bookings Not Found.');
 
-    return booking;
+    return { totalCount: res[0], list: res[1] };
   }
 
   async createBooking(data: CreateBookingInput): Promise<Booking> {

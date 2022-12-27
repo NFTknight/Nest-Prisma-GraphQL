@@ -505,6 +505,11 @@ enum OtpStatusCode {
   INCORRECT
 }
 
+type PaginatedBookings {
+  list: [Booking!]
+  totalCount: Int!
+}
+
 type PaginatedCategories {
   list: [Category!]
   totalCount: Int!
@@ -605,7 +610,7 @@ enum ProductType {
 
 type Query {
   getBooking(id: String!): Booking!
-  getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
+  getBookings(pagination: PaginationArgs, productId: String, tagId: String, vendorId: String!): PaginatedBookings!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
