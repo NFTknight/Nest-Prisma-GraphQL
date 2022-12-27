@@ -9,6 +9,11 @@ import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
 import { Product, Prisma, AttendanceType } from '@prisma/client';
+import { PaginatedProducts } from '../models/paginated-products.model';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { ProductFilterInput } from 'src/common/filter/filter.input';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 
 @Injectable()
 export class ProductsService {
@@ -16,6 +21,69 @@ export class ProductsService {
     private readonly prisma: PrismaService,
     private readonly vendorService: VendorsService
   ) {}
+
+  async getProducts(
+    vendorId: string,
+    categoryId?: string,
+    pg?: PaginationArgs,
+    sortOrder?: SortOrder,
+    filter?: ProductFilterInput
+  ): Promise<PaginatedProducts> {
+    try {
+      const { skip, take } = getPaginationArgs(pg);
+
+      let orderBy = {};
+      if (sortOrder) {
+        orderBy[sortOrder.field] = sortOrder.direction;
+      } else {
+        orderBy = {
+          sortOrder: 'asc',
+        };
+      }
+
+      const where: Prisma.ProductWhereInput = {
+        ...filter,
+        vendorId,
+      };
+
+      if (categoryId) {
+        where['categoryId'] = categoryId;
+      }
+
+      const products = await this.prisma.product.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+      });
+
+      const list = products.map((product) => {
+        if (product.meetingLink) {
+          if (product.badge)
+            product.badge = { ...product.badge, label: AttendanceType.ONLINE };
+          else product.badge = { label: AttendanceType.ONLINE };
+        } else if (product.location) {
+          if (product.badge)
+            product.badge = {
+              ...product.badge,
+              label: AttendanceType.PHYSICAL,
+            };
+          else product.badge = { label: AttendanceType.PHYSICAL };
+        }
+
+        return product;
+      });
+
+      const totalCount = await this.prisma.product.count({ where });
+
+      return {
+        list: list,
+        totalCount: totalCount,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 
   async getProduct(id: string): Promise<Product> {
     const product = await this.prisma.product.findUnique({ where: { id } });

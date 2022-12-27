@@ -56,6 +56,7 @@ export class CategoriesService {
         skip,
         take,
         orderBy,
+        include: { products: true },
       }),
     ]);
     return { totalCount: res[0], list: res[1] };
