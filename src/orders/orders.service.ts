@@ -20,7 +20,6 @@ import {
 } from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
 import { Cart } from 'src/cart/models/cart.model';
-import { ProductsService } from 'src/products/services/products.service';
 
 @Injectable()
 export class OrdersService {
@@ -29,8 +28,7 @@ export class OrdersService {
     private readonly emailService: SendgridService,
     private readonly prisma: PrismaService,
     private readonly shippingService: ShippingService,
-    private readonly vendorService: VendorsService,
-    private readonly productsService: ProductsService
+    private readonly vendorService: VendorsService
   ) {}
 
   async getOrder(id: string): Promise<Order> {
@@ -55,7 +53,7 @@ export class OrdersService {
       if (sortOrder) {
         orderBy[sortOrder.field] = sortOrder.direction;
       } else {
-        orderBy = { createdAt: 'des' };
+        orderBy = { id: 'asc' };
       }
 
       const where = {
@@ -177,9 +175,9 @@ export class OrdersService {
       );
     }
 
-    if (order.cartId && order.status === OrderStatus.PENDING) {
+    if (data.cartId && order.status === OrderStatus.PENDING) {
       // if the order does not exist, this function will throw an error.
-      cartItem = await this.cartService.getCartAndDelete(order.cartId);
+      cartItem = await this.cartService.getCartAndDelete(data.cartId);
     }
     const cartObject = {
       finalPrice: cartItem?.finalPrice || 0,
@@ -233,11 +231,7 @@ export class OrdersService {
       }
     }
 
-    await this.productsService.updateProductVariantQuantities(
-      cartItem?.items || []
-    );
-
-    return { ...res, ...updatingOrderObject, updatedAt: new Date() };
+    return res;
   }
 
   async deleteOrder(id: string): Promise<Order> {
