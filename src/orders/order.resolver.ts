@@ -17,6 +17,7 @@ import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { OrdersService } from './orders.service';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { OrdersFilterInput } from 'src/common/filter/filter.input';
+import { PaginatedOrders } from './models/paginated-orders.model';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -31,26 +32,14 @@ export class OrdersResolver {
     return this.ordersService.getOrder(id);
   }
 
-  @Query(() => [Order])
+  @Query(() => PaginatedOrders)
   async getOrders(
     @Args('vendorId', { nullable: true }) vendorId: string,
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,
     @Args('sortOrder', { nullable: true }) sortOrder?: SortOrder,
     @Args('filter', { nullable: true }) filter?: OrdersFilterInput
-  ) {
-    try {
-      const orders = this.ordersService.getOrders(
-        vendorId,
-        pg,
-        sortOrder,
-        filter
-      );
-
-      return orders;
-    } catch (err) {
-      console.log('something went wrong', err);
-      return [];
-    }
+  ): Promise<PaginatedOrders> {
+    return await this.ordersService.getOrders(vendorId, pg, sortOrder, filter);
   }
 
   @Mutation(() => Order)

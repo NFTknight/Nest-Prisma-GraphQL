@@ -515,6 +515,16 @@ type PaginatedCategories {
   totalCount: Int!
 }
 
+type PaginatedCoupons {
+  list: [Coupon!]
+  totalCount: Int!
+}
+
+type PaginatedOrders {
+  list: [Order!]
+  totalCount: Int!
+}
+
 type PaginatedProducts {
   list: [Product!]
   totalCount: Int!
@@ -614,12 +624,12 @@ type Query {
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
-  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
+  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedCoupons!
   getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
-  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
+  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!

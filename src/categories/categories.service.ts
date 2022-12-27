@@ -50,7 +50,7 @@ export class CategoriesService {
       where['active'] = active;
     }
     const res = await this.prisma.$transaction([
-      this.prisma.category.count({ where: { vendorId: vendorId } }),
+      this.prisma.category.count({ where }),
       this.prisma.category.findMany({
         where,
         skip,

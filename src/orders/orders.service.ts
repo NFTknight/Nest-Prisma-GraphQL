@@ -20,6 +20,7 @@ import {
 } from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
 import { Cart } from 'src/cart/models/cart.model';
+import { PaginatedOrders } from './models/paginated-orders.model';
 
 @Injectable()
 export class OrdersService {
@@ -45,7 +46,7 @@ export class OrdersService {
     pg?: PaginationArgs,
     sortOrder?: SortOrder,
     filter?: OrdersFilterInput
-  ) {
+  ): Promise<PaginatedOrders> {
     try {
       const { skip, take } = getPaginationArgs(pg);
 
@@ -61,9 +62,16 @@ export class OrdersService {
         ...filter,
       };
 
-      return await this.prisma.order.findMany({ where, skip, take, orderBy });
+      const res = await this.prisma.$transaction([
+        this.prisma.order.count({ where }),
+        this.prisma.order.findMany({ where, skip, take, orderBy }),
+      ]);
+      if (!res) throw new NotFoundException('data not found');
+
+      return { totalCount: res[0], list: res[1] };
     } catch (err) {
       console.log('Err => ', err);
+      throw new Error(err);
     }
   }
 
