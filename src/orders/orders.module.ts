@@ -1,6 +1,7 @@
 import { HttpModule } from '@nestjs/axios';
 import { forwardRef, Module } from '@nestjs/common';
 import { CartModule } from 'src/cart/cart.module';
+import { ProductsService } from 'src/products/services/products.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ShippingModule } from 'src/shipping/shipping.module';
 import { ShippingService } from 'src/shipping/shipping.service';
@@ -15,7 +16,13 @@ import { OrdersService } from './orders.service';
     ShippingModule,
     HttpModule,
   ],
-  providers: [OrdersService, OrdersResolver, SendgridService, ShippingService],
+  providers: [
+    OrdersService,
+    OrdersResolver,
+    SendgridService,
+    ShippingService,
+    ProductsService,
+  ],
   exports: [OrdersService],
 })
 export class OrdersModule {}

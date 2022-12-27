@@ -428,7 +428,6 @@ type Order {
   invoiceId: String
   items: [CartItem!]!
   orderId: String!
-  payment: ExecutePayment
   paymentMethod: PaymentMethods
   status: OrderStatus!
   totalPrice: Float!
@@ -810,6 +809,7 @@ type Variant {
   default: Boolean
   image: String!
   price: Int!
+  quantity: Int!
   sku: String!
   title: String!
   title_ar: String!

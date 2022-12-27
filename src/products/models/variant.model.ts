@@ -18,6 +18,9 @@ export class Variant implements VariantOption {
   @Field()
   price: number;
 
+  @Field({ defaultValue: 1 })
+  quantity: number;
+
   @Field()
   image: string;
 }
