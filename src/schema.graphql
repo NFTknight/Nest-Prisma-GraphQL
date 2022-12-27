@@ -613,7 +613,7 @@ type Query {
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [String!]!
-  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
+  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): Tags!
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
@@ -674,6 +674,11 @@ type Tag {
   vendor: Vendor!
   vendorId: String!
   workdays: [WorkDay!]!
+}
+
+type Tags {
+  count: Int!
+  data: [Tag!]!
 }
 
 type Token {

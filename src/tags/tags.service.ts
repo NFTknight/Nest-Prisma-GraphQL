@@ -3,7 +3,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateTagInput } from './dto/create-tag.input';
 import { UpdateTagInput } from './dto/update-tag.input';
-import { Tag } from './models/tag.model';
+import { Tag, Tags } from './models/tag.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -23,17 +23,21 @@ export class TagsService {
     return tag;
   }
 
-  getTags(
+  async getTags(
     vendorId?: string,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Tag[]> {
+  ): Promise<Tags> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
       vendorId,
     };
-    return this.prisma.tag.findMany({ where, skip, take });
+    const res = await this.prisma.$transaction([
+      this.prisma.category.count(),
+      this.prisma.tag.findMany({ where, skip, take }),
+    ]);
+    return { count: res[0], data: res[1] };
   }
 
   async getTagsByProduct(productId: string): Promise<Tag[]> {

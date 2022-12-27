@@ -10,7 +10,7 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateTagInput } from './dto/create-tag.input';
 import { UpdateTagInput } from './dto/update-tag.input';
-import { Tag } from './models/tag.model';
+import { Tag, Tags } from './models/tag.model';
 import { TagsService } from './tags.service';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -32,7 +32,7 @@ export class TagsResolver {
     return this.tagsService.getTag(id);
   }
 
-  @Query(() => [Tag])
+  @Query(() => Tags)
   async getTags(
     @Args('vendorId', { nullable: true }) vendorId?: string,
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,
