@@ -50,6 +50,7 @@ jobs:
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           clusterName: anyaa-k8s
+          expirationTime: 300
 
       - name: Upgrade deployment
         run: |

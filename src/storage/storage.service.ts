@@ -12,8 +12,10 @@ export class StorageService {
     this.config = this.configService.get('storage');
     this.s3 = new S3({
       endpoint: new Endpoint(this.config.enpoint),
-      accessKeyId: this.config.accessKey,
-      secretAccessKey: this.config.secretKey,
+      credentials: {
+        accessKeyId: this.config.accessKey,
+        secretAccessKey: this.config.secretKey,
+      },
     });
   }
 
