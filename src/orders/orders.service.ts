@@ -55,7 +55,7 @@ export class OrdersService {
       if (sortOrder) {
         orderBy[sortOrder.field] = sortOrder.direction;
       } else {
-        orderBy = { id: 'asc' };
+        orderBy = { createdAt: 'des' };
       }
 
       const where = {
