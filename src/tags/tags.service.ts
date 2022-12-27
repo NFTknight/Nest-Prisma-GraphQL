@@ -3,10 +3,11 @@ import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateTagInput } from './dto/create-tag.input';
 import { UpdateTagInput } from './dto/update-tag.input';
-import { Tag, Tags } from './models/tag.model';
+import { Tag } from './models/tag.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { PaginatedTags } from './models/paginated-tags.model';
 
 @Injectable()
 export class TagsService {
@@ -27,7 +28,7 @@ export class TagsService {
     vendorId?: string,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Tags> {
+  ): Promise<PaginatedTags> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
@@ -37,7 +38,7 @@ export class TagsService {
       this.prisma.category.count(),
       this.prisma.tag.findMany({ where, skip, take }),
     ]);
-    return { count: res[0], data: res[1] };
+    return { totalCount: res[0], list: res[1] };
   }
 
   async getTagsByProduct(productId: string): Promise<Tag[]> {

@@ -11,10 +11,11 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
-import { Categories, Category } from './models/category.model';
+import { Category } from './models/category.model';
 import { CategoriesService } from './categories.service';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { PaginatedCategories } from './models/paginated-categories.model';
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -28,7 +29,7 @@ export class CategoriesResolver {
     return this.categoriesService.getCategory(id);
   }
 
-  @Query(() => Categories)
+  @Query(() => PaginatedCategories)
   getCategories(
     @Args('vendorId') vendorId: string,
     @Args('active', { nullable: true }) active: boolean | null,

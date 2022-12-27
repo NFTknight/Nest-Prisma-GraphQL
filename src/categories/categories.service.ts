@@ -3,11 +3,12 @@ import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
-import { Categories, Category } from './models/category.model';
+import { Category } from './models/category.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { Product } from '@prisma/client';
+import { PaginatedCategories } from './models/paginated-categories.model';
 
 @Injectable()
 export class CategoriesService {
@@ -30,7 +31,7 @@ export class CategoriesService {
     active: boolean | null,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Categories> {
+  ): Promise<PaginatedCategories> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
@@ -57,7 +58,7 @@ export class CategoriesService {
         orderBy,
       }),
     ]);
-    return { count: res[0], data: res[1] };
+    return { totalCount: res[0], list: res[1] };
   }
 
   async createCategory(data: CreateCategoryInput): Promise<Category> {

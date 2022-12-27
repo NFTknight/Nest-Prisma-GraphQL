@@ -10,7 +10,7 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateTagInput } from './dto/create-tag.input';
 import { UpdateTagInput } from './dto/update-tag.input';
-import { Tag, Tags } from './models/tag.model';
+import { Tag } from './models/tag.model';
 import { TagsService } from './tags.service';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -18,6 +18,7 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
+import { PaginatedTags } from './models/paginated-tags.model';
 
 @Resolver(() => Tag)
 export class TagsResolver {
@@ -32,7 +33,7 @@ export class TagsResolver {
     return this.tagsService.getTag(id);
   }
 
-  @Query(() => Tags)
+  @Query(() => PaginatedTags)
   async getTags(
     @Args('vendorId', { nullable: true }) vendorId?: string,
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,

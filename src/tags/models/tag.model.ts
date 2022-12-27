@@ -17,12 +17,3 @@ export class Tag extends BaseModel {
   @Field(() => [WorkDay])
   workdays: WorkDay[];
 }
-
-@ObjectType()
-export class Tags {
-  @Field(() => [Tag], { nullable: false })
-  data: Tag[];
-
-  @Field(() => Int, { nullable: false })
-  count: number;
-}
