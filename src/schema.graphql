@@ -149,11 +149,6 @@ input CartUpdateInput {
   paymentMethod: PaymentMethods
 }
 
-type Categories {
-  count: Int!
-  data: [Category!]!
-}
-
 type Category {
   active: Boolean!
 
@@ -491,8 +486,9 @@ enum OrderStatus {
 }
 
 input OrdersFilterInput {
-  field: String!
-  title: String
+  PaymentMethods: PaymentMethods
+  deliveryMethod: DeliveryMethods
+  status: OrderStatus
 }
 
 type OtpResponse {
@@ -509,8 +505,18 @@ enum OtpStatusCode {
   INCORRECT
 }
 
+type PaginatedCategories {
+  list: [Category!]
+  totalCount: Int!
+}
+
 type PaginatedProducts {
   list: [Product!]
+  totalCount: Int!
+}
+
+type PaginatedTags {
+  list: [Tag!]
   totalCount: Int!
 }
 
@@ -600,7 +606,7 @@ enum ProductType {
 type Query {
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
-  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): Categories!
+  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
@@ -613,7 +619,7 @@ type Query {
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [String!]!
-  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): Tags!
+  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
@@ -674,11 +680,6 @@ type Tag {
   vendor: Vendor!
   vendorId: String!
   workdays: [WorkDay!]!
-}
-
-type Tags {
-  count: Int!
-  data: [Tag!]!
 }
 
 type Token {

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
+import { DeliveryMethods, Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
@@ -56,13 +56,11 @@ export class OrdersService {
         orderBy = { id: 'asc' };
       }
 
-      const where = {
+      const where: Prisma.OrderWhereInput = {
         vendorId,
+        ...filter,
       };
 
-      if (filter && filter?.field) {
-        where[filter.field] = filter.title.trim();
-      }
       return await this.prisma.order.findMany({ where, skip, take, orderBy });
     } catch (err) {
       console.log('Err => ', err);
