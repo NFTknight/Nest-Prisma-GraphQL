@@ -199,6 +199,7 @@ type VariantOption {
   default  Boolean?
   sku      String
   price    Float
+  quantity Float? @default(1)
   image    String?
   title    String
   title_ar String

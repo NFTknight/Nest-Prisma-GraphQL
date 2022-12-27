@@ -8,6 +8,7 @@ import { WayBill } from 'src/shipping/models/waybill.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { CustomerInfo } from './customer-info.model';
 import { Order as PrismaOrder } from '@prisma/client';
+import './order.enum';
 
 @ObjectType()
 export class FormResponse {

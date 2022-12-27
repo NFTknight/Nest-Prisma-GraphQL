@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Endpoint, S3 } from 'aws-sdk';
+import { Endpoint, S3, CredentialProviderChain } from 'aws-sdk';
+import * as AWS from 'aws-sdk';
 import { StorageConfig } from 'src/common/configs/config.interface';
 
 @Injectable()
@@ -8,11 +9,18 @@ export class StorageService {
   private readonly config: StorageConfig;
   private readonly s3: S3;
   constructor(private readonly configService: ConfigService) {
+    CredentialProviderChain.defaultProviders = [];
     this.config = this.configService.get('storage');
-    this.s3 = new S3({
-      endpoint: new Endpoint(this.config.enpoint),
+    AWS.config.update({
       accessKeyId: this.config.accessKey,
       secretAccessKey: this.config.secretKey,
+    });
+    this.s3 = new S3({
+      endpoint: new Endpoint(this.config.enpoint),
+      credentials: {
+        accessKeyId: this.config.accessKey,
+        secretAccessKey: this.config.secretKey,
+      },
     });
   }
 

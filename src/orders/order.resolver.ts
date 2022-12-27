@@ -10,7 +10,6 @@ import { Cart } from 'src/cart/models/cart.model';
 import { CartService } from 'src/cart/cart.service';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateOrderInput } from './dto/create-order.input';
 import { UpdateOrderInput } from './dto/update-order.input';
 import { Order } from './models/order.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
@@ -40,11 +39,6 @@ export class OrdersResolver {
     @Args('filter', { nullable: true }) filter?: OrdersFilterInput
   ): Promise<PaginatedOrders> {
     return await this.ordersService.getOrders(vendorId, pg, sortOrder, filter);
-  }
-
-  @Mutation(() => Order)
-  createOrder(@Args('data') data: CreateOrderInput) {
-    return this.ordersService.createOrder(data);
   }
 
   @Mutation(() => Order)

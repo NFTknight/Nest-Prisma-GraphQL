@@ -15,8 +15,9 @@ import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
 import { Booking } from './models/booking.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
-import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginatedBookings } from './models/paginated-bookings.model';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 
 @Resolver(() => Booking)
 export class BookingResolver {
@@ -31,6 +32,7 @@ export class BookingResolver {
     return this.bookingService.getBooking(id);
   }
 
+  @UseGuards(GqlAuthGuard)
   @Query(() => PaginatedBookings)
   async getBookings(
     @Args('vendorId') vendorId: string,
@@ -53,11 +55,13 @@ export class BookingResolver {
     return res;
   }
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Booking)
   createBooking(@Args('data') data: CreateBookingInput): Promise<Booking> {
     return this.bookingService.createBooking(data);
   }
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Booking)
   updateBooking(
     @Args('id') id: string,
@@ -66,6 +70,7 @@ export class BookingResolver {
     return this.bookingService.updateBooking(id, data);
   }
 
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Booking)
   deleteBooking(@Args('id') id: string): Promise<Booking> {
     return this.bookingService.deleteBooking(id);

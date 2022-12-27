@@ -214,7 +214,7 @@ type Coupon {
 }
 
 input CreateBookingInput {
-  cartId: String!
+  customerInfo: CustomerInput!
   productId: String!
   slots: [BookingSlotInput!]!
   status: BookingStatus!
@@ -241,13 +241,6 @@ input CreateCouponInput {
 input CreateFormInput {
   content: String!
   vendorId: String!
-}
-
-input CreateOrderInput {
-  cartId: String!
-  deliveryMethod: DeliveryMethods
-  paymentMethod: PaymentMethods
-  status: OrderStatus!
 }
 
 input CreateProductInput {
@@ -377,7 +370,6 @@ type Mutation {
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
   createForm(data: CreateFormInput!): Form!
-  createOrder(data: CreateOrderInput!): Order!
   createProduct(data: CreateProductInput!): Product!
   createTag(data: CreateTagInput!): Tag!
   createUser(data: SignupInput!): Auth!
@@ -475,7 +467,7 @@ type OrderPayment {
   wayBill: WayBill
 }
 
-"""Order Status"""
+"""Order status"""
 enum OrderStatus {
   COMPLETED
   CONFIRMED
@@ -703,7 +695,7 @@ type Token {
 }
 
 input UpdateBookingInput {
-  cartId: String
+  customerInfo: CustomerInput
   orderId: String!
   productId: String
   slots: [BookingSlotInput!]
@@ -835,6 +827,7 @@ type Variant {
   default: Boolean
   image: String!
   price: Int!
+  quantity: Int!
   sku: String!
   title: String!
   title_ar: String!
