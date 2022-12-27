@@ -8,10 +8,13 @@ import type {
   NestConfig,
 } from 'src/common/configs/config.interface';
 import { BadRequestException } from '@nestjs/common/exceptions';
+import { json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('bootstrap');
+
+  app.use(json({ limit: '8mb' }));
 
   // Validation
   app.useGlobalPipes(

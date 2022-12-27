@@ -158,8 +158,3 @@ export class ProductsService {
     return false;
   }
 }
-
-// Promise.all(arr.map(async (elem): Promise<number> => {
-//   await asyncFunction();
-//   return elem + 10;
-// }));
