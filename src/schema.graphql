@@ -534,7 +534,7 @@ type Product {
   badge: BadgeType
   bookedSeats: Int
   category: Category
-  categoryId: String!
+  categoryId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
