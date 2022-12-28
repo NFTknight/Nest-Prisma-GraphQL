@@ -22,8 +22,9 @@ export class Order extends BaseModel implements PrismaOrder {
   @IsString()
   orderId: string;
 
-  @IsString()
+  @Field(() => String, { nullable: true })
   cartId: string;
+
   @Field(() => Cart, { nullable: true })
   cart: Cart;
 
