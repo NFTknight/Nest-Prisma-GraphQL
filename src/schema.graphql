@@ -80,6 +80,7 @@ type Cart {
   createdAt: DateTime!
   customerId: String!
   customerInfo: CustomerInfo
+  deliveryArea: String
   deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
@@ -144,6 +145,7 @@ input CartItemInput {
 input CartUpdateInput {
   appliedCoupon: String
   customerInfo: CustomerInput
+  deliveryArea: String
   deliveryMethod: DeliveryMethods
   items: [CartItemInput!]
   paymentMethod: PaymentMethods

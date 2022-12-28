@@ -285,6 +285,8 @@ model Cart {
   updatedAt DateTime @updatedAt
   Order     Order[]
 
+  deliveryArea String?
+
   @@unique([customerId, vendorId])
 }
 
