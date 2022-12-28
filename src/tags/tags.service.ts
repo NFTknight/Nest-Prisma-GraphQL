@@ -7,6 +7,7 @@ import { Tag } from './models/tag.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { PaginatedTags } from './models/paginated-tags.model';
 
 @Injectable()
 export class TagsService {
@@ -23,17 +24,21 @@ export class TagsService {
     return tag;
   }
 
-  getTags(
+  async getTags(
     vendorId?: string,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Tag[]> {
+  ): Promise<PaginatedTags> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
       vendorId,
     };
-    return this.prisma.tag.findMany({ where, skip, take });
+    const res = await this.prisma.$transaction([
+      this.prisma.tag.count({ where }),
+      this.prisma.tag.findMany({ where, skip, take }),
+    ]);
+    return { totalCount: res[0], list: res[1] };
   }
 
   async getTagsByProduct(productId: string): Promise<Tag[]> {

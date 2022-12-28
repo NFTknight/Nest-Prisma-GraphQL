@@ -52,4 +52,7 @@ export class Cart extends BaseModel implements PrismaCart {
 
   @Field(() => CartAddress, { nullable: true })
   shipperAddress: Address;
+
+  @Field(() => String, { nullable: true })
+  deliveryArea: string;
 }

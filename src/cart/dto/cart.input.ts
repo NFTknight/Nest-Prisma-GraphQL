@@ -106,4 +106,7 @@ export class CartUpdateInput {
 
   @Field(() => CartAddressInput, { nullable: true })
   shippingAddress: CartAddressInput;
+
+  @Field(() => String, { nullable: true })
+  deliveryArea?: string;
 }
