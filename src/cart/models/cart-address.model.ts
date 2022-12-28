@@ -3,19 +3,19 @@ import { Field, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class CartAddress {
   @Field()
-  ContactName: string;
+  contactName: string;
 
   @Field()
-  ContactPhoneNumber: string;
+  contactPhoneNumber: string;
 
   @Field()
-  Country: string;
+  country: string;
 
   @Field()
-  City: string;
+  city: string;
 
   @Field()
-  AddressLine1: string;
+  addressLine1: string;
 
   @Field(() => String, { nullable: true })
   addressUrl: string;

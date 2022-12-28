@@ -66,19 +66,19 @@ export class CustomerInput {
 @InputType()
 export class CartAddressInput {
   @Field()
-  ContactName: string;
+  contactName: string;
 
   @Field()
-  ContactPhoneNumber: string;
+  contactPhoneNumber: string;
 
   @Field()
-  Country: string;
+  country: string;
 
   @Field()
-  City: string;
+  city: string;
 
   @Field()
-  AddressLine1: string;
+  addressLine1: string;
 
   @Field(() => String, { nullable: true })
   addressUrl: string;
@@ -102,8 +102,8 @@ export class CartUpdateInput {
   deliveryMethod?: DeliveryMethods;
 
   @Field(() => CartAddressInput, { nullable: true })
-  ConsigneeAddress: CartAddressInput;
+  consigneeAddress: CartAddressInput;
 
   @Field(() => CartAddressInput, { nullable: true })
-  ShippingAddress: CartAddressInput;
+  shippingAddress: CartAddressInput;
 }

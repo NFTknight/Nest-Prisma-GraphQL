@@ -74,9 +74,8 @@ input BookingTimeInput {
 }
 
 type Cart {
-  ConsigneeAddress: CartAddress
-  ShipperAddress: CartAddress
   appliedCoupon: String
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -87,6 +86,7 @@ type Cart {
   id: ID!
   items: [CartItem!]!
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -95,21 +95,21 @@ type Cart {
 }
 
 type CartAddress {
-  AddressLine1: String!
-  City: String!
-  ContactName: String!
-  ContactPhoneNumber: String!
-  Country: String!
+  addressLine1: String!
   addressUrl: String
+  city: String!
+  contactName: String!
+  contactPhoneNumber: String!
+  country: String!
 }
 
 input CartAddressInput {
-  AddressLine1: String!
-  City: String!
-  ContactName: String!
-  ContactPhoneNumber: String!
-  Country: String!
+  addressLine1: String!
   addressUrl: String
+  city: String!
+  contactName: String!
+  contactPhoneNumber: String!
+  country: String!
 }
 
 type CartItem {
@@ -162,13 +162,13 @@ input CartItemInput {
 }
 
 input CartUpdateInput {
-  ConsigneeAddress: CartAddressInput
-  ShippingAddress: CartAddressInput
   appliedCoupon: String
+  consigneeAddress: CartAddressInput
   customerInfo: CustomerInput
   deliveryMethod: DeliveryMethods
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
+  shippingAddress: CartAddressInput
 }
 
 type Category {

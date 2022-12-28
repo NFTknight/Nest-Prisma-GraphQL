@@ -11,11 +11,11 @@ import {
 import { CartAddress } from './cart-address.model';
 
 type Address = {
-  ContactName: string;
-  ContactPhoneNumber: string;
-  Country: string;
-  City: string;
-  AddressLine1: string;
+  contactName: string;
+  contactPhoneNumber: string;
+  country: string;
+  city: string;
+  addressLine1: string;
   addressUrl: string;
 };
 @ObjectType()
@@ -48,8 +48,8 @@ export class Cart extends BaseModel implements PrismaCart {
   deliveryMethod: DeliveryMethods;
 
   @Field(() => CartAddress, { nullable: true })
-  ConsigneeAddress: Address;
+  consigneeAddress: Address;
 
   @Field(() => CartAddress, { nullable: true })
-  ShipperAddress: Address;
+  shipperAddress: Address;
 }

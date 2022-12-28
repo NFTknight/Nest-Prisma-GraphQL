@@ -265,11 +265,11 @@ type CartItem {
 }
 
 type CartAddress {
-  ContactName String
-  ContactPhoneNumber String
-  Country String
-  City String
-  AddressLine1 String
+  contactName String
+  contactPhoneNumber String
+  country String
+  city String
+  addressLine1 String
   addressUrl String
 }
 model Cart {
@@ -292,8 +292,8 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Order     Order[]
-  ConsigneeAddress CartAddress?
-  ShipperAddress CartAddress?
+  consigneeAddress CartAddress?
+  shipperAddress CartAddress?
 
   @@unique([customerId, vendorId])
 }
