@@ -23,4 +23,7 @@ export class Variant implements VariantOption {
 
   @Field()
   image: string;
+
+  @Field()
+  images: string[];
 }

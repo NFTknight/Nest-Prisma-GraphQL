@@ -17,10 +17,13 @@ import { OrdersService } from './orders.service';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { OrdersFilterInput } from 'src/common/filter/filter.input';
 import { PaginatedOrders } from './models/paginated-orders.model';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { PrismaService } from 'nestjs-prisma';
 
 @Resolver(() => Order)
 export class OrdersResolver {
   constructor(
+    private readonly prismaService: PrismaService,
     private readonly ordersService: OrdersService,
     private readonly vendorService: VendorsService,
     private readonly cartService: CartService
@@ -39,6 +42,32 @@ export class OrdersResolver {
     @Args('filter', { nullable: true }) filter?: OrdersFilterInput
   ): Promise<PaginatedOrders> {
     return await this.ordersService.getOrders(vendorId, pg, sortOrder, filter);
+  }
+
+  @Query(() => PaginatedOrders)
+  async getAllOrders(
+    @Args('pagination', { nullable: true }) pg?: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder?: SortOrder
+  ): Promise<PaginatedOrders> {
+    const { skip, take } = getPaginationArgs(pg);
+    let orderBy = {};
+    if (sortOrder) {
+      orderBy[sortOrder.field] = sortOrder.direction;
+    } else {
+      orderBy = { createdAt: 'desc' };
+    }
+
+    const list = await this.prismaService.order.findMany({
+      skip,
+      take,
+      orderBy,
+    });
+    const totalCount = await this.prismaService.order.count();
+
+    return {
+      list: list,
+      totalCount: totalCount,
+    };
   }
 
   @Mutation(() => Order)
