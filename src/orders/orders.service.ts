@@ -30,7 +30,8 @@ export class OrdersService {
     private readonly emailService: SendgridService,
     private readonly prisma: PrismaService,
     private readonly shippingService: ShippingService,
-    private readonly vendorService: VendorsService
+    private readonly vendorService: VendorsService,
+    private readonly productsService: ProductsService
   ) {}
 
   async getOrder(id: string): Promise<Order> {
@@ -129,9 +130,9 @@ export class OrdersService {
       );
     }
 
-    if (data.cartId && order.status === OrderStatus.PENDING) {
+    if (order.cartId && order.status === OrderStatus.PENDING) {
       // if the order does not exist, this function will throw an error.
-      cartItem = await this.cartService.getCartAndDelete(data.cartId);
+      cartItem = await this.cartService.getCartAndDelete(order.cartId);
     }
     const cartObject = {
       finalPrice: cartItem?.finalPrice || 0,
@@ -185,7 +186,11 @@ export class OrdersService {
       }
     }
 
-    return res;
+    await this.productsService.updateProductVariantQuantities(
+      cartItem?.items || []
+    );
+
+    return { ...res, ...updatingOrderObject, updatedAt: new Date() };
   }
 
   async deleteOrder(id: string): Promise<Order> {
