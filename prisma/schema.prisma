@@ -201,6 +201,7 @@ type VariantOption {
   price    Float
   quantity Float? @default(1)
   image    String?
+  images    String[]
   title    String
   title_ar String
 }
@@ -208,6 +209,13 @@ type VariantOption {
 type TimeSlot {
   startTime DateTime
   endTime   DateTime
+}
+
+type Location {
+  url      String
+  address  String
+  lat      Float
+  lng      Float
 }
 
 model Product {
@@ -218,6 +226,7 @@ model Product {
   description    String
   description_ar String
   image          String
+  images         String[]
   type           ProductType
 
   vendorId String @db.ObjectId
@@ -242,7 +251,7 @@ model Product {
   attendanceType   AttendanceType?
   badge            BadgeType?
   meetingLink      String?
-  location         String?
+  location         Location?
   endTime          Boolean?        @default(false)
   customerLocation Boolean?        @default(false)
   duration         Int?

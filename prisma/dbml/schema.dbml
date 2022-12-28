@@ -89,6 +89,7 @@ Table Product {
   description String [not null]
   description_ar String [not null]
   image String [not null]
+  images String[] [not null]
   type ProductType [not null]
   vendorId String [not null]
   vendor Vendor [not null]
@@ -108,7 +109,7 @@ Table Product {
   attendanceType AttendanceType
   badge BadgeType
   meetingLink String
-  location String
+  location Location
   endTime Boolean [default: false]
   customerLocation Boolean [default: false]
   duration Int
