@@ -5,9 +5,18 @@ import { ProductsService } from 'src/products/services/products.service';
 import { OrdersService } from 'src/orders/orders.service';
 import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
-import { BookingStatus, Booking } from '@prisma/client';
+import {
+  BookingStatus,
+  Booking,
+  OrderStatus,
+  PaymentMethods,
+} from '@prisma/client';
 import { TagsService } from 'src/tags/tags.service';
 import { VendorsService } from 'src/vendors/vendors.service';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { PaginatedBookings } from './models/paginated-bookings.model';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class BookingsService {
@@ -28,30 +37,66 @@ export class BookingsService {
 
     return booking;
   }
-  async getBookings(where: any): Promise<Booking[]> {
-    const booking = await this.prisma.booking.findMany({ where });
+  async getBookings(
+    where: any,
+    pg?: PaginationArgs
+  ): Promise<PaginatedBookings> {
+    const { skip, take } = getPaginationArgs(pg);
+    const res = await this.prisma.$transaction([
+      this.prisma.booking.count({ where }),
+      this.prisma.booking.findMany({ where, skip, take }),
+    ]);
 
-    if (!booking) throw new NotFoundException('Bookings Not Found.');
+    if (!res[1]) throw new NotFoundException('Bookings Not Found.');
 
-    return booking;
+    return { totalCount: res[0], list: res[1] };
   }
 
   async createBooking(data: CreateBookingInput): Promise<Booking> {
-    const { vendorId, cartId, productId, tagId, ...rest } = data;
+    const { vendorId, customerInfo, productId, tagId, slots, status } = data;
     // if the cart/product or order does not exist, this function will throw an error.
-    await this.cartService.getCart(cartId);
-    await this.productService.getProduct(productId);
+    const product = await this.productService.getProduct(productId);
     await this.vendorService.getVendor(vendorId);
     await this.tagService.getTag(tagId);
     // if all of these exist we can successfully create the booking.
 
+    const vendorPrefix = await this.vendorService.getVendorOrderPrefix(
+      vendorId
+    );
+    const orderId = `${vendorPrefix}-${nanoid(8)}`.toUpperCase();
+
+    const productVariant = product.variants[0];
+
+    const order = await this.prisma.order.create({
+      data: {
+        orderId,
+        items: [
+          {
+            tagId,
+            quantity: slots.length,
+            price: productVariant.price,
+            productId,
+            slots,
+            sku: productVariant.sku,
+          },
+        ],
+        totalPrice: productVariant.price * slots.length,
+        finalPrice: productVariant.price * slots.length,
+        customerInfo,
+        customerId: customerInfo.email,
+        status: OrderStatus.CONFIRMED,
+        paymentMethod: PaymentMethods.STORE,
+      },
+    });
+
     return this.prisma.booking.create({
       data: {
-        ...rest,
+        order: { connect: { id: order.id } },
         vendor: { connect: { id: vendorId } },
-        cart: { connect: { id: cartId } },
         tag: { connect: { id: tagId } },
         product: { connect: { id: productId } },
+        slots,
+        status,
       },
     });
   }

@@ -1,5 +1,5 @@
 import { registerEnumType } from '@nestjs/graphql';
-import { BookingStatus } from 'prisma/prisma-client';
+import { BookingStatus } from '@prisma/client';
 
 registerEnumType(BookingStatus, {
   name: 'BookingStatus',
