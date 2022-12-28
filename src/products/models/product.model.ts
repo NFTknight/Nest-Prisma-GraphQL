@@ -37,6 +37,7 @@ export class Product extends BaseModel implements PrismaProduct {
   @Field(() => Vendor, { nullable: false })
   vendor?: Vendor;
 
+  @Field(() => String, { nullable: true })
   categoryId: string;
 
   @Field(() => Category, { nullable: true })

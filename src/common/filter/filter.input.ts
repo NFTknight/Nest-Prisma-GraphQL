@@ -1,8 +1,15 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { AttendanceType, ProductType } from '@prisma/client';
+import {
+  AttendanceType,
+  Prisma,
+  ProductType,
+  OrderStatus,
+  DeliveryMethods,
+  PaymentMethods,
+} from '@prisma/client';
 
 @InputType()
-export class ProductFilterInput {
+export class ProductFilterInput implements Prisma.ProductWhereInput {
   @Field(() => ProductType)
   type?: ProductType;
 
@@ -11,7 +18,11 @@ export class ProductFilterInput {
 }
 
 @InputType()
-export class OrdersFilterInput {
-  field: string;
-  title?: string;
+export class OrdersFilterInput implements Prisma.OrderWhereInput {
+  @Field(() => OrderStatus)
+  status?: OrderStatus;
+  @Field(() => DeliveryMethods)
+  deliveryMethod?: DeliveryMethods;
+  @Field(() => PaymentMethods)
+  PaymentMethods?: PaymentMethods;
 }

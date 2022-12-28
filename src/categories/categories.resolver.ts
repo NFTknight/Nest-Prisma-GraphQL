@@ -15,6 +15,7 @@ import { Category } from './models/category.model';
 import { CategoriesService } from './categories.service';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { PaginatedCategories } from './models/paginated-categories.model';
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -28,7 +29,7 @@ export class CategoriesResolver {
     return this.categoriesService.getCategory(id);
   }
 
-  @Query(() => [Category])
+  @Query(() => PaginatedCategories)
   getCategories(
     @Args('vendorId') vendorId: string,
     @Args('active', { nullable: true }) active: boolean | null,

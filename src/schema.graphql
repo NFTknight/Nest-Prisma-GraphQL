@@ -480,8 +480,9 @@ enum OrderStatus {
 }
 
 input OrdersFilterInput {
-  field: String!
-  title: String
+  PaymentMethods: PaymentMethods
+  deliveryMethod: DeliveryMethods
+  status: OrderStatus
 }
 
 type OtpResponse {
@@ -498,8 +499,33 @@ enum OtpStatusCode {
   INCORRECT
 }
 
+type PaginatedBookings {
+  list: [Booking!]
+  totalCount: Int!
+}
+
+type PaginatedCategories {
+  list: [Category!]
+  totalCount: Int!
+}
+
+type PaginatedCoupons {
+  list: [Coupon!]
+  totalCount: Int!
+}
+
+type PaginatedOrders {
+  list: [Order!]
+  totalCount: Int!
+}
+
 type PaginatedProducts {
   list: [Product!]
+  totalCount: Int!
+}
+
+type PaginatedTags {
+  list: [Tag!]
   totalCount: Int!
 }
 
@@ -536,7 +562,7 @@ type Product {
   badge: BadgeType
   bookedSeats: Int
   category: Category
-  categoryId: String!
+  categoryId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -585,21 +611,21 @@ enum ProductType {
 
 type Query {
   getBooking(id: String!): Booking!
-  getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
-  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): [Category!]!
+  getBookings(pagination: PaginationArgs, productId: String, tagId: String, vendorId: String!): PaginatedBookings!
+  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
-  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
+  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedCoupons!
   getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
-  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
+  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
   getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [String!]!
-  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
+  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!

@@ -15,9 +15,8 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 
 @ObjectType()
 export class CartItem implements PrismaCartItem {
-  // this is something important
-
   slug?: string;
+
   title?: string;
   title_ar?: string;
 

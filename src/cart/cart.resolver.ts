@@ -5,10 +5,14 @@ import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 import { OrderPayment } from 'src/orders/models/order-payment.model';
 import { DeliveryMethods } from '@prisma/client';
 import { BadRequestException } from '@nestjs/common';
+import { ProductsService } from 'src/products/services/products.service';
 
 @Resolver(Cart)
 export class CartResolver {
-  constructor(private readonly cartService: CartService) {}
+  constructor(
+    private readonly cartService: CartService,
+    private readonly productService: ProductsService
+  ) {}
 
   @Query(() => Cart)
   async getCustomerCart(
@@ -23,6 +27,14 @@ export class CartResolver {
     if (!cart) {
       cart = await this.cartService.createNewCart(vendorId, customerId);
     }
+
+    const updatedCartItem: any = await Promise.all(
+      cart.items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        return { ...product, ...item };
+      })
+    );
+    cart.items = updatedCartItem;
 
     return cart;
   }

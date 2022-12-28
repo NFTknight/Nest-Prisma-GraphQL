@@ -43,60 +43,20 @@ export class ProductsResolver {
   }
 
   @Query(() => PaginatedProducts)
-  async getProducts(
+  getProducts(
     @Args('vendorId') vendorId: string,
     @Args('categoryId', { nullable: true }) categoryId: string,
     @Args('pagination', { nullable: true }) pg: PaginationArgs,
     @Args('sortOrder', { nullable: true }) sortOrder: SortOrder,
     @Args('filter', { nullable: true }) filter: ProductFilterInput
   ): Promise<PaginatedProducts> {
-    const { skip, take } = getPaginationArgs(pg);
-
-    let orderBy = {};
-    if (sortOrder) {
-      orderBy[sortOrder.field] = sortOrder.direction;
-    } else {
-      orderBy = {
-        sortOrder: 'asc',
-      };
-    }
-
-    const where: Prisma.ProductWhereInput = {
-      ...filter,
+    return this.productService.getProducts(
       vendorId,
-    };
-
-    if (categoryId) {
-      where['categoryId'] = categoryId;
-    }
-
-    const products = await this.prismaService.product.findMany({
-      where,
-      skip,
-      take,
-      orderBy,
-    });
-
-    const list = products.map((product) => {
-      if (product.meetingLink) {
-        if (product.badge)
-          product.badge = { ...product.badge, label: AttendanceType.ONLINE };
-        else product.badge = { label: AttendanceType.ONLINE };
-      } else if (product.location) {
-        if (product.badge)
-          product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
-        else product.badge = { label: AttendanceType.PHYSICAL };
-      }
-
-      return product;
-    });
-
-    const totalCount = await this.prismaService.product.count({ where });
-
-    return {
-      list: list,
-      totalCount: totalCount,
-    };
+      categoryId,
+      pg,
+      sortOrder,
+      filter
+    );
   }
 
   @UseGuards(GqlAuthGuard)
