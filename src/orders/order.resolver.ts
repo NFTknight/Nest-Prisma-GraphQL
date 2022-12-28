@@ -54,7 +54,7 @@ export class OrdersResolver {
     if (sortOrder) {
       orderBy[sortOrder.field] = sortOrder.direction;
     } else {
-      orderBy = { createdAt: 'des' };
+      orderBy = { createdAt: 'desc' };
     }
 
     const list = await this.prismaService.order.findMany({
@@ -68,11 +68,6 @@ export class OrdersResolver {
       list: list,
       totalCount: totalCount,
     };
-  }
-
-  @Mutation(() => Order)
-  createOrder(@Args('data') data: CreateOrderInput) {
-    return this.ordersService.createOrder(data);
   }
 
   @Mutation(() => Order)
