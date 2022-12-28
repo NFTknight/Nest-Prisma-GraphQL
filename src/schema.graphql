@@ -74,6 +74,8 @@ input BookingTimeInput {
 }
 
 type Cart {
+  ConsigneeAddress: CartAddress
+  ShipperAddress: CartAddress
   appliedCoupon: String
 
   """Identifies the date and time when the object was created."""
@@ -90,6 +92,24 @@ type Cart {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   vendorId: String!
+}
+
+type CartAddress {
+  AddressLine1: String!
+  City: String!
+  ContactName: String!
+  ContactPhoneNumber: String!
+  Country: String!
+  addressUrl: String
+}
+
+input CartAddressInput {
+  AddressLine1: String!
+  City: String!
+  ContactName: String!
+  ContactPhoneNumber: String!
+  Country: String!
+  addressUrl: String
 }
 
 type CartItem {
@@ -142,6 +162,8 @@ input CartItemInput {
 }
 
 input CartUpdateInput {
+  ConsigneeAddress: CartAddressInput
+  ShippingAddress: CartAddressInput
   appliedCoupon: String
   customerInfo: CustomerInput
   deliveryMethod: DeliveryMethods

@@ -264,6 +264,14 @@ type CartItem {
   slots     BookingTime[]
 }
 
+type CartAddress {
+  ContactName String
+  ContactPhoneNumber String
+  Country String
+  City String
+  AddressLine1 String
+  addressUrl String
+}
 model Cart {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
   items         CartItem[]
@@ -284,6 +292,8 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Order     Order[]
+  ConsigneeAddress CartAddress?
+  ShipperAddress CartAddress?
 
   @@unique([customerId, vendorId])
 }

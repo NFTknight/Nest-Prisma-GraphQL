@@ -8,7 +8,16 @@ import {
   PaymentMethods,
   CustomerInfo as CustomerInfoModel,
 } from '@prisma/client';
+import { CartAddress } from './cart-address.model';
 
+type Address = {
+  ContactName: string;
+  ContactPhoneNumber: string;
+  Country: string;
+  City: string;
+  AddressLine1: string;
+  addressUrl: string;
+};
 @ObjectType()
 export class Cart extends BaseModel implements PrismaCart {
   @Field(() => [CartItem])
@@ -37,4 +46,10 @@ export class Cart extends BaseModel implements PrismaCart {
 
   @Field(() => DeliveryMethods, { nullable: true })
   deliveryMethod: DeliveryMethods;
+
+  @Field(() => CartAddress, { nullable: true })
+  ConsigneeAddress: Address;
+
+  @Field(() => CartAddress, { nullable: true })
+  ShipperAddress: Address;
 }
