@@ -180,8 +180,9 @@ export class CartService {
     // TODO - add payment gateway
 
     const cart = await this.getCart(cartId);
+    const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
-    if (cart.paymentMethod === PaymentMethods.ONLINE && !paymentSession) {
+    if (isOnlinePayment && !paymentSession) {
       throw new BadRequestException('Payment session is required');
     }
 
@@ -214,7 +215,7 @@ export class CartService {
           }),
           finalPrice: cart.totalPrice,
           totalPrice: cart.totalPrice,
-          status: OrderStatus.CREATED,
+          status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],
           vendor: {
             connect: {
               id: vendorId,
@@ -232,7 +233,7 @@ export class CartService {
     let payment = undefined;
     let errors = undefined;
 
-    if (cart.paymentMethod === PaymentMethods.ONLINE) {
+    if (isOnlinePayment) {
       try {
         payment = await this.paymentService.executePayment(
           order.id,
