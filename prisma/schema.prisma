@@ -341,6 +341,9 @@ model Order {
 
   invoiceId String?
 
+  consigneeAddress CartAddress?
+  shipperAddress CartAddress?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

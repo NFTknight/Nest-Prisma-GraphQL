@@ -431,6 +431,7 @@ type Order {
   appliedCoupon: String
   cart: Cart
   cartId: String!
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -443,6 +444,7 @@ type Order {
   items: [CartItem!]!
   orderId: String!
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   status: OrderStatus!
   totalPrice: Float!
 
@@ -465,6 +467,7 @@ type OrderPayment {
   appliedCoupon: String
   cart: Cart
   cartId: String!
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -479,6 +482,7 @@ type OrderPayment {
   orderId: String!
   payment: ExecutePayment
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   status: OrderStatus!
   totalPrice: Float!
 

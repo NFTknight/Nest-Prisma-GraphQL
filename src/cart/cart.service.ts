@@ -160,6 +160,13 @@ export class CartService {
     const cart = await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
+    if (!cart) throw new BadRequestException('Cart doesnt exists');
+
+    if (!cart?.consigneeAddress)
+      throw new BadRequestException(
+        'Consignee Address doenst exist for the cart'
+      );
+
     // cart deletion
     await this.prisma.cart.delete({
       where: { id: cartId },

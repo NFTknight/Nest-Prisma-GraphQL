@@ -10,7 +10,7 @@ import {
 } from '@prisma/client';
 import { CartAddress } from './cart-address.model';
 
-type Address = {
+export type Address = {
   contactName: string;
   contactPhoneNumber: string;
   country: string;
