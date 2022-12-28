@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
+import { DeliveryMethods, Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
@@ -20,6 +20,7 @@ import {
 } from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
 import { Cart } from 'src/cart/models/cart.model';
+import { PaginatedOrders } from './models/paginated-orders.model';
 import { ProductsService } from 'src/products/services/products.service';
 
 @Injectable()
@@ -47,7 +48,7 @@ export class OrdersService {
     pg?: PaginationArgs,
     sortOrder?: SortOrder,
     filter?: OrdersFilterInput
-  ) {
+  ): Promise<PaginatedOrders> {
     try {
       const { skip, take } = getPaginationArgs(pg);
 
@@ -58,16 +59,21 @@ export class OrdersService {
         orderBy = { id: 'asc' };
       }
 
-      const where = {
+      const where: Prisma.OrderWhereInput = {
         vendorId,
+        ...filter,
       };
 
-      if (filter && filter?.field) {
-        where[filter.field] = filter.title.trim();
-      }
-      return await this.prisma.order.findMany({ where, skip, take, orderBy });
+      const res = await this.prisma.$transaction([
+        this.prisma.order.count({ where }),
+        this.prisma.order.findMany({ where, skip, take, orderBy }),
+      ]);
+      if (!res) throw new NotFoundException('data not found');
+
+      return { totalCount: res[0], list: res[1] };
     } catch (err) {
       console.log('Err => ', err);
+      throw new Error(err);
     }
   }
 

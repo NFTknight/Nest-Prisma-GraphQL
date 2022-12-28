@@ -18,6 +18,7 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
+import { PaginatedTags } from './models/paginated-tags.model';
 
 @Resolver(() => Tag)
 export class TagsResolver {
@@ -32,7 +33,7 @@ export class TagsResolver {
     return this.tagsService.getTag(id);
   }
 
-  @Query(() => [Tag])
+  @Query(() => PaginatedTags)
   async getTags(
     @Args('vendorId', { nullable: true }) vendorId?: string,
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,
