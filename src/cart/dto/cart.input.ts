@@ -78,4 +78,7 @@ export class CartUpdateInput {
 
   @Field(() => DeliveryMethods, { nullable: true })
   deliveryMethod?: DeliveryMethods;
+
+  @Field(() => String, { nullable: true })
+  deliveryArea?: string;
 }

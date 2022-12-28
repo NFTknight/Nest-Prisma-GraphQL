@@ -37,4 +37,7 @@ export class Cart extends BaseModel implements PrismaCart {
 
   @Field(() => DeliveryMethods, { nullable: true })
   deliveryMethod: DeliveryMethods;
+
+  @Field(() => String, { nullable: true })
+  deliveryArea: string;
 }
