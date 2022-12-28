@@ -408,7 +408,7 @@ type Mutation {
 type Order {
   appliedCoupon: String
   cart: Cart
-  cartId: String!
+  cartId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -442,7 +442,7 @@ enum OrderDirection {
 type OrderPayment {
   appliedCoupon: String
   cart: Cart
-  cartId: String!
+  cartId: String
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
