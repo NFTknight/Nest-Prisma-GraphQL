@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
+import { DeliveryMethods, Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
@@ -20,6 +20,8 @@ import {
 } from './dto/update-order.input';
 import { FormResponse } from './models/order.model';
 import { Cart } from 'src/cart/models/cart.model';
+import { PaginatedOrders } from './models/paginated-orders.model';
+import { ProductsService } from 'src/products/services/products.service';
 
 @Injectable()
 export class OrdersService {
@@ -45,7 +47,7 @@ export class OrdersService {
     pg?: PaginationArgs,
     sortOrder?: SortOrder,
     filter?: OrdersFilterInput
-  ) {
+  ): Promise<PaginatedOrders> {
     try {
       const { skip, take } = getPaginationArgs(pg);
 
@@ -56,70 +58,22 @@ export class OrdersService {
         orderBy = { id: 'asc' };
       }
 
-      const where = {
+      const where: Prisma.OrderWhereInput = {
         vendorId,
+        ...filter,
       };
 
-      if (filter && filter?.field) {
-        where[filter.field] = filter.title.trim();
-      }
-      return await this.prisma.order.findMany({ where, skip, take, orderBy });
+      const res = await this.prisma.$transaction([
+        this.prisma.order.count({ where }),
+        this.prisma.order.findMany({ where, skip, take, orderBy }),
+      ]);
+      if (!res) throw new NotFoundException('data not found');
+
+      return { totalCount: res[0], list: res[1] };
     } catch (err) {
       console.log('Err => ', err);
+      throw new Error(err);
     }
-  }
-
-  async createOrder(data: CreateOrderInput) {
-    // if the vendor does not exist, this function will throw an error.
-    const cart = await this.cartService.getCart(data.cartId);
-    const { vendorId, paymentMethod, deliveryMethod } = cart;
-    const customerAnswers: FormResponse[] = [];
-    cart.items.map((item) => {
-      if (item?.answers)
-        customerAnswers.push({
-          productId: item.productId,
-          answers: item.answers,
-        });
-    });
-    const vendor = await this.vendorService.getVendor(vendorId);
-
-    // get order ID from vendor
-    // TODO - Move this to helper function
-    let orderId = '';
-    const vendorStrArr = vendor.name.split(' ');
-    if (vendorStrArr.length === 1) {
-      orderId = vendor.name.slice(0, 2).toUpperCase();
-    } else if (vendorStrArr.length === 2) {
-      orderId = vendorStrArr[0][0] + vendorStrArr[1][0];
-    } else {
-      orderId = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
-    }
-    orderId =
-      orderId + '-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-
-    const newData: CreateOrderInput = {
-      ...data,
-      paymentMethod,
-      deliveryMethod,
-    };
-
-    // if vendor and cart exists we can successfully create the order.
-    const res = await this.prisma.order.create({
-      data: { ...newData, orderId, vendorId, customerAnswers },
-    } as any);
-
-    // Email notification to vendor and customer when order is created
-    if (res.id) {
-      this.emailService.send(
-        SendEmails(ORDER_OPTIONS.PURCHASED, res?.customerInfo?.email)
-      );
-      if (vendor?.info?.email)
-        this.emailService.send(
-          SendEmails(ORDER_OPTIONS.RECEIVED, vendor?.info?.email)
-        );
-    }
-
-    return res;
   }
 
   async updateOrder(id: string, data: UpdateOrderInput): Promise<Order> {

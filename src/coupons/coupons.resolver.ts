@@ -14,6 +14,7 @@ import { Coupon } from './models/coupon.model';
 import { CouponsService } from './coupons.service';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { PaginatedCoupons } from './models/paginated-coupons.model';
 
 @Resolver(() => Coupon)
 export class CouponsResolver {
@@ -27,12 +28,12 @@ export class CouponsResolver {
     return this.couponsService.getCoupon(id);
   }
 
-  @Query(() => [Coupon])
+  @Query(() => PaginatedCoupons)
   getCoupons(
     @Args('vendorId', { nullable: true }) vendorId?: string,
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,
     @Args('sortOrder', { nullable: true }) sortOrder?: SortOrder
-  ) {
+  ): Promise<PaginatedCoupons> {
     return this.couponsService.getCoupons(vendorId, pg, sortOrder);
   }
 

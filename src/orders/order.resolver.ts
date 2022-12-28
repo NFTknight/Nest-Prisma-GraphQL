@@ -10,7 +10,6 @@ import { Cart } from 'src/cart/models/cart.model';
 import { CartService } from 'src/cart/cart.service';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { CreateOrderInput } from './dto/create-order.input';
 import { UpdateOrderInput } from './dto/update-order.input';
 import { Order } from './models/order.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
@@ -35,26 +34,14 @@ export class OrdersResolver {
     return this.ordersService.getOrder(id);
   }
 
-  @Query(() => [Order])
+  @Query(() => PaginatedOrders)
   async getOrders(
     @Args('vendorId', { nullable: true }) vendorId: string,
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,
     @Args('sortOrder', { nullable: true }) sortOrder?: SortOrder,
     @Args('filter', { nullable: true }) filter?: OrdersFilterInput
-  ) {
-    try {
-      const orders = this.ordersService.getOrders(
-        vendorId,
-        pg,
-        sortOrder,
-        filter
-      );
-
-      return orders;
-    } catch (err) {
-      console.log('something went wrong', err);
-      return [];
-    }
+  ): Promise<PaginatedOrders> {
+    return await this.ordersService.getOrders(vendorId, pg, sortOrder, filter);
   }
 
   @Query(() => PaginatedOrders)

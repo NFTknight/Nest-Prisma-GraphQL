@@ -35,10 +35,10 @@ const config: Config = {
     token: process.env.MYFATOORAH_API_TOKEN as string,
   },
   storage: {
-    enpoint: process.env.DO_ENDPOINT as string,
-    space: process.env.DO_SPACE as string,
-    accessKey: process.env.DO_ACCESS_KEY as string,
-    secretKey: process.env.DO_SECRET_KEY as string,
+    enpoint: process.env.AWS_S3_ENDPOINT as string,
+    space: process.env.AWS_BUCKET as string,
+    accessKey: process.env.AWS_ACCESS_KEY_ID as string,
+    secretKey: process.env.AWS_SECRET_ACCESS_KEY as string,
   },
 };
 

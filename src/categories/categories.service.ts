@@ -8,6 +8,7 @@ import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { Product } from '@prisma/client';
+import { PaginatedCategories } from './models/paginated-categories.model';
 
 @Injectable()
 export class CategoriesService {
@@ -30,7 +31,7 @@ export class CategoriesService {
     active: boolean | null,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Category[]> {
+  ): Promise<PaginatedCategories> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
@@ -48,12 +49,17 @@ export class CategoriesService {
     if (typeof active === 'boolean') {
       where['active'] = active;
     }
-    return this.prisma.category.findMany({
-      where,
-      skip,
-      take,
-      orderBy,
-    });
+    const res = await this.prisma.$transaction([
+      this.prisma.category.count({ where }),
+      this.prisma.category.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+        include: { products: true },
+      }),
+    ]);
+    return { totalCount: res[0], list: res[1] };
   }
 
   async createCategory(data: CreateCategoryInput): Promise<Category> {
