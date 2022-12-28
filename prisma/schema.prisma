@@ -254,14 +254,14 @@ model Product {
   Booking   Booking[]
 }
 
-type CartItem {
+type CartItem{
   productId String        @db.ObjectId
   answers   String?
   sku       String
   price     Float
   quantity  Int           @default(1)
   tagId     String?       @db.ObjectId
-  slots     BookingTime[]
+  slots     BookingTime[]  
 }
 
 model Cart {
