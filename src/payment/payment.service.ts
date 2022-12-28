@@ -54,7 +54,8 @@ export class PaymentService {
       DisplayCurrencyIso: 'KWD',
       CustomerEmail: order.customerInfo.email,
       CustomerReference: order.orderId,
-      CallBackUrl: `http://api.dev.anyaa.io/api/payment/callback`,
+      CallBackUrl: `http://api.dev.anyaa.io/api/payment/callback?orderId=${orderId}`,
+      ErrorUrl: `http://api.dev.anyaa.io/api/payment/error?orderId=${orderId}`, // TODO QASIM: Will be error page for our website
       InvoiceItems: order.items.map((item) => ({
         ItemName: `${item.productId}_${item.sku}`,
         Quantity: item.quantity,
