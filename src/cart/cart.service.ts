@@ -194,32 +194,40 @@ export class CartService {
 
     const orderId = `${vendorPrefix}-${nanoid(8)}`.toUpperCase();
 
-    const res = await this.prisma.order.create({
-      data: {
-        orderId,
-        items: cart.items,
-        customerId: cart.customerId,
-        customerInfo: cart.customerInfo,
-        paymentMethod: cart.paymentMethod,
-        appliedCoupon: cart.appliedCoupon,
-        ...(cart.deliveryMethod && {
-          deliveryMethod: cart.deliveryMethod,
-        }),
-        finalPrice: cart.totalPrice,
-        totalPrice: cart.totalPrice,
-        status: OrderStatus.CREATED,
-        vendor: {
-          connect: {
-            id: vendorId,
-          },
-        },
-        cart: {
-          connect: {
-            id: cartId,
-          },
-        },
+    let order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
       },
     });
+
+    if (!order) {
+      order = await this.prisma.order.create({
+        data: {
+          orderId,
+          items: cart.items,
+          customerId: cart.customerId,
+          customerInfo: cart.customerInfo,
+          paymentMethod: cart.paymentMethod,
+          appliedCoupon: cart.appliedCoupon,
+          ...(cart.deliveryMethod && {
+            deliveryMethod: cart.deliveryMethod,
+          }),
+          finalPrice: cart.totalPrice,
+          totalPrice: cart.totalPrice,
+          status: OrderStatus.CREATED,
+          vendor: {
+            connect: {
+              id: vendorId,
+            },
+          },
+          cart: {
+            connect: {
+              id: cartId,
+            },
+          },
+        },
+      });
+    }
 
     let payment = undefined;
     let errors = undefined;
@@ -227,12 +235,12 @@ export class CartService {
     if (cart.paymentMethod === PaymentMethods.ONLINE) {
       try {
         payment = await this.paymentService.executePayment(
-          res.id,
+          order.id,
           paymentSession
         );
 
         await this.prisma.order.update({
-          where: { id: res.id },
+          where: { id: order.id },
           data: {
             invoiceId: payment.InvoiceId.toString(),
           },
@@ -243,9 +251,9 @@ export class CartService {
     }
 
     // Email notification to vendor and customer when order is created
-    if (res.id) {
+    if (order.id) {
       this.emailService.send(
-        SendEmails(ORDER_OPTIONS.PURCHASED, res?.customerInfo?.email)
+        SendEmails(ORDER_OPTIONS.PURCHASED, order?.customerInfo?.email)
       );
       if (vendor?.info?.email)
         this.emailService.send(
@@ -254,7 +262,7 @@ export class CartService {
     }
 
     return {
-      ...res,
+      ...order,
       payment,
       errors,
     };
