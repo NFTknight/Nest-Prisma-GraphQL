@@ -255,8 +255,9 @@ input CreateProductInput {
   endTime: Boolean
   formId: String
   image: String!
+  images: [String!]!
   itemsInStock: Int
-  location: String
+  location: LocationInput
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
@@ -352,6 +353,20 @@ type Form {
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
 scalar JWT
+
+type Location {
+  address: String!
+  lat: Float!
+  lng: Float!
+  url: String!
+}
+
+input LocationInput {
+  address: String!
+  lat: Float!
+  lng: Float!
+  url: String!
+}
 
 input LoginInput {
   email: String!
@@ -548,8 +563,9 @@ type Product {
   formId: String!
   id: ID!
   image: String!
+  images: [String!]!
   itemsInStock: Int
-  location: String
+  location: Location
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
@@ -717,8 +733,9 @@ input UpdateProductInput {
   endTime: Boolean
   formId: String
   image: String
+  images: [String!]
   itemsInStock: Int
-  location: String
+  location: LocationInput
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
@@ -800,6 +817,7 @@ type User {
 type Variant {
   default: Boolean
   image: String!
+  images: [String!]!
   price: Int!
   quantity: Int!
   sku: String!
@@ -810,6 +828,7 @@ type Variant {
 input VariantInput {
   default: Boolean
   image: String
+  images: [String!]
   price: Int!
   sku: String!
   title: String!

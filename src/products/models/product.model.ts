@@ -1,4 +1,4 @@
-import { Field, ObjectType, Int } from '@nestjs/graphql';
+import { Field, ObjectType, Int, Float } from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
@@ -7,6 +7,7 @@ import {
   ProductType,
   AttendanceType,
   BadgeType as Btype,
+  Location as LocType,
 } from 'prisma/prisma-client';
 import { Tag } from 'src/tags/models/tag.model';
 import './product-type.enum';
@@ -17,6 +18,15 @@ import { Form } from 'src/forms/models/forms.model';
 export class BadgeType implements Btype {
   @Field(() => AttendanceType)
   label: AttendanceType;
+}
+@ObjectType()
+export class Location implements LocType {
+  url: string;
+  address: string;
+  @Field(() => Float)
+  lat: number;
+  @Field(() => Float)
+  lng: number;
 }
 @ObjectType()
 export class Product extends BaseModel implements PrismaProduct {
@@ -31,6 +41,8 @@ export class Product extends BaseModel implements PrismaProduct {
   type: ProductType;
 
   image: string;
+
+  images: string[];
 
   vendorId: string;
 
@@ -81,7 +93,7 @@ export class Product extends BaseModel implements PrismaProduct {
   meetingLink: string;
 
   @Field({ nullable: true })
-  location: string;
+  location: Location;
 
   @Field({ nullable: true })
   endTime: boolean;
