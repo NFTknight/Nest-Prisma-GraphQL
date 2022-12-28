@@ -75,6 +75,7 @@ input BookingTimeInput {
 
 type Cart {
   appliedCoupon: String
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -86,11 +87,30 @@ type Cart {
   id: ID!
   items: [CartItem!]!
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   vendorId: String!
+}
+
+type CartAddress {
+  addressLine1: String!
+  addressUrl: String
+  city: String!
+  contactName: String!
+  contactPhoneNumber: String!
+  country: String!
+}
+
+input CartAddressInput {
+  addressLine1: String!
+  addressUrl: String
+  city: String!
+  contactName: String!
+  contactPhoneNumber: String!
+  country: String!
 }
 
 type CartItem {
@@ -144,11 +164,13 @@ input CartItemInput {
 
 input CartUpdateInput {
   appliedCoupon: String
+  consigneeAddress: CartAddressInput
   customerInfo: CustomerInput
   deliveryArea: String
   deliveryMethod: DeliveryMethods
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
+  shippingAddress: CartAddressInput
 }
 
 type Category {
@@ -426,6 +448,7 @@ type Order {
   appliedCoupon: String
   cart: Cart
   cartId: String!
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -438,6 +461,7 @@ type Order {
   items: [CartItem!]!
   orderId: String!
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   status: OrderStatus!
   totalPrice: Float!
 
@@ -460,6 +484,7 @@ type OrderPayment {
   appliedCoupon: String
   cart: Cart
   cartId: String!
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -474,6 +499,7 @@ type OrderPayment {
   orderId: String!
   payment: ExecutePayment
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   status: OrderStatus!
   totalPrice: Float!
 
