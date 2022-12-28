@@ -105,6 +105,8 @@ export class Product extends BaseModel implements PrismaProduct {
   @Field({ nullable: true })
   duration: number;
 
+  @Field({ nullable: true })
   startDate: Date;
+  @Field({ nullable: true })
   endDate: Date;
 }

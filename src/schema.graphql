@@ -585,7 +585,7 @@ type Product {
   description: String!
   description_ar: String!
   duration: Int
-  endDate: DateTime!
+  endDate: DateTime
   endTime: Boolean
   form: Form
   formId: String!
@@ -599,7 +599,7 @@ type Product {
   noOfSeats: Int
   slug: String!
   sortOrder: Int
-  startDate: DateTime!
+  startDate: DateTime
   tagIds: [String!]!
   tags: [Tag!]
   title: String!

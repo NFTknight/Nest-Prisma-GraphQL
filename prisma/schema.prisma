@@ -255,8 +255,8 @@ model Product {
   endTime          Boolean?        @default(false)
   customerLocation Boolean?        @default(false)
   duration         Int?
-  startDate        DateTime        @default(now())
-  endDate          DateTime        @default(now())
+  startDate        DateTime?        
+  endDate          DateTime?        
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
