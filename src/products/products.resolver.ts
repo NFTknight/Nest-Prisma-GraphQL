@@ -59,6 +59,14 @@ export class ProductsResolver {
     );
   }
 
+  @Query(() => PaginatedProducts)
+  getAllProducts(
+    @Args('pagination', { nullable: true }) pg: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder: SortOrder
+  ): Promise<PaginatedProducts> {
+    return this.productService.getAllProducts(pg, sortOrder);
+  }
+
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Product)
   createProduct(@Args('data') data: CreateProductInput): Promise<Product> {
