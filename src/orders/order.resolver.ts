@@ -19,6 +19,8 @@ import { OrdersFilterInput } from 'src/common/filter/filter.input';
 import { PaginatedOrders } from './models/paginated-orders.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PrismaService } from 'nestjs-prisma';
+import { UseGuards } from '@nestjs/common';
+import { GqlGuardIsAgent } from 'src/auth/gql-signup.guard';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -34,6 +36,7 @@ export class OrdersResolver {
     return this.ordersService.getOrder(id);
   }
 
+  @UseGuards(GqlGuardIsAgent)
   @Query(() => PaginatedOrders)
   async getOrders(
     @Args('vendorId', { nullable: true }) vendorId: string,
@@ -44,6 +47,7 @@ export class OrdersResolver {
     return await this.ordersService.getOrders(vendorId, pg, sortOrder, filter);
   }
 
+  @UseGuards(GqlGuardIsAgent)
   @Query(() => PaginatedOrders)
   async getAllOrders(
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,

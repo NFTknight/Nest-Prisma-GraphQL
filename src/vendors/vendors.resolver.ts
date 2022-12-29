@@ -12,6 +12,7 @@ import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { VendorsView, VendorView } from './models/vendor.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { GqlGuardIsAgent } from 'src/auth/gql-signup.guard';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -35,11 +36,13 @@ export class VendorsResolver {
     return this.vendorsService.getVendorBySlug(slug);
   }
 
+  @UseGuards(GqlGuardIsAgent)
   @Query(() => VendorView)
   getVendorView(@Args('vendorId') vendorId: string): Promise<VendorView> {
     return this.vendorsService.getVendorView(vendorId);
   }
 
+  @UseGuards(GqlGuardIsAgent)
   @Query(() => VendorsView)
   async getVendorsView(
     @Args('pagination', { nullable: true }) pg: PaginationArgs

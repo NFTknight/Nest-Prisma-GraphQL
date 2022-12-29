@@ -25,7 +25,7 @@ import { Tag } from 'src/tags/models/tag.model';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { FormService } from 'src/forms/forms.service';
-import { AttendanceType } from '@prisma/client';
+import { GqlGuardIsAgent } from 'src/auth/gql-signup.guard';
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(
@@ -42,6 +42,7 @@ export class ProductsResolver {
     return this.productService.getProduct(id);
   }
 
+  @UseGuards(GqlGuardIsAgent)
   @Query(() => PaginatedProducts)
   getProducts(
     @Args('vendorId') vendorId: string,
