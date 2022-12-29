@@ -1,10 +1,11 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'nestjs-prisma';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
+import { PaymentStatusApiRequest } from './dto/payment-status.dto';
 import { PaymentSession } from './models/payment-session.model';
 
 @Injectable()
@@ -71,6 +72,37 @@ export class PaymentService {
           },
         })
         .pipe(map((res) => res.data.Data))
+    );
+  }
+
+  async checkPaymentStatus(orderId: string) {
+    const url = `${this.paymentConfig.url}/v2/GetPaymentStatus`;
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order Not Found.');
+
+    const data: PaymentStatusApiRequest = {
+      Key: order.invoiceId,
+      KeyType: 'invoiceid',
+    };
+
+    return firstValueFrom(
+      this.httpService
+        .post(url, data, {
+          headers: {
+            Authorization: `Bearer ${this.paymentConfig.token}`,
+          },
+        })
+        .pipe(
+          map((res) => {
+            return res.data.Data;
+          })
+        )
     );
   }
 }

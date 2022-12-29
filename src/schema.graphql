@@ -348,6 +348,38 @@ type Form {
   vendorId: String!
 }
 
+type GetPaymentStatusResponse {
+  Comments: String!
+  CreatedDate: String!
+  CustomerEmail: String!
+  CustomerMobile: String!
+  CustomerName: String!
+  CustomerReference: String!
+  DepositStatus: String!
+  DueDeposit: Int!
+  ExpiryDate: String!
+  ExpiryTime: String!
+  InvoiceDisplayValue: String!
+  InvoiceId: Int!
+  InvoiceItems: [InvoiceItemModel!]!
+  InvoiceReference: String!
+  InvoiceStatus: String!
+  InvoiceTransactions: [TransactionModel!]!
+  InvoiceValue: Int!
+  Suppliers: [SupplierModel!]!
+  UserDefinedField: String!
+}
+
+type InvoiceItemModel {
+  Depth: Int
+  Height: Int
+  ItemName: String!
+  Quantity: Int!
+  UnitPrice: Int!
+  Weight: Int
+  Width: Int
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -593,6 +625,7 @@ type Query {
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
+  getPaymentStatus(orderId: String!): GetPaymentStatusResponse!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
@@ -643,6 +676,14 @@ input SortOrder {
   field: String!
 }
 
+type SupplierModel {
+  DepositShare: Int!
+  InvoiceShare: Int!
+  ProposedShare: Int!
+  SupplierCode: Int!
+  SupplierName: String!
+}
+
 type Tag {
   active: Boolean!
 
@@ -666,6 +707,28 @@ type Token {
 
   """JWT refresh token"""
   refreshToken: JWT!
+}
+
+type TransactionModel {
+  AuthorizationId: String!
+  CardNumber: String!
+  Country: String!
+  Currency: String!
+  CustomerServiceCharge: String!
+  DueValue: String!
+  Error: String!
+  ErrorCode: String!
+  IpAddress: String!
+  PaidCurrency: String!
+  PaidCurrencyValue: String!
+  PaymentGateway: String!
+  PaymentId: String!
+  ReferenceId: String!
+  TrackId: String!
+  TransactionDate: String!
+  TransactionId: String!
+  TransactionStatus: String!
+  TransationValue: String!
 }
 
 input UpdateBookingInput {
