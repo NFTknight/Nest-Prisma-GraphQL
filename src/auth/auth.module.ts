@@ -10,6 +10,9 @@ import { JwtStrategy } from './jwt.strategy';
 import { SecurityConfig } from 'src/common/configs/config.interface';
 import { SmsModule } from 'src/sms/sms.module';
 import { GqlGuardIsAdmin } from './gql-signup.guard';
+import { UsersService } from 'src/users/users.service';
+import { VendorsService } from 'src/vendors/vendors.service';
+import { SendgridService } from 'src/sendgrid/sendgrid.service';
 
 @Module({
   imports: [
@@ -30,6 +33,9 @@ import { GqlGuardIsAdmin } from './gql-signup.guard';
   ],
   providers: [
     AuthService,
+    VendorsService,
+    SendgridService,
+    UsersService,
     AuthResolver,
     JwtStrategy,
     GqlAuthGuard,
