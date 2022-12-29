@@ -84,20 +84,45 @@ export class CartResolver {
   }
 
   @Mutation(() => Cart)
-  removeCartItem(
+  async removeCartItem(
     @Args('cartId') cartId: string,
     @Args('productId') productId: string,
     @Args('sku') sku: string
   ) {
-    return this.cartService.removeItemFromCart(cartId, productId, sku);
+    const updatedCart = await this.cartService.removeItemFromCart(
+      cartId,
+      productId,
+      sku
+    );
+
+    console.log({ updatedCart: updatedCart.items });
+    const updatedCartItem: any = await Promise.all(
+      updatedCart.items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        return { ...product, ...item };
+      })
+    );
+    updatedCart.items = updatedCartItem;
+
+    return updatedCart;
   }
 
   @Mutation(() => Cart)
-  updateCartItem(
+  async updateCartItem(
     @Args('cartId') cartId: string,
     @Args('data') data: CartItemInput
   ) {
-    return this.cartService.updateCartItem(cartId, data);
+    const updatedCart = await this.cartService.updateCartItem(cartId, data);
+
+    const updatedCartItem: any = await Promise.all(
+      updatedCart.items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        return { ...product, ...item };
+      })
+    );
+    updatedCart.items = updatedCartItem;
+
+    return updatedCart;
   }
 
   @Mutation(() => Cart)
@@ -121,6 +146,14 @@ export class CartResolver {
 
       cart = await this.cartService.updateCart(cartId, data);
     }
+
+    const updatedCartItem: any = await Promise.all(
+      cart.items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        return { ...product, ...item };
+      })
+    );
+    cart.items = updatedCartItem;
     return cart;
   }
 
