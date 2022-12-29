@@ -85,6 +85,39 @@ export class ProductsService {
     }
   }
 
+  async getAllProducts(
+    pg?: PaginationArgs,
+    sortOrder?: SortOrder
+  ): Promise<PaginatedProducts> {
+    try {
+      const { skip, take } = getPaginationArgs(pg);
+
+      let orderBy = {};
+      if (sortOrder) {
+        orderBy[sortOrder.field] = sortOrder.direction;
+      } else {
+        orderBy = {
+          sortOrder: 'asc',
+        };
+      }
+
+      const list = await this.prisma.product.findMany({
+        skip,
+        take,
+        orderBy,
+      });
+
+      const totalCount = await this.prisma.product.count();
+
+      return {
+        list,
+        totalCount,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
   async getProduct(id: string): Promise<Product> {
     const product = await this.prisma.product.findUnique({ where: { id } });
 
