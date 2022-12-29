@@ -9,6 +9,7 @@ import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './jwt.strategy';
 import { SecurityConfig } from 'src/common/configs/config.interface';
 import { SmsModule } from 'src/sms/sms.module';
+import { GqlGuardIsAdmin } from './gql-signup.guard';
 
 @Module({
   imports: [
@@ -32,8 +33,9 @@ import { SmsModule } from 'src/sms/sms.module';
     AuthResolver,
     JwtStrategy,
     GqlAuthGuard,
+    GqlGuardIsAdmin,
     PasswordService,
   ],
-  exports: [GqlAuthGuard],
+  exports: [GqlAuthGuard, GqlGuardIsAdmin],
 })
 export class AuthModule {}

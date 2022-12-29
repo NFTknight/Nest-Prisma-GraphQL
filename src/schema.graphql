@@ -438,6 +438,7 @@ type Mutation {
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
+  updateUserRole(userId: String!): String!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
   uploadFile(file: String!, key: String!): String!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
@@ -684,7 +685,9 @@ type Query {
 """User role"""
 enum Role {
   ADMIN
+  AGENT
   USER
+  VENDOR
 }
 
 input SendOtpInput {
