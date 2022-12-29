@@ -18,6 +18,8 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
+import { PaginatedTags } from './models/paginated-tags.model';
+import { BookingTime } from 'src/bookings/models/booking-time.model';
 
 @Resolver(() => Tag)
 export class TagsResolver {
@@ -32,7 +34,7 @@ export class TagsResolver {
     return this.tagsService.getTag(id);
   }
 
-  @Query(() => [Tag])
+  @Query(() => PaginatedTags)
   async getTags(
     @Args('vendorId', { nullable: true }) vendorId?: string,
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,
@@ -85,14 +87,16 @@ export class TagsResolver {
     });
   }
 
-  @Query(() => [String])
+  @Query(() => [BookingTime])
   getTagAvailabilityByDate(
     @Args('tagId') tagId: string,
     @Args('date') date: string,
     @Args('productId') productId: string
   ) {
-    // TODO
-    // Return all avaible slots for this tag given bookings and working hours of the tag
-    return [];
+    return this.tagsService.getTagAvailabilityByDate(
+      tagId,
+      new Date(date),
+      productId
+    );
   }
 }

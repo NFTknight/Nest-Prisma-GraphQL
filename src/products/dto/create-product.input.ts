@@ -2,6 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
 import { ProductType, AttendanceType } from '@prisma/client';
 import { VariantInput } from './variant.input';
+import { LocationInput } from './location.input';
 
 @InputType()
 export class CreateProductInput {
@@ -28,6 +29,9 @@ export class CreateProductInput {
   @Field()
   @IsNotEmpty()
   image: string;
+
+  @Field()
+  images: string[];
 
   @Field(() => ProductType)
   @IsNotEmpty()
@@ -67,7 +71,8 @@ export class CreateProductInput {
 
   meetingLink?: string;
 
-  location?: string;
+  @Field(() => LocationInput, { nullable: true })
+  location?: LocationInput;
 
   endTime?: boolean;
 

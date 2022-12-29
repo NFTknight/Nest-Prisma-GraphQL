@@ -75,21 +75,42 @@ input BookingTimeInput {
 
 type Cart {
   appliedCoupon: String
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   customerId: String!
   customerInfo: CustomerInfo
+  deliveryArea: String
   deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
   items: [CartItem!]!
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   vendorId: String!
+}
+
+type CartAddress {
+  addressLine1: String!
+  addressUrl: String
+  city: String!
+  contactName: String!
+  contactPhoneNumber: String!
+  country: String!
+}
+
+input CartAddressInput {
+  addressLine1: String!
+  addressUrl: String
+  city: String!
+  contactName: String!
+  contactPhoneNumber: String!
+  country: String!
 }
 
 type CartItem {
@@ -143,10 +164,13 @@ input CartItemInput {
 
 input CartUpdateInput {
   appliedCoupon: String
+  consigneeAddress: CartAddressInput
   customerInfo: CustomerInput
+  deliveryArea: String
   deliveryMethod: DeliveryMethods
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
+  shippingAddress: CartAddressInput
 }
 
 type Category {
@@ -255,8 +279,9 @@ input CreateProductInput {
   endTime: Boolean
   formId: String
   image: String!
+  images: [String!]!
   itemsInStock: Int
-  location: String
+  location: LocationInput
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
@@ -385,6 +410,20 @@ A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
 scalar JWT
 
+type Location {
+  address: String!
+  lat: Float!
+  lng: Float!
+  url: String!
+}
+
+input LocationInput {
+  address: String!
+  lat: Float!
+  lng: Float!
+  url: String!
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -440,7 +479,8 @@ type Mutation {
 type Order {
   appliedCoupon: String
   cart: Cart
-  cartId: String!
+  cartId: String
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -453,6 +493,7 @@ type Order {
   items: [CartItem!]!
   orderId: String!
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   status: OrderStatus!
   totalPrice: Float!
 
@@ -474,7 +515,8 @@ enum OrderDirection {
 type OrderPayment {
   appliedCoupon: String
   cart: Cart
-  cartId: String!
+  cartId: String
+  consigneeAddress: CartAddress
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -489,6 +531,7 @@ type OrderPayment {
   orderId: String!
   payment: ExecutePayment
   paymentMethod: PaymentMethods
+  shipperAddress: CartAddress
   status: OrderStatus!
   totalPrice: Float!
 
@@ -510,8 +553,9 @@ enum OrderStatus {
 }
 
 input OrdersFilterInput {
-  field: String!
-  title: String
+  PaymentMethods: PaymentMethods
+  deliveryMethod: DeliveryMethods
+  status: OrderStatus
 }
 
 type OtpResponse {
@@ -528,8 +572,33 @@ enum OtpStatusCode {
   INCORRECT
 }
 
+type PaginatedBookings {
+  list: [Booking!]
+  totalCount: Int!
+}
+
+type PaginatedCategories {
+  list: [Category!]
+  totalCount: Int!
+}
+
+type PaginatedCoupons {
+  list: [Coupon!]
+  totalCount: Int!
+}
+
+type PaginatedOrders {
+  list: [Order!]
+  totalCount: Int!
+}
+
 type PaginatedProducts {
   list: [Product!]
+  totalCount: Int!
+}
+
+type PaginatedTags {
+  list: [Tag!]
   totalCount: Int!
 }
 
@@ -574,20 +643,21 @@ type Product {
   description: String!
   description_ar: String!
   duration: Int
-  endDate: DateTime!
+  endDate: DateTime
   endTime: Boolean
   form: Form
   formId: String!
   id: ID!
   image: String!
+  images: [String!]!
   itemsInStock: Int
-  location: String
+  location: Location
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
   slug: String!
   sortOrder: Int
-  startDate: DateTime!
+  startDate: DateTime
   tagIds: [String!]!
   tags: [Tag!]
   title: String!
@@ -614,23 +684,25 @@ enum ProductType {
 }
 
 type Query {
+  getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
+  getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
   getBooking(id: String!): Booking!
-  getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
-  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): [Category!]!
+  getBookings(pagination: PaginationArgs, productId: String, tagId: String, vendorId: String!): PaginatedBookings!
+  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
-  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Coupon!]!
+  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedCoupons!
   getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
-  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Order!]!
+  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getPaymentStatus(orderId: String!): GetPaymentStatusResponse!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
-  getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [String!]!
-  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): [Tag!]!
+  getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [BookingTime!]!
+  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
@@ -780,8 +852,9 @@ input UpdateProductInput {
   endTime: Boolean
   formId: String
   image: String
+  images: [String!]
   itemsInStock: Int
-  location: String
+  location: LocationInput
   meetingLink: String
   minPreorderDays: Int
   noOfSeats: Int
@@ -863,6 +936,7 @@ type User {
 type Variant {
   default: Boolean
   image: String!
+  images: [String!]!
   price: Int!
   quantity: Int!
   sku: String!
@@ -873,6 +947,7 @@ type Variant {
 input VariantInput {
   default: Boolean
   image: String
+  images: [String!]
   price: Int!
   sku: String!
   title: String!

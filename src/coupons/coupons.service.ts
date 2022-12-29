@@ -7,6 +7,7 @@ import { Coupon } from './models/coupon.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { PaginatedCoupons } from './models/paginated-coupons.model';
 
 @Injectable()
 export class CouponsService {
@@ -27,13 +28,17 @@ export class CouponsService {
     vendorId?: string,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Coupon[]> {
+  ): Promise<PaginatedCoupons> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
       vendorId,
     };
-    return this.prisma.coupon.findMany({ where, skip, take });
+    const res = await this.prisma.$transaction([
+      this.prisma.coupon.count({ where }),
+      this.prisma.coupon.findMany({ where, skip, take }),
+    ]);
+    return { totalCount: res[0], list: res[1] };
   }
 
   async createCoupon(data: CreateCouponInput): Promise<Coupon> {

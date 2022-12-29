@@ -7,13 +7,25 @@ import { Tag } from './models/tag.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { PaginatedTags } from './models/paginated-tags.model';
+import * as dayjs from 'dayjs';
+import * as Duration from 'dayjs/plugin/duration';
+import * as Utc from 'dayjs/plugin/utc';
+import * as Timezone from 'dayjs/plugin/timezone';
+import * as Between from 'dayjs/plugin/isBetween';
+import { find } from 'lodash';
 
 @Injectable()
 export class TagsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly vendorService: VendorsService
-  ) {}
+  ) {
+    dayjs.extend(Duration);
+    dayjs.extend(Utc);
+    dayjs.extend(Timezone);
+    dayjs.extend(Between);
+  }
 
   async getTag(id: string): Promise<Tag> {
     const tag = await this.prisma.tag.findUnique({ where: { id } });
@@ -23,17 +35,21 @@ export class TagsService {
     return tag;
   }
 
-  getTags(
+  async getTags(
     vendorId?: string,
     pg?: PaginationArgs,
     sortOrder?: SortOrder
-  ): Promise<Tag[]> {
+  ): Promise<PaginatedTags> {
     const { skip, take } = getPaginationArgs(pg);
 
     const where = {
       vendorId,
     };
-    return this.prisma.tag.findMany({ where, skip, take });
+    const res = await this.prisma.$transaction([
+      this.prisma.tag.count({ where }),
+      this.prisma.tag.findMany({ where, skip, take }),
+    ]);
+    return { totalCount: res[0], list: res[1] };
   }
 
   async getTagsByProduct(productId: string): Promise<Tag[]> {
@@ -101,5 +117,92 @@ export class TagsService {
     }
 
     return await this.prisma.tag.delete({ where: { id } });
+  }
+
+  async getTagAvailabilityByDate(id: string, date: Date, productId: string) {
+    const [tag, product, bookings] = await this.prisma.$transaction([
+      this.prisma.tag.findFirstOrThrow({ where: { id } }),
+      this.prisma.product.findFirstOrThrow({
+        where: { id: productId },
+      }),
+      this.prisma.booking.findMany({
+        where: {
+          tagId: id,
+          slots: {
+            some: {
+              from: {
+                gte: dayjs(date).startOf('day').toDate(),
+              },
+              to: {
+                lte: dayjs(date).endOf('day').toDate(),
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const weekday = dayjs(date).format('dddd');
+    const duration = dayjs.duration({
+      minutes: product.duration,
+    });
+    const workdays = tag.workdays;
+
+    // 1. Check if the tag is available on the given weekday.
+    if (!workdays.find((w) => w.day === weekday)) {
+      return [];
+    }
+
+    // Get the workday object for the given weekday.
+    const workday = find(workdays, (w) => w.day === weekday);
+
+    const [startHour, startMinute] = workday?.from.split(':');
+    const [endHour, endMinute] = workday?.to.split(':');
+
+    // set start time to the given date.
+    const startTime = dayjs(date)
+      .tz('Asia/Riyadh')
+      .set('hour', parseInt(startHour))
+      .set('minute', parseInt(startMinute));
+
+    // set end time to the given date.
+    const endTime = dayjs(date)
+      .tz('Asia/Riyadh')
+      .set('hour', parseInt(endHour))
+      .set('minute', parseInt(endMinute));
+
+    const availableTimes = [];
+    let startFrom = startTime.clone();
+
+    const slots = bookings
+      .map((b) =>
+        b.slots.map((s) => ({
+          from: dayjs(s.from).tz('Asia/Riyadh'),
+          to: dayjs(s.to).tz('Asia/Riyadh'),
+        }))
+      )
+      .flat();
+
+    // Split from and to into duration intervals
+    while (startFrom.isBefore(endTime)) {
+      // Check if the time is available.
+      const isAvailable = !slots.some((s) => {
+        return (
+          startFrom.isBetween(s.from, s.to, 'minute', '()') ||
+          startFrom.add(duration).isBetween(s.from, s.to, 'minute', '()')
+        );
+      });
+
+      if (isAvailable) {
+        availableTimes.push({
+          from: startFrom.toDate(),
+          to: startFrom.add(duration).toDate(),
+        });
+      }
+
+      startFrom = startFrom.add(duration);
+    }
+
+    return availableTimes;
   }
 }

@@ -19,4 +19,7 @@ export class VariantInput {
 
   @Field()
   image?: string;
+
+  @Field()
+  images?: string[];
 }

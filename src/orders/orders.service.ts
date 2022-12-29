@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DeliveryMethods, Order, OrderStatus } from '@prisma/client';
+import { DeliveryMethods, Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
-import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
+import { SendEmails } from 'src/utils/email';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -13,13 +13,12 @@ import { OrdersFilterInput } from 'src/common/filter/filter.input';
 import { WayBill } from 'src/shipping/models/waybill.model';
 import { ShippingService } from 'src/shipping/shipping.service';
 
-import { CreateOrderInput } from './dto/create-order.input';
 import {
   CreateShipmentInput,
   UpdateOrderInput,
 } from './dto/update-order.input';
-import { FormResponse } from './models/order.model';
 import { Cart } from 'src/cart/models/cart.model';
+import { PaginatedOrders } from './models/paginated-orders.model';
 import { ProductsService } from 'src/products/services/products.service';
 
 @Injectable()
@@ -37,6 +36,14 @@ export class OrdersService {
     const order = await this.prisma.order.findUnique({
       where: { id },
     });
+    const updatedCartItem = await Promise.all(
+      order?.items?.map(async (item) => {
+        const product = await this.productsService.getProduct(item.productId);
+        return { ...product, ...item };
+      })
+    );
+    order.items = updatedCartItem;
+
     if (!order) throw new NotFoundException('Order Not Found.');
 
     return order;
@@ -47,7 +54,7 @@ export class OrdersService {
     pg?: PaginationArgs,
     sortOrder?: SortOrder,
     filter?: OrdersFilterInput
-  ) {
+  ): Promise<PaginatedOrders> {
     try {
       const { skip, take } = getPaginationArgs(pg);
 
@@ -58,16 +65,20 @@ export class OrdersService {
         orderBy = { id: 'asc' };
       }
 
-      const where = {
+      const where: Prisma.OrderWhereInput = {
         vendorId,
+        ...filter,
       };
 
-      if (filter && filter?.field) {
-        where[filter.field] = filter.title.trim();
-      }
-      return await this.prisma.order.findMany({ where, skip, take, orderBy });
+      const res = await this.prisma.$transaction([
+        this.prisma.order.count({ where }),
+        this.prisma.order.findMany({ where, skip, take, orderBy }),
+      ]);
+      if (!res) throw new NotFoundException('data not found');
+      return { totalCount: res[0], list: res[1] };
     } catch (err) {
       console.log('Err => ', err);
+      throw new Error(err);
     }
   }
 
@@ -82,9 +93,14 @@ export class OrdersService {
 
     const order = await this.getOrder(id);
     let wayBillData: WayBill = null;
-    const { vendorId, customerInfo } = order;
+    const { vendorId } = order;
 
+    if (order.cartId && order.status === OrderStatus.PENDING) {
+      // if the order does not exist, this function will throw an error.
+      cartItem = await this.cartService.getCartAndDelete(order.cartId);
+    }
     if (
+      order.cartId &&
       order.status === OrderStatus.PENDING &&
       order.deliveryMethod === DeliveryMethods.SMSA &&
       !order.wayBill
@@ -93,20 +109,19 @@ export class OrdersService {
 
       const WayBillRequestObject: CreateShipmentInput = {
         ConsigneeAddress: {
-          ContactName: `${customerInfo?.firstName || ''} ${
-            customerInfo?.lastName || ''
-          }`,
-          ContactPhoneNumber: customerInfo.phone,
+          ContactName: cartItem.consigneeAddress?.contactName,
+          ContactPhoneNumber: cartItem.consigneeAddress?.contactPhoneNumber,
+          //this is hardcoded for now
           Country: 'SA',
-          City: 'Jeddah',
-          AddressLine1: customerInfo?.address || 'Ar Rawdah, Jeddah 23434',
+          City: cartItem.consigneeAddress?.city,
+          AddressLine1: cartItem.consigneeAddress?.addressLine1,
         },
         ShipperAddress: {
           ContactName: vendorData.name || 'Company Name',
-          ContactPhoneNumber: vendorData.info.phone || '06012312312',
+          ContactPhoneNumber: vendorData?.info?.phone || '06012312312',
           Country: 'SA',
           City: 'Riyadh',
-          AddressLine1: vendorData.info.address || 'Ar Rawdah, Jeddah 23434',
+          AddressLine1: vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
         },
         OrderNumber: order?.orderId,
         DeclaredValue: 10,
@@ -123,22 +138,20 @@ export class OrdersService {
         WayBillRequestObject
       );
     }
-
-    if (order.cartId && order.status === OrderStatus.PENDING) {
-      // if the order does not exist, this function will throw an error.
-      cartItem = await this.cartService.getCartAndDelete(order.cartId);
-    }
     const cartObject = {
       finalPrice: cartItem?.finalPrice || 0,
       totalPrice: cartItem?.totalPrice || 0,
       items: cartItem?.items,
       appliedCoupon: cartItem?.appliedCoupon,
+      consigneeAddress: cartItem?.consigneeAddress || null,
+      shipperAddress: cartItem?.shipperAddress || null,
     };
-
     let updatingOrderObject: any = data;
-    if (cartItem?.finalPrice) {
+
+    if (cartItem && Object.keys(cartItem).length) {
       updatingOrderObject = { ...updatingOrderObject, ...cartObject };
     }
+
     if (wayBillData?.sawb) {
       updatingOrderObject = { ...updatingOrderObject, wayBill: wayBillData };
     }
