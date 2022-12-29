@@ -70,7 +70,7 @@ export class CartService {
   async addItemToCart(cartId: string, data: CartItemInput) {
     const cart = await this.getCart(cartId);
 
-    const product = await this.prisma.product.findUnique({
+    const product = await this.prisma.product.findUniqueOrThrow({
       where: { id: data.productId },
     });
 
@@ -109,7 +109,7 @@ export class CartService {
     const cart = await this.getCart(cartId);
 
     const items = cart.items.filter(
-      (item) => item.productId !== productId && item.sku !== sku
+      (item) => item.productId !== productId || item.sku !== sku
     );
 
     const totalPrice = items.reduce(
