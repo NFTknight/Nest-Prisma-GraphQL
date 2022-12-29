@@ -14,6 +14,7 @@ export class FormService {
   ) {}
 
   async getForm(id: string): Promise<Form> {
+    if (!id) return null;
     const form = await this.prisma.form.findUnique({
       where: { id },
     });

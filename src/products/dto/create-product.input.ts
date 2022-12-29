@@ -30,8 +30,8 @@ export class CreateProductInput {
   @IsNotEmpty()
   image: string;
 
-  @Field()
-  images: string[];
+  @Field(() => [String], { nullable: true })
+  images?: string[];
 
   @Field(() => ProductType)
   @IsNotEmpty()

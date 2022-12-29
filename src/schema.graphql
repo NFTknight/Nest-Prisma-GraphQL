@@ -279,7 +279,7 @@ input CreateProductInput {
   endTime: Boolean
   formId: String
   image: String!
-  images: [String!]!
+  images: [String!]
   itemsInStock: Int
   location: LocationInput
   meetingLink: String
@@ -614,10 +614,10 @@ type Product {
   endDate: DateTime
   endTime: Boolean
   form: Form
-  formId: String!
+  formId: String
   id: ID!
   image: String!
-  images: [String!]!
+  images: [String!]
   itemsInStock: Int
   location: Location
   meetingLink: String
@@ -872,8 +872,8 @@ type User {
 
 type Variant {
   default: Boolean
-  image: String!
-  images: [String!]!
+  image: String
+  images: [String!]
   price: Int!
   quantity: Int!
   sku: String!

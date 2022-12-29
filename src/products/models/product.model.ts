@@ -42,6 +42,7 @@ export class Product extends BaseModel implements PrismaProduct {
 
   image: string;
 
+  @Field(() => [String], { nullable: true })
   images: string[];
 
   vendorId: string;
@@ -83,6 +84,7 @@ export class Product extends BaseModel implements PrismaProduct {
   @Field(() => AttendanceType, { nullable: true })
   attendanceType: AttendanceType;
 
+  @Field(() => String, { nullable: true })
   formId: string;
   @Field(() => Form, { nullable: true })
   form?: Form;
