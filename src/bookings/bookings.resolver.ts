@@ -14,8 +14,6 @@ import { BookingsService } from './bookings.service';
 import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
 import { Booking } from './models/booking.model';
-import { PaginationArgs } from 'src/common/pagination/pagination.input';
-import { PaginatedBookings } from './models/paginated-bookings.model';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 
@@ -33,13 +31,12 @@ export class BookingResolver {
   }
 
   @UseGuards(GqlAuthGuard)
-  @Query(() => PaginatedBookings)
+  @Query(() => [Booking])
   async getBookings(
     @Args('vendorId') vendorId: string,
     @Args('productId', { nullable: true }) productId: string,
-    @Args('tagId', { nullable: true }) tagId: string,
-    @Args('pagination', { nullable: true }) pg: PaginationArgs
-  ): Promise<PaginatedBookings> {
+    @Args('tagId', { nullable: true }) tagId: string
+  ): Promise<Booking[]> {
     const where = {
       vendorId,
     };
@@ -51,7 +48,7 @@ export class BookingResolver {
       where['tagId'] = tagId;
     }
 
-    const res = await this.bookingService.getBookings(where, pg);
+    const res = await this.bookingService.getBookings(where);
     return res;
   }
 
