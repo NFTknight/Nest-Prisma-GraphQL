@@ -47,7 +47,9 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT || nestConfig.port || 3000);
   logger.log(
-    `Application listening on port http://localhost:${nestConfig.port || 3000}`
+    `Application listening on port http://localhost:${
+      process.env.PORT || nestConfig.port || 3000
+    }/graphql`
   );
 }
 bootstrap();
