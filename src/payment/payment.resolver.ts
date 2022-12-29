@@ -15,7 +15,7 @@ export class PaymentResolver {
   }
 
   @Query(() => GetPaymentStatusResponse)
-  async getPaymentStatus(@Args('orderId') orderId: string) {
+  async getOrderPaymentStatus(@Args('orderId') orderId: string) {
     return this.paymentService.checkPaymentStatus(orderId);
   }
 }

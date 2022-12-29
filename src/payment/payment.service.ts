@@ -39,7 +39,7 @@ export class PaymentService {
     );
   }
 
-  async executePayment(orderId: string, sessionId: string) {
+  async executePayment(orderId: string, sessionId: string, vendorSlug: string) {
     const url = `${this.paymentConfig.url}/v2/ExecutePayment`;
     const order = await this.prisma.order.findUnique({
       where: {
@@ -55,8 +55,8 @@ export class PaymentService {
       DisplayCurrencyIso: 'KWD',
       CustomerEmail: order.customerInfo.email,
       CustomerReference: order.orderId,
-      CallBackUrl: `http://api.dev.anyaa.io/api/payment/callback?orderId=${orderId}`,
-      ErrorUrl: `http://api.dev.anyaa.io/api/payment/error?orderId=${orderId}`, // TODO QASIM: Will be error page for our website
+      CallBackUrl: `http://api.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/confirmation`,
+      ErrorUrl: `http://api.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/failure`,
       InvoiceItems: order.items.map((item) => ({
         ItemName: `${item.productId}_${item.sku}`,
         Quantity: item.quantity,
@@ -91,7 +91,7 @@ export class PaymentService {
       KeyType: 'invoiceid',
     };
 
-    return firstValueFrom(
+    const res = await firstValueFrom(
       this.httpService
         .post(url, data, {
           headers: {
@@ -104,5 +104,9 @@ export class PaymentService {
           })
         )
     );
+    return {
+      orderStatus: order.status,
+      paymentStatus: res?.InvoiceStatus,
+    };
   }
 }

@@ -202,9 +202,9 @@ export class CartService {
 
     const orderId = `${vendorPrefix}-${nanoid(8)}`.toUpperCase();
 
-    let order = await this.prisma.order.findUnique({
+    let order = await this.prisma.order.findFirst({
       where: {
-        id: orderId,
+        cartId,
       },
     });
 
@@ -244,7 +244,8 @@ export class CartService {
       try {
         payment = await this.paymentService.executePayment(
           order.id,
-          paymentSession
+          paymentSession,
+          vendor.slug
         );
 
         await this.prisma.order.update({
