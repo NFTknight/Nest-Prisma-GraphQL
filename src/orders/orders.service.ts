@@ -37,7 +37,7 @@ export class OrdersService {
       where: { id },
     });
     const updatedCartItem = await Promise.all(
-      order.items.map(async (item) => {
+      order?.items?.map(async (item) => {
         const product = await this.productsService.getProduct(item.productId);
         return { ...product, ...item };
       })
