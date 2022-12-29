@@ -684,7 +684,9 @@ type Query {
 """User role"""
 enum Role {
   ADMIN
+  AGENT
   USER
+  VENDOR
 }
 
 input SendOtpInput {

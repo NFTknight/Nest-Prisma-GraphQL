@@ -95,7 +95,6 @@ export class CartResolver {
       sku
     );
 
-    console.log({ updatedCart: updatedCart.items });
     const updatedCartItem: any = await Promise.all(
       updatedCart.items.map(async (item) => {
         const product = await this.productService.getProduct(item.productId);
