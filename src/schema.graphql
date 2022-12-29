@@ -667,7 +667,7 @@ type Query {
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getTag(id: String!): Tag!
-  getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [String!]!
+  getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [BookingTime!]!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!

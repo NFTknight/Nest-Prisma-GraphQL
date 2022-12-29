@@ -70,6 +70,7 @@
     "bcrypt": "5.1.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
+    "dayjs": "^1.11.7",
     "graphql": "16.6.0",
     "graphql-fields-list": "^2.2.4",
     "graphql-scalars": "1.20.1",
