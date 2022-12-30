@@ -1,12 +1,19 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
 import { PaymentStatusApiRequest } from './dto/payment-status.dto';
 import { PaymentSession } from './models/payment-session.model';
+
+const OrderInvoiceStatus = {
+  PENDING: 'Pending',
+  PAID: 'Paid',
+  CANCELED: 'Canceled',
+};
 
 @Injectable()
 export class PaymentService {
@@ -104,8 +111,25 @@ export class PaymentService {
           })
         )
     );
+    let orderStatus = order.status;
+    if (res?.InvoiceStatus !== OrderInvoiceStatus.PENDING) {
+      try {
+        orderStatus =
+          res?.InvoiceStatus === OrderInvoiceStatus.PAID
+            ? OrderStatus.PENDING
+            : OrderStatus.FAILED;
+
+        await this.prisma.order.update({
+          where: { id: orderId },
+          data: { status: orderStatus, updatedAt: new Date() },
+        });
+      } catch (error) {
+        throw new NotFoundException('Order Status is not updated.', error);
+      }
+    }
+
     return {
-      orderStatus: order.status,
+      orderStatus,
       paymentStatus: res?.InvoiceStatus,
     };
   }
