@@ -5,12 +5,7 @@ import { ProductsService } from 'src/products/services/products.service';
 import { OrdersService } from 'src/orders/orders.service';
 import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
-import {
-  BookingStatus,
-  Booking,
-  OrderStatus,
-  PaymentMethods,
-} from '@prisma/client';
+import { BookingStatus, OrderStatus, PaymentMethods } from '@prisma/client';
 import { TagsService } from 'src/tags/tags.service';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { nanoid } from 'nanoid';
@@ -18,7 +13,7 @@ import { PaginatedBookings } from './models/paginated-bookings.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
-
+import { Booking } from 'src/bookings/models/booking.model';
 @Injectable()
 export class BookingsService {
   constructor(
