@@ -16,6 +16,9 @@ import { UpdateBookingInput } from './dto/update-booking.input';
 import { Booking } from './models/booking.model';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { PaginatedBookings } from './models/paginated-bookings.model';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 
 @Resolver(() => Booking)
 export class BookingResolver {
@@ -50,6 +53,14 @@ export class BookingResolver {
 
     const res = await this.bookingService.getBookings(where);
     return res;
+  }
+
+  @Query(() => PaginatedBookings)
+  async getAllBookings(
+    @Args('pagination', { nullable: true }) pg: PaginationArgs,
+    @Args('sortBooking', { nullable: true }) sortOrder: SortOrder
+  ): Promise<PaginatedBookings> {
+    return this.bookingService.getAllBookings(pg, sortOrder);
   }
 
   @UseGuards(GqlAuthGuard)
