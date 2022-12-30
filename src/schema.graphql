@@ -47,6 +47,7 @@ type Booking {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendor: Vendor
   vendorId: String!
 }
 

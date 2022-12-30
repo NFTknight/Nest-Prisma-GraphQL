@@ -24,8 +24,9 @@ export class Booking extends BaseModel {
   @Field(() => Tag)
   tag?: Tag;
 
-  @Field()
   vendorId: string;
+  @Field(() => Vendor)
+  vendor?: Vendor;
 
   productId: string;
   @Field(() => Product)
