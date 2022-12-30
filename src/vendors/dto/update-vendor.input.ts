@@ -56,6 +56,24 @@ class UpdateVendorInfoInput {
 
   @Field()
   iban?: string;
+
+  @Field()
+  instagram?: string;
+
+  @Field()
+  facebook?: string;
+
+  @Field()
+  snapchat?: string;
+
+  @Field()
+  whatsapp?: string;
+
+  @Field()
+  vat_num?: string;
+
+  @Field()
+  cr_num?: string;
 }
 
 @InputType()

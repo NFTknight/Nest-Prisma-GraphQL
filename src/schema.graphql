@@ -828,14 +828,20 @@ input UpdateVendorInfoInput {
   address: String
   addressUrl: String
   certificates: [Certificate!]
+  cr_num: String
   description: String
   description_ar: String
   email: String
+  facebook: String
   heroImage: String
   iban: String
+  instagram: String
   logo: String
   phone: String
+  snapchat: String
   terms: String
+  vat_num: String
+  whatsapp: String
 }
 
 input UpdateVendorInput {
