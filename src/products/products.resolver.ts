@@ -42,8 +42,6 @@ export class ProductsResolver {
     return this.productService.getProduct(id);
   }
 
-  @UseGuards(RolesGuard)
-  @SetMetadata('role', Role.ADMIN)
   @Query(() => PaginatedProducts)
   getProducts(
     @Args('vendorId') vendorId: string,

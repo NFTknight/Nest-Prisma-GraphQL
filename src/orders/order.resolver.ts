@@ -38,7 +38,7 @@ export class OrdersResolver {
   }
 
   @UseGuards(RolesGuard)
-  @SetMetadata('role', Role.ADMIN)
+  @SetMetadata('role', Role.VENDOR)
   @Query(() => PaginatedOrders)
   async getOrders(
     @Args('vendorId', { nullable: true }) vendorId: string,
