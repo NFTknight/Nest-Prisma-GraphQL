@@ -21,9 +21,9 @@ export class Variant implements VariantOption {
   @Field({ defaultValue: 1 })
   quantity: number;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   image: string;
 
-  @Field()
+  @Field(() => [String], { nullable: true })
   images: string[];
 }
