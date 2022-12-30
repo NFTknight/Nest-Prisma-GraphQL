@@ -184,8 +184,6 @@ export class CartService {
   }
 
   async checkoutCartAndCreateOrder(cartId: string, paymentSession?: string) {
-    // TODO - add payment gateway
-
     const cart = await this.getCart(cartId);
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
@@ -219,6 +217,12 @@ export class CartService {
           appliedCoupon: cart.appliedCoupon,
           ...(cart.deliveryMethod && {
             deliveryMethod: cart.deliveryMethod,
+          }),
+          ...(cart.consigneeAddress && {
+            consigneeAddress: cart.consigneeAddress,
+          }),
+          ...(cart.shipperAddress && {
+            shipperAddress: cart.shipperAddress,
           }),
           finalPrice: cart.totalPrice,
           totalPrice: cart.totalPrice,
@@ -257,6 +261,13 @@ export class CartService {
       } catch (error) {
         errors = error.response.data.ValidationErrors;
       }
+    }
+
+    // Payment method is not ONLINE or online payment is successfully done
+    if (errors === undefined) {
+      await this.prisma.cart.delete({
+        where: { id: cartId },
+      });
     }
 
     // Email notification to vendor and customer when order is created
