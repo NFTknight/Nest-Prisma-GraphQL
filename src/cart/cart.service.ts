@@ -16,6 +16,7 @@ import { nanoid } from 'nanoid';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { PaymentService } from 'src/payment/payment.service';
+import { ProductsService } from 'src/products/services/products.service';
 
 @Injectable()
 export class CartService {
@@ -24,7 +25,8 @@ export class CartService {
     private readonly cartItemService: CartItemService,
     private readonly vendorService: VendorsService,
     private readonly emailService: SendgridService,
-    private readonly paymentService: PaymentService
+    private readonly paymentService: PaymentService,
+    private readonly productService: ProductsService
   ) {}
 
   async createNewCart(vendorId: string, customerId: string): Promise<Cart> {
@@ -101,6 +103,13 @@ export class CartService {
       where: { id: cartId },
       data: omit(cartData, ['id']),
     });
+    const updatedCartItem: any = await Promise.all(
+      updatedCart.items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        return { ...product, ...item };
+      })
+    );
+    updatedCart.items = updatedCartItem;
 
     return updatedCart;
   }
@@ -147,13 +156,22 @@ export class CartService {
       0
     );
 
-    return this.prisma.cart.update({
+    const updatedCart = this.prisma.cart.update({
       where: { id: cartId },
       data: {
         items,
         totalPrice,
       },
     });
+    const updatedCartItem: any = await Promise.all(
+      cart.items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        return { ...product, ...item };
+      })
+    );
+    updatedCart.items = updatedCartItem;
+
+    return updatedCart;
   }
 
   async getCartAndDelete(cartId: string) {
