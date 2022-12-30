@@ -7,7 +7,7 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { CategoriesService } from 'src/categories/categories.service';
-import { Form, Prisma, Vendor } from '@prisma/client';
+import { Form, Prisma, Role, Vendor } from '@prisma/client';
 import { Category } from 'src/categories/models/category.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from './dto/create-product.input';
@@ -22,10 +22,10 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { ProductFilterInput } from 'src/common/filter/filter.input';
 import { TagsService } from 'src/tags/tags.service';
 import { Tag } from 'src/tags/models/tag.model';
-import { UseGuards } from '@nestjs/common';
+import { SetMetadata, UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { FormService } from 'src/forms/forms.service';
-import { AttendanceType } from '@prisma/client';
+import { RolesGuard } from 'src/auth/gql-signup.guard';
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(
@@ -42,6 +42,8 @@ export class ProductsResolver {
     return this.productService.getProduct(id);
   }
 
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
   @Query(() => PaginatedProducts)
   getProducts(
     @Args('vendorId') vendorId: string,

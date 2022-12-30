@@ -1,5 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
 import { forwardRef, Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { CartModule } from 'src/cart/cart.module';
 import { ProductsService } from 'src/products/services/products.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
@@ -18,6 +19,7 @@ import { OrdersService } from './orders.service';
   ],
   providers: [
     OrdersService,
+    JwtService,
     OrdersResolver,
     SendgridService,
     ShippingService,
