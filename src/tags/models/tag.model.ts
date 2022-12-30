@@ -7,9 +7,10 @@ import { WorkDay } from './workday.model';
 export class Tag extends BaseModel {
   title: string;
   title_ar: string;
+  @Field(() => Vendor, { nullable: true })
   vendorId: string;
 
-  @Field(() => Vendor, { nullable: false })
+  @Field(() => Vendor, { nullable: true })
   vendor?: Vendor;
   active: boolean;
   // TODO add availability
