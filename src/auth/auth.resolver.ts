@@ -15,8 +15,8 @@ import { SignupInput } from './dto/signup.input';
 import { RefreshTokenInput } from './dto/refresh-token.input';
 import { SmsService } from 'src/sms/sms.service';
 import { OtpResponse } from 'src/sms/models/otp.model';
-import { UseGuards } from '@nestjs/common';
-import { GqlGuardIsAdmin } from './gql-signup.guard';
+import { SetMetadata, UseGuards } from '@nestjs/common';
+import { RolesGuard } from './gql-signup.guard';
 import { Role } from '@prisma/client';
 import { UserRole } from './models/user.role.model';
 import { UsersService } from 'src/users/users.service';
@@ -88,7 +88,8 @@ export class AuthResolver {
     return this.auth.refreshToken(token);
   }
 
-  @UseGuards(GqlGuardIsAdmin)
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
   @Mutation(() => UserRole)
   async updateUserRole(
     @Args({ name: 'userId', type: () => String }) userId: string,
