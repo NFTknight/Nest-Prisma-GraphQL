@@ -9,7 +9,6 @@ import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './jwt.strategy';
 import { SecurityConfig } from 'src/common/configs/config.interface';
 import { SmsModule } from 'src/sms/sms.module';
-import { GqlGuardIsAdmin } from './gql-signup.guard';
 import { UsersService } from 'src/users/users.service';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
@@ -39,9 +38,8 @@ import { SendgridService } from 'src/sendgrid/sendgrid.service';
     AuthResolver,
     JwtStrategy,
     GqlAuthGuard,
-    GqlGuardIsAdmin,
     PasswordService,
   ],
-  exports: [GqlAuthGuard, GqlGuardIsAdmin],
+  exports: [GqlAuthGuard],
 })
 export class AuthModule {}
