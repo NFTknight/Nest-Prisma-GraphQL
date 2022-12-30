@@ -29,6 +29,8 @@ model User {
 enum Role {
   ADMIN
   USER
+  VENDOR
+  AGENT
 }
 
 model Vendor {

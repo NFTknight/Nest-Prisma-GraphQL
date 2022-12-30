@@ -438,6 +438,7 @@ type Mutation {
   updateProduct(data: UpdateProductInput!, id: String!): Product!
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
+  updateUserRole(role: Role!, userId: String!): UserRole!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
   uploadFile(file: String!, key: String!): String!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
@@ -865,6 +866,11 @@ type User {
   vendor: Vendor
   vendorId: String
   verified: Boolean!
+}
+
+type UserRole {
+  role: Role!
+  userId: String!
 }
 
 type Variant {
