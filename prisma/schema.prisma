@@ -125,8 +125,8 @@ model Tag {
   title    String
   title_ar String
 
-  vendorId String @db.ObjectId
-  vendor   Vendor @relation(fields: [vendorId], references: [id])
+  vendorId String? @db.ObjectId
+  vendor   Vendor? @relation(fields: [vendorId], references: [id],  onDelete: SetNull)
 
   products   Product[] @relation(fields: [productIds], references: [id])
   productIds String[]  @db.ObjectId
@@ -201,9 +201,9 @@ type VariantOption {
   default  Boolean?
   sku      String
   price    Float
-  quantity Float? @default(1)
+  quantity Float?   @default(1)
   image    String?
-  images    String[]
+  images   String[]
   title    String
   title_ar String
 }
@@ -214,10 +214,10 @@ type TimeSlot {
 }
 
 type Location {
-  url      String
-  address  String
-  lat      Float
-  lng      Float
+  url     String
+  address String
+  lat     Float
+  lng     Float
 }
 
 model Product {
@@ -257,32 +257,33 @@ model Product {
   endTime          Boolean?        @default(false)
   customerLocation Boolean?        @default(false)
   duration         Int?
-  startDate        DateTime?        
-  endDate          DateTime?        
+  startDate        DateTime?
+  endDate          DateTime?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Booking   Booking[]
 }
 
-type CartItem{
+type CartItem {
   productId String        @db.ObjectId
   answers   String?
   sku       String
   price     Float
   quantity  Int           @default(1)
   tagId     String?       @db.ObjectId
-  slots     BookingTime[]  
+  slots     BookingTime[]
 }
 
 type CartAddress {
-  contactName String
+  contactName        String
   contactPhoneNumber String
-  country String
-  city String
-  addressLine1 String
-  addressUrl String
+  country            String
+  city               String
+  addressLine1       String
+  addressUrl         String
 }
+
 model Cart {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
   items         CartItem[]
@@ -300,11 +301,11 @@ model Cart {
   deliveryMethod DeliveryMethods?
   paymentMethod  PaymentMethods?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Order     Order[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  Order            Order[]
   consigneeAddress CartAddress?
-  shipperAddress CartAddress?
+  shipperAddress   CartAddress?
 
   deliveryArea String?
 
@@ -355,7 +356,7 @@ model Order {
   invoiceId String?
 
   consigneeAddress CartAddress?
-  shipperAddress CartAddress?
+  shipperAddress   CartAddress?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -400,7 +401,7 @@ model Booking {
   productId     String        @db.ObjectId
   product       Product       @relation(fields: [productId], references: [id])
   vendorId      String        @db.ObjectId
-  vendor        Vendor        @relation(fields: [vendorId], references: [id])
+  vendor        Vendor        @relation(fields: vendorId, references: id)
   tagId         String        @db.ObjectId
   tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus

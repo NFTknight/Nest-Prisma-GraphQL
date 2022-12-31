@@ -47,6 +47,7 @@ type Booking {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendor: Vendor
   vendorId: String!
 }
 
@@ -114,43 +115,14 @@ input CartAddressInput {
 }
 
 type CartItem {
-  active: Boolean
   answers: String
-  attendanceType: AttendanceType
-  badge: BadgeType
-  bookedSeats: Int
-  category: Category
-  categoryId: String
-  customerLocation: Boolean
-  description: String
-  description_ar: String
-  duration: Int
-  endDate: DateTime
-  endTime: Boolean
-  form: Form
-  formId: String
-  image: String
-  itemsInStock: Int
-  location: String
-  meetingLink: String
-  minPreorderDays: Int
-  noOfSeats: Int
   price: Float!
+  product: Product
   productId: String!
   quantity: Int!
   sku: String!
   slots: [BookingTime!]
-  slug: String
-  sortOrder: Int
-  startDate: DateTime
   tagId: String
-  tagIds: [String!]
-  tags: [Tag!]
-  title: String
-  title_ar: String
-  type: ProductType
-  variants: [Variant!]
-  vendor: Vendor!
 }
 
 input CartItemInput {
@@ -348,11 +320,11 @@ enum DeliveryMethods {
 }
 
 type ExecutePayment {
-  CustomerReference: String!
-  InvoiceId: Int!
-  IsDirectPayment: Boolean!
-  PaymentURL: String!
-  RecurringId: String!
+  CustomerReference: String
+  InvoiceId: Int
+  IsDirectPayment: Boolean
+  PaymentURL: String
+  RecurringId: String
 }
 
 type ExecutePaymentError {
@@ -371,6 +343,11 @@ type Form {
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
+}
+
+type GetPaymentStatusResponse {
+  orderStatus: String!
+  paymentStatus: String!
 }
 
 """
@@ -541,6 +518,11 @@ enum OtpStatusCode {
   INCORRECT
 }
 
+type PaginatedBookings {
+  list: [Booking!]
+  totalCount: Int!
+}
+
 type PaginatedCategories {
   list: [Category!]
   totalCount: Int!
@@ -648,6 +630,7 @@ enum ProductType {
 }
 
 type Query {
+  getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
   getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
   getBooking(id: String!): Booking!
@@ -660,6 +643,7 @@ type Query {
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
+  getOrderPaymentStatus(orderId: String!): GetPaymentStatusResponse!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
@@ -725,8 +709,8 @@ type Tag {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
-  vendor: Vendor!
-  vendorId: String!
+  vendor: Vendor
+  vendorId: String
   workdays: [WorkDay!]!
 }
 

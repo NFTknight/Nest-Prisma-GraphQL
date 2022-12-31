@@ -9,6 +9,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
 import { ProductsService } from '../../products/services/products.service';
 import { CartItemInput } from '../dto/cart.input';
+import { CartItem } from '../models/cart-item.model';
 import { Cart } from '../models/cart.model';
 
 @Injectable()
@@ -106,5 +107,20 @@ export class CartItemService {
     });
 
     return newCart;
+  }
+
+  async resolveItems(items: CartItem[]) {
+    const resolvedItems = [];
+
+    for (const item of items) {
+      const product = await this.productService.getProduct(item.productId);
+
+      resolvedItems.push({
+        ...item,
+        product,
+      });
+    }
+
+    return resolvedItems;
   }
 }

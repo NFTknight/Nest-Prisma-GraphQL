@@ -45,8 +45,8 @@ Table Tag {
   id String [pk]
   title String [not null]
   title_ar String [not null]
-  vendorId String [not null]
-  vendor Vendor [not null]
+  vendorId String
+  vendor Vendor
   products Product [not null]
   productIds String[] [not null]
   active Boolean [not null, default: true]
@@ -258,7 +258,7 @@ Enum BookingStatus {
 
 Ref: Vendor.ownerId - User.id
 
-Ref: Tag.vendorId > Vendor.id
+Ref: Tag.vendorId > Vendor.id [delete: Set Null]
 
 Ref: Tag.productIds > Product.id
 

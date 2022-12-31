@@ -7,16 +7,19 @@ import { Product } from 'src/products/models/product.model';
 import { Tag } from 'src/tags/models/tag.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { BookingTime } from './booking-time.model';
+import { Booking as PrismaBooking } from 'prisma/prisma-client';
 import './booking-status.enum';
 
 @ObjectType()
-export class Booking extends BaseModel {
-  orderId?: string;
+export class Booking extends BaseModel implements PrismaBooking {
+  @Field(() => String, { nullable: true })
+  orderId: string;
 
   @Field(() => Order)
   order?: Order;
 
-  cartId?: string;
+  @Field(() => String, { nullable: true })
+  cartId: string;
   @Field(() => Cart)
   cart?: Cart;
 
@@ -24,8 +27,9 @@ export class Booking extends BaseModel {
   @Field(() => Tag)
   tag?: Tag;
 
-  @Field()
   vendorId: string;
+  @Field(() => Vendor)
+  vendor?: Vendor;
 
   productId: string;
   @Field(() => Product)
@@ -35,8 +39,8 @@ export class Booking extends BaseModel {
   status: BookingStatus;
 
   @Field(() => [BookingTime], { nullable: true })
-  slots?: BookingTime[];
+  slots: BookingTime[];
 
   @Field(() => Date, { nullable: true })
-  holdTimestamp?: Date;
+  holdTimestamp: Date;
 }
