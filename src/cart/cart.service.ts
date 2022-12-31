@@ -202,11 +202,10 @@ export class CartService {
   }
 
   async checkoutCartAndCreateOrder(cartId: string, paymentSession?: string) {
-    // TODO - add payment gateway
-
     const cart = await this.getCart(cartId);
+    const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
-    if (cart.paymentMethod === PaymentMethods.ONLINE && !paymentSession) {
+    if (isOnlinePayment && !paymentSession) {
       throw new BadRequestException('Payment session is required');
     }
 
@@ -219,45 +218,60 @@ export class CartService {
 
     const orderId = `${vendorPrefix}-${nanoid(8)}`.toUpperCase();
 
-    const res = await this.prisma.order.create({
-      data: {
-        orderId,
-        items: cart.items,
-        customerId: cart.customerId,
-        customerInfo: cart.customerInfo,
-        paymentMethod: cart.paymentMethod,
-        appliedCoupon: cart.appliedCoupon,
-        ...(cart.deliveryMethod && {
-          deliveryMethod: cart.deliveryMethod,
-        }),
-        finalPrice: cart.totalPrice,
-        totalPrice: cart.totalPrice,
-        status: OrderStatus.CREATED,
-        vendor: {
-          connect: {
-            id: vendorId,
-          },
-        },
-        cart: {
-          connect: {
-            id: cartId,
-          },
-        },
+    let order = await this.prisma.order.findFirst({
+      where: {
+        cartId,
       },
     });
+
+    if (!order) {
+      order = await this.prisma.order.create({
+        data: {
+          orderId,
+          items: cart.items,
+          customerId: cart.customerId,
+          customerInfo: cart.customerInfo,
+          paymentMethod: cart.paymentMethod,
+          appliedCoupon: cart.appliedCoupon,
+          ...(cart.deliveryMethod && {
+            deliveryMethod: cart.deliveryMethod,
+          }),
+          ...(cart.consigneeAddress && {
+            consigneeAddress: cart.consigneeAddress,
+          }),
+          ...(cart.shipperAddress && {
+            shipperAddress: cart.shipperAddress,
+          }),
+          finalPrice: cart.totalPrice,
+          totalPrice: cart.totalPrice,
+          status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],
+          vendor: {
+            connect: {
+              id: vendorId,
+            },
+          },
+          cart: {
+            connect: {
+              id: cartId,
+            },
+          },
+        },
+      });
+    }
 
     let payment = undefined;
     let errors = undefined;
 
-    if (cart.paymentMethod === PaymentMethods.ONLINE) {
+    if (isOnlinePayment) {
       try {
         payment = await this.paymentService.executePayment(
-          res.id,
-          paymentSession
+          order.id,
+          paymentSession,
+          vendor.slug
         );
 
         await this.prisma.order.update({
-          where: { id: res.id },
+          where: { id: order.id },
           data: {
             invoiceId: payment.InvoiceId.toString(),
           },
@@ -267,10 +281,17 @@ export class CartService {
       }
     }
 
+    // Payment method is not ONLINE or online payment is successfully done
+    if (errors === undefined) {
+      await this.prisma.cart.delete({
+        where: { id: cartId },
+      });
+    }
+
     // Email notification to vendor and customer when order is created
-    if (res.id) {
+    if (order.id) {
       this.emailService.send(
-        SendEmails(ORDER_OPTIONS.PURCHASED, res?.customerInfo?.email)
+        SendEmails(ORDER_OPTIONS.PURCHASED, order?.customerInfo?.email)
       );
       if (vendor?.info?.email)
         this.emailService.send(
@@ -279,7 +300,7 @@ export class CartService {
     }
 
     return {
-      ...res,
+      ...order,
       payment,
       errors,
     };

@@ -373,6 +373,11 @@ type Form {
   vendorId: String!
 }
 
+type GetPaymentStatusResponse {
+  orderStatus: String!
+  paymentStatus: String!
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -660,6 +665,7 @@ type Query {
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
+  getOrderPaymentStatus(orderId: String!): GetPaymentStatusResponse!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
