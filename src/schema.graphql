@@ -703,7 +703,7 @@ type Tag {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   vendor: Vendor
-  vendorId: Vendor
+  vendorId: String
   workdays: [WorkDay!]!
 }
 
