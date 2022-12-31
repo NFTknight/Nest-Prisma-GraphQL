@@ -125,8 +125,8 @@ model Tag {
   title    String
   title_ar String
 
-  vendorId String @db.ObjectId
-  vendor   Vendor @relation(fields: [vendorId], references: [id])
+  vendorId String? @db.ObjectId
+  vendor   Vendor? @relation(fields: [vendorId], references: [id],  onDelete: SetNull)
 
   products   Product[] @relation(fields: [productIds], references: [id])
   productIds String[]  @db.ObjectId

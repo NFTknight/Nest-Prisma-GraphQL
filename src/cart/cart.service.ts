@@ -196,7 +196,11 @@ export class CartService {
     const cart = await this.getCart(cartId);
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
-    if (isOnlinePayment && !paymentSession) {
+    if (!cart.deliveryMethod) {
+      throw new BadRequestException('delivery method is required');
+    } else if (!cart.paymentMethod) {
+      throw new BadRequestException('Payment method is required');
+    } else if (isOnlinePayment && !paymentSession) {
       throw new BadRequestException('Payment session is required');
     }
 

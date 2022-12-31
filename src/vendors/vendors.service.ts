@@ -56,6 +56,7 @@ export class VendorsService {
   }
 
   async getVendor(id: string): Promise<Vendor> {
+    if (!id) return null;
     const vendor = await this.prisma.vendor.findFirst({
       where: { id },
     });
