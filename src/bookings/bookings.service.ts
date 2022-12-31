@@ -5,16 +5,15 @@ import { ProductsService } from 'src/products/services/products.service';
 import { OrdersService } from 'src/orders/orders.service';
 import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
-import {
-  BookingStatus,
-  Booking,
-  OrderStatus,
-  PaymentMethods,
-} from '@prisma/client';
+import { BookingStatus, OrderStatus, PaymentMethods } from '@prisma/client';
 import { TagsService } from 'src/tags/tags.service';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { nanoid } from 'nanoid';
-
+import { PaginatedBookings } from './models/paginated-bookings.model';
+import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { Booking } from 'src/bookings/models/booking.model';
 @Injectable()
 export class BookingsService {
   constructor(
@@ -34,12 +33,47 @@ export class BookingsService {
 
     return booking;
   }
+
   async getBookings(where: any): Promise<Booking[]> {
     const res = await this.prisma.booking.findMany({ where });
 
     if (!res) throw new NotFoundException('Bookings Not Found.');
 
     return res;
+  }
+
+  async getAllBookings(
+    pg?: PaginationArgs,
+    sortOrder?: SortOrder
+  ): Promise<PaginatedBookings> {
+    try {
+      const { skip, take } = getPaginationArgs(pg);
+      let orderBy = {};
+      if (sortOrder) {
+        orderBy[sortOrder.field] = sortOrder.direction;
+      } else {
+        orderBy = {
+          updatedAt: 'desc',
+        };
+      }
+
+      const list = await this.prisma.booking.findMany({
+        skip,
+        take,
+        orderBy,
+      });
+
+      if (!list) throw new NotFoundException('Bookings Not Found.');
+
+      const totalCount = await this.prisma.booking.count();
+
+      return {
+        list,
+        totalCount,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 
   async createBooking(data: CreateBookingInput): Promise<Booking> {

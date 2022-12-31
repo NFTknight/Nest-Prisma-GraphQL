@@ -47,6 +47,7 @@ type Booking {
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
+  vendor: Vendor
   vendorId: String!
 }
 
@@ -517,6 +518,11 @@ enum OtpStatusCode {
   INCORRECT
 }
 
+type PaginatedBookings {
+  list: [Booking!]
+  totalCount: Int!
+}
+
 type PaginatedCategories {
   list: [Category!]
   totalCount: Int!
@@ -624,6 +630,7 @@ enum ProductType {
 }
 
 type Query {
+  getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
   getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
   getBooking(id: String!): Booking!

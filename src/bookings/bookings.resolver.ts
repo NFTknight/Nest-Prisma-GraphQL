@@ -9,18 +9,23 @@ import {
 import { Cart } from 'src/cart/models/cart.model';
 import { CartService } from 'src/cart/cart.service';
 import { ProductsService } from 'src/products/services/products.service';
-
+import { VendorsService } from 'src/vendors/vendors.service';
 import { BookingsService } from './bookings.service';
 import { CreateBookingInput } from './dto/create-booking.input';
 import { UpdateBookingInput } from './dto/update-booking.input';
 import { Booking } from './models/booking.model';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { PaginatedBookings } from './models/paginated-bookings.model';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
+import { Vendor } from '@prisma/client';
 
 @Resolver(() => Booking)
 export class BookingResolver {
   constructor(
     private readonly cartService: CartService,
+    private readonly vendorService: VendorsService,
     private readonly productService: ProductsService,
     private readonly bookingService: BookingsService
   ) {}
@@ -52,6 +57,14 @@ export class BookingResolver {
     return res;
   }
 
+  @Query(() => PaginatedBookings)
+  async getAllBookings(
+    @Args('pagination', { nullable: true }) pg: PaginationArgs,
+    @Args('sortBooking', { nullable: true }) sortOrder: SortOrder
+  ): Promise<PaginatedBookings> {
+    return this.bookingService.getAllBookings(pg, sortOrder);
+  }
+
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Booking)
   createBooking(@Args('data') data: CreateBookingInput): Promise<Booking> {
@@ -81,5 +94,10 @@ export class BookingResolver {
   @ResolveField('product')
   product(@Parent() booking: Booking) {
     return this.productService.getProduct(booking.productId);
+  }
+
+  @ResolveField('vendor')
+  vendor(@Parent() booking: Booking): Promise<Vendor> {
+    return this.vendorService.getVendor(booking.vendorId);
   }
 }
