@@ -22,6 +22,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { SetMetadata, UseGuards } from '@nestjs/common';
 import { RolesGuard } from 'src/auth/gql-signup.guard';
 import { Role } from '@prisma/client';
+import { CartItemService } from 'src/cart/services/cart-item.service';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -29,6 +30,7 @@ export class OrdersResolver {
     private readonly prismaService: PrismaService,
     private readonly ordersService: OrdersService,
     private readonly vendorService: VendorsService,
+    private readonly cartItemService: CartItemService,
     private readonly cartService: CartService
   ) {}
 
@@ -94,5 +96,11 @@ export class OrdersResolver {
   @ResolveField('cart')
   cart(@Parent() order: Order): Promise<Cart> {
     return this.cartService.getCart(order.cartId);
+  }
+
+  @ResolveField('items')
+  async items(@Parent() { id }: Order) {
+    const order = await this.ordersService.getOrder(id);
+    return this.cartItemService.resolveItems(order.items);
   }
 }

@@ -36,13 +36,6 @@ export class OrdersService {
     const order = await this.prisma.order.findUnique({
       where: { id },
     });
-    const updatedCartItem = await Promise.all(
-      order?.items?.map(async (item) => {
-        const product = await this.productsService.getProduct(item.productId);
-        return { ...product, ...item };
-      })
-    );
-    order.items = updatedCartItem;
 
     if (!order) throw new NotFoundException('Order Not Found.');
 

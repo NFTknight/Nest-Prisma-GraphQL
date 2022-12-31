@@ -99,19 +99,10 @@ export class CartService {
         break;
     }
 
-    const updatedCart = await this.prisma.cart.update({
+    return this.prisma.cart.update({
       where: { id: cartId },
       data: omit(cartData, ['id']),
     });
-    const updatedCartItem: any = await Promise.all(
-      updatedCart.items.map(async (item) => {
-        const product = await this.productService.getProduct(item.productId);
-        return { ...product, ...item };
-      })
-    );
-    updatedCart.items = updatedCartItem;
-
-    return updatedCart;
   }
 
   async removeItemFromCart(cartId: string, productId: string, sku: string) {
