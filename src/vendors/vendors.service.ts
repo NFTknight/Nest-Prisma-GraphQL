@@ -41,10 +41,7 @@ export class VendorsService {
     return res;
   }
 
-  updateVendor(
-    id: string,
-    updateVendorInput: UpdateVendorInput
-  ): Promise<Vendor> {
+  updateVendor(id: string, updateVendorInput: UpdateVendorInput) {
     return this.prisma.vendor.update({
       data: { ...updateVendorInput, updatedAt: new Date() },
       where: { id },
@@ -55,7 +52,7 @@ export class VendorsService {
     return this.prisma.vendor.delete({ where: { id } });
   }
 
-  async getVendor(id: string): Promise<Vendor> {
+  async getVendor(id: string) {
     if (!id) return null;
     const vendor = await this.prisma.vendor.findFirst({
       where: { id },

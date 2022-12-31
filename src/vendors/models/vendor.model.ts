@@ -4,9 +4,10 @@ import { VendorBank } from './vendor-bank.model';
 import { VendorInfo } from './vendor-info.model';
 import { VendorSettings } from './vendor-settings.model';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Vendor as PrismaVendor } from '@prisma/client';
 
 @ObjectType()
-export class Vendor extends BaseModel {
+export class Vendor extends BaseModel implements PrismaVendor {
   @Field()
   name: string;
 
@@ -19,13 +20,17 @@ export class Vendor extends BaseModel {
   @Field(() => VendorInfo, {
     nullable: true,
   })
-  info?: VendorInfo;
+  info: VendorInfo;
 
-  @Field(() => VendorSettings)
-  settings?: VendorSettings;
+  @Field(() => VendorSettings, {
+    nullable: true,
+  })
+  settings: VendorSettings;
 
-  @Field(() => VendorBank)
-  bank?: VendorBank;
+  @Field(() => VendorBank, {
+    nullable: true,
+  })
+  bank: VendorBank;
 
   @Field()
   ownerId: string;

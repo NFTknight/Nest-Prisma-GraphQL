@@ -34,12 +34,10 @@ enum Role {
 }
 
 model Vendor {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  slug      String
-  active    Boolean @default(true)
-  heroImage String?
-  logo      String?
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  slug   String
+  active Boolean @default(true)
 
   info     VendorInfo?
   bank     VendorBankInfo?
@@ -76,15 +74,14 @@ type VendorInfo {
   heroImage      String?
   logo           String?
   terms          String?
-  location       String?
+  location       Location?
   instagram      String?
   facebook       String?
   snapchat       String?
   whatsapp       String?
-  vat_num        String?
-  cr_num         String?
+  vatNum         String?
+  crNum          String?
   certificates   Certificate[]
-  iban           String?
 }
 
 enum DeliveryMethods {
@@ -126,7 +123,7 @@ model Tag {
   title_ar String
 
   vendorId String? @db.ObjectId
-  vendor   Vendor? @relation(fields: [vendorId], references: [id],  onDelete: SetNull)
+  vendor   Vendor? @relation(fields: [vendorId], references: [id], onDelete: SetNull)
 
   products   Product[] @relation(fields: [productIds], references: [id])
   productIds String[]  @db.ObjectId
