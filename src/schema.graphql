@@ -348,11 +348,11 @@ enum DeliveryMethods {
 }
 
 type ExecutePayment {
-  CustomerReference: String!
-  InvoiceId: Int!
-  IsDirectPayment: Boolean!
-  PaymentURL: String!
-  RecurringId: String!
+  CustomerReference: String
+  InvoiceId: Int
+  IsDirectPayment: Boolean
+  PaymentURL: String
+  RecurringId: String
 }
 
 type ExecutePaymentError {
