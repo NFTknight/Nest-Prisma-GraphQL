@@ -17,6 +17,6 @@ import { CartItemService } from './services/cart-item.service';
     PaymentModule,
   ],
   providers: [CartItemService, CartService, CartResolver],
-  exports: [CartService],
+  exports: [CartService, CartItemService],
 })
 export class CartModule {}
