@@ -1,17 +1,24 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { Cart } from './models/cart.model';
 import { CartService } from './cart.service';
 import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 import { OrderPayment } from 'src/orders/models/order-payment.model';
 import { DeliveryMethods } from '@prisma/client';
 import { BadRequestException } from '@nestjs/common';
-import { ProductsService } from 'src/products/services/products.service';
+import { CartItemService } from './services/cart-item.service';
 
 @Resolver(Cart)
 export class CartResolver {
   constructor(
     private readonly cartService: CartService,
-    private readonly productService: ProductsService
+    private readonly cartItemService: CartItemService
   ) {}
 
   @Query(() => Cart)
@@ -27,14 +34,6 @@ export class CartResolver {
     if (!cart) {
       cart = await this.cartService.createNewCart(vendorId, customerId);
     }
-
-    const updatedCartItem: any = await Promise.all(
-      cart.items.map(async (item) => {
-        const product = await this.productService.getProduct(item.productId);
-        return { ...product, ...item };
-      })
-    );
-    cart.items = updatedCartItem;
 
     return cart;
   }
@@ -84,16 +83,22 @@ export class CartResolver {
   }
 
   @Mutation(() => Cart)
-  removeCartItem(
+  async removeCartItem(
     @Args('cartId') cartId: string,
     @Args('productId') productId: string,
     @Args('sku') sku: string
   ) {
-    return this.cartService.removeItemFromCart(cartId, productId, sku);
+    const updatedCart = await this.cartService.removeItemFromCart(
+      cartId,
+      productId,
+      sku
+    );
+
+    return updatedCart;
   }
 
   @Mutation(() => Cart)
-  updateCartItem(
+  async updateCartItem(
     @Args('cartId') cartId: string,
     @Args('data') data: CartItemInput
   ) {
@@ -133,5 +138,12 @@ export class CartResolver {
     paymentSession: string
   ) {
     return this.cartService.checkoutCartAndCreateOrder(cartId, paymentSession);
+  }
+
+  @ResolveField('items')
+  async items(@Parent() { id: cartId }: Cart) {
+    const cart = await this.cartService.getCart(cartId);
+    // resolve or product in items
+    return this.cartItemService.resolveItems(cart.items);
   }
 }

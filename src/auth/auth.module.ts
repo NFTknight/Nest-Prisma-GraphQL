@@ -9,6 +9,9 @@ import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './jwt.strategy';
 import { SecurityConfig } from 'src/common/configs/config.interface';
 import { SmsModule } from 'src/sms/sms.module';
+import { UsersService } from 'src/users/users.service';
+import { VendorsService } from 'src/vendors/vendors.service';
+import { SendgridService } from 'src/sendgrid/sendgrid.service';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { SmsModule } from 'src/sms/sms.module';
   ],
   providers: [
     AuthService,
+    VendorsService,
+    SendgridService,
+    UsersService,
     AuthResolver,
     JwtStrategy,
     GqlAuthGuard,

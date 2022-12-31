@@ -5,6 +5,7 @@ import { VendorsModule } from 'src/vendors/vendors.module';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { TagModule } from 'src/tags/tags.module';
 import { FormService } from 'src/forms/forms.service';
+import { JwtService } from '@nestjs/jwt';
 
 // import { ProductVariantsService } from './services/product-variants.service';
 // import { ProductVariantsResolver } from './resolvers/product-variants.resolver';
@@ -15,6 +16,7 @@ import { FormService } from 'src/forms/forms.service';
     ProductsResolver,
     ProductsService,
     FormService,
+    JwtService,
     // ProductVariantsResolver,
     // ProductVariantsService,
   ],

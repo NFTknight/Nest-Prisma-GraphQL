@@ -6,6 +6,7 @@ import { ChangePasswordInput } from './dto/change-password.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { SmsService } from 'src/sms/sms.service';
 import { OtpStatusCode } from 'src/sms/models/check-otp.model';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,15 @@ export class UsersService {
   async updateUser(userId: string, newUserData: UpdateUserInput) {
     return this.prisma.user.update({
       data: newUserData,
+      where: {
+        id: userId,
+      },
+    });
+  }
+
+  async updateUserRole(userId: string, role: Role) {
+    return this.prisma.user.update({
+      data: { role },
       where: {
         id: userId,
       },

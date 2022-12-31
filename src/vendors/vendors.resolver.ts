@@ -4,7 +4,7 @@ import { Vendor } from './models/vendor.model';
 import { PrismaService } from 'nestjs-prisma';
 import { CreateVendorInput } from './dto/create-vendor.input';
 import { UpdateVendorInput } from './dto/update-vendor.input';
-import { UseGuards } from '@nestjs/common';
+import { SetMetadata, UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserEntity } from 'src/common/decorators/user.decorator';
 import { User } from 'src/users/models/user.model';
@@ -12,6 +12,8 @@ import { AddDeliveryAreasInput } from './dto/add-delivery-areas.input';
 import { VendorsView, VendorView } from './models/vendor.model';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { RolesGuard } from 'src/auth/gql-signup.guard';
+import { Role } from '@prisma/client';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -35,11 +37,15 @@ export class VendorsResolver {
     return this.vendorsService.getVendorBySlug(slug);
   }
 
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
   @Query(() => VendorView)
   getVendorView(@Args('vendorId') vendorId: string): Promise<VendorView> {
     return this.vendorsService.getVendorView(vendorId);
   }
 
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
   @Query(() => VendorsView)
   async getVendorsView(
     @Args('pagination', { nullable: true }) pg: PaginationArgs

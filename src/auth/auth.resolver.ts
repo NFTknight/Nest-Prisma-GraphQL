@@ -15,14 +15,18 @@ import { SignupInput } from './dto/signup.input';
 import { RefreshTokenInput } from './dto/refresh-token.input';
 import { SmsService } from 'src/sms/sms.service';
 import { OtpResponse } from 'src/sms/models/otp.model';
-import { UseGuards } from '@nestjs/common';
+import { SetMetadata, UseGuards } from '@nestjs/common';
+import { RolesGuard } from './gql-signup.guard';
 import { Role } from '@prisma/client';
+import { UserRole } from './models/user.role.model';
+import { UsersService } from 'src/users/users.service';
 
 @Resolver(() => Auth)
 export class AuthResolver {
   constructor(
     private readonly auth: AuthService,
-    private readonly sms: SmsService
+    private readonly sms: SmsService,
+    private readonly usersService: UsersService
   ) {}
 
   @Mutation(() => Auth)
@@ -82,6 +86,17 @@ export class AuthResolver {
   @Mutation(() => Token)
   async refreshToken(@Args() { token }: RefreshTokenInput) {
     return this.auth.refreshToken(token);
+  }
+
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
+  @Mutation(() => UserRole)
+  async updateUserRole(
+    @Args({ name: 'userId', type: () => String }) userId: string,
+    @Args({ name: 'role', type: () => Role }) role: Role
+  ) {
+    await this.usersService.updateUserRole(userId, role);
+    return { userId, role };
   }
 
   @ResolveField('user')

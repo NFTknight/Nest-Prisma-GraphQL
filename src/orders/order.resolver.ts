@@ -19,6 +19,10 @@ import { OrdersFilterInput } from 'src/common/filter/filter.input';
 import { PaginatedOrders } from './models/paginated-orders.model';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PrismaService } from 'nestjs-prisma';
+import { SetMetadata, UseGuards } from '@nestjs/common';
+import { RolesGuard } from 'src/auth/gql-signup.guard';
+import { Role } from '@prisma/client';
+import { CartItemService } from 'src/cart/services/cart-item.service';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -26,6 +30,7 @@ export class OrdersResolver {
     private readonly prismaService: PrismaService,
     private readonly ordersService: OrdersService,
     private readonly vendorService: VendorsService,
+    private readonly cartItemService: CartItemService,
     private readonly cartService: CartService
   ) {}
 
@@ -34,6 +39,8 @@ export class OrdersResolver {
     return this.ordersService.getOrder(id);
   }
 
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.VENDOR)
   @Query(() => PaginatedOrders)
   async getOrders(
     @Args('vendorId', { nullable: true }) vendorId: string,
@@ -44,6 +51,8 @@ export class OrdersResolver {
     return await this.ordersService.getOrders(vendorId, pg, sortOrder, filter);
   }
 
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
   @Query(() => PaginatedOrders)
   async getAllOrders(
     @Args('pagination', { nullable: true }) pg?: PaginationArgs,
@@ -87,5 +96,11 @@ export class OrdersResolver {
   @ResolveField('cart')
   cart(@Parent() order: Order): Promise<Cart> {
     return this.cartService.getCart(order.cartId);
+  }
+
+  @ResolveField('items')
+  async items(@Parent() { id }: Order) {
+    const order = await this.ordersService.getOrder(id);
+    return this.cartItemService.resolveItems(order.items);
   }
 }
