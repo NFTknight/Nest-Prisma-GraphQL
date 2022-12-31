@@ -812,19 +812,19 @@ input UpdateVendorInfoInput {
   address: String
   addressUrl: String
   certificates: [Certificate!]
-  cr_num: String
+  crNum: String
   description: String
   description_ar: String
   email: String
   facebook: String
   heroImage: String
-  iban: String
   instagram: String
+  location: LocationInput
   logo: String
   phone: String
   snapchat: String
   terms: String
-  vat_num: String
+  vatNum: String
   whatsapp: String
 }
 
@@ -837,8 +837,9 @@ input UpdateVendorInput {
 }
 
 input UpdateVendorSettingsInput {
-  deliveryMethods: [DeliveryMethods!]!
-  paymentMethods: [PaymentMethods!]!
+  deliveryAreas: [AddDeliveryAreasInput!]
+  deliveryMethods: [DeliveryMethods!]
+  paymentMethods: [PaymentMethods!]
 }
 
 type User {
@@ -913,20 +914,19 @@ type VendorInfo {
   address: String
   addressUrl: String
   certificates: [Certificates!]
-  cr_num: String
+  crNum: String
   description: String
   description_ar: String
   email: String
   facebook: String
   heroImage: String
-  iban: String
   instagram: String
-  location: String
+  location: Location
   logo: String
   phone: String
   snapchat: String
   terms: String
-  vat_num: String
+  vatNum: String
   whatsapp: String
 }
 

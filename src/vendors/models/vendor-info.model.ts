@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Certificate } from '@prisma/client';
+import { Certificate, VendorInfo as PrismaVendorInfo } from '@prisma/client';
+import { Location } from 'src/products/models/product.model';
 
 @ObjectType()
 class Certificates {
@@ -8,56 +9,55 @@ class Certificates {
 }
 
 @ObjectType()
-export class VendorInfo {
-  @Field()
-  address?: string;
+export class VendorInfo implements PrismaVendorInfo {
+  @Field({ nullable: true })
+  address: string;
 
-  @Field()
-  phone?: string;
+  @Field({ nullable: true })
+  phone: string;
 
-  @Field()
-  email?: string;
+  @Field({ nullable: true })
+  email: string;
 
-  @Field()
-  addressUrl?: string;
+  @Field({ nullable: true })
+  addressUrl: string;
 
-  @Field()
-  description?: string;
+  @Field({ nullable: true })
+  description: string;
 
-  @Field()
-  description_ar?: string;
+  @Field({ nullable: true })
+  description_ar: string;
 
-  @Field()
-  terms?: string;
+  @Field({ nullable: true })
+  heroImage: string;
 
-  @Field()
-  heroImage?: string;
+  @Field({ nullable: true })
+  logo: string;
 
-  @Field()
-  logo?: string;
-  location?: string;
+  @Field({ nullable: true })
+  terms: string;
 
-  @Field()
-  instagram?: string;
+  @Field(() => Location, { nullable: true })
+  location: Location;
 
-  @Field()
-  facebook?: string;
+  @Field(() => [Certificates], { nullable: true })
+  certificates: Certificate[];
 
-  @Field()
-  snapchat?: string;
+  @Field({ nullable: true })
+  instagram: string;
 
-  @Field()
-  whatsapp?: string;
+  @Field({ nullable: true })
+  facebook: string;
 
-  @Field()
-  vat_num?: string;
+  @Field({ nullable: true })
+  snapchat: string;
 
-  @Field()
-  cr_num?: string;
+  @Field({ nullable: true })
+  whatsapp: string;
 
-  @Field(() => [Certificates])
-  certificates?: Certificate[];
+  @Field({ nullable: true })
+  vatNum: string;
 
-  @Field()
-  iban?: string;
+  @Field({ nullable: true })
+  crNum: string;
 }

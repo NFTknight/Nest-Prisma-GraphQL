@@ -1,10 +1,19 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { DeliveryMethods, PaymentMethods } from '@prisma/client';
+import {
+  DeliveryMethods,
+  PaymentMethods,
+  DeliveryAreas as PrismaDeliveryAreas,
+} from '@prisma/client';
+
 @ObjectType()
-class DeliveryAreas {
+export class DeliveryAreas implements PrismaDeliveryAreas {
+  @Field()
   label: string;
+  @Field()
   label_ar: string;
+  @Field()
   active: boolean;
+  @Field()
   charge: number;
 }
 
