@@ -23,4 +23,8 @@ export class ReviewsService {
   async updateReview(id: string, data: UpdateReviewInput): Promise<Review> {
     return this.prisma.review.update({ where: { id }, data });
   }
+
+  async getReviewsByProductId(id: string): Promise<Review[]> {
+    return this.prisma.review.findMany({ where: { productId: id } });
+  }
 }

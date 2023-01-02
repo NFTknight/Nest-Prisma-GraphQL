@@ -17,6 +17,11 @@ export class ReviewsResolver {
     return this.reviewService.getReviews();
   }
 
+  @Query(() => [Review])
+  getReviewsByProductId(@Args('id') id: string): Promise<Review[]> {
+    return this.reviewService.getReviewsByProductId(id);
+  }
+
   @Mutation(() => Review)
   deleteReview(@Args('id') id: string): Promise<Review> {
     return this.reviewService.deleteReview(id);
