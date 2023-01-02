@@ -890,6 +890,7 @@ input VariantInput {
 }
 
 type Vendor {
+  MF_vendorCode: Int
   active: Boolean!
   bank: VendorBank
 
