@@ -21,6 +21,7 @@ Table Vendor {
   id String [pk]
   name String [not null]
   slug String [not null]
+  MF_vendorCode Int
   active Boolean [not null, default: true]
   info VendorInfo
   bank VendorBankInfo
