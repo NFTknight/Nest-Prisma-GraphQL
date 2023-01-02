@@ -501,6 +501,10 @@ enum OrderStatus {
 input OrdersFilterInput {
   PaymentMethods: PaymentMethods
   deliveryMethod: DeliveryMethods
+  email: String
+  firstName: String
+  lastName: String
+  phone: String
   status: OrderStatus
 }
 

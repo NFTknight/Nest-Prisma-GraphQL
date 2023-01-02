@@ -52,21 +52,41 @@ export class OrdersService {
       const { skip, take } = getPaginationArgs(pg);
 
       let orderBy = {};
+
+      let where: Prisma.OrderWhereInput = {
+        vendorId,
+      };
+
       if (sortOrder) {
         orderBy[sortOrder.field] = sortOrder.direction;
       } else {
         orderBy = { id: 'asc' };
       }
 
-      const where: Prisma.OrderWhereInput = {
-        vendorId,
-        ...filter,
-      };
+      if (filter) {
+        const { firstName, lastName, phone, email, ...restFilters } = filter;
+        where = { ...where, ...restFilters };
+
+        if (firstName || lastName || phone || email) {
+          where = {
+            ...where,
+            customerInfo: {
+              is: {
+                firstName,
+                lastName,
+                phone,
+                email,
+              },
+            },
+          };
+        }
+      }
 
       const res = await this.prisma.$transaction([
         this.prisma.order.count({ where }),
         this.prisma.order.findMany({ where, skip, take, orderBy }),
       ]);
+
       if (!res) throw new NotFoundException('data not found');
       return { totalCount: res[0], list: res[1] };
     } catch (err) {
