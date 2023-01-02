@@ -360,6 +360,20 @@ model Order {
   updatedAt DateTime @updatedAt
 }
 
+
+model Review {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  productId String
+  rating Float
+  variantTitle String
+  review String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 type CustomerInfo {
   firstName String
   lastName  String
