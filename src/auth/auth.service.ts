@@ -15,6 +15,9 @@ import { SmsService } from 'src/sms/sms.service';
 import { OtpStatusCode } from 'src/sms/models/check-otp.model';
 import { Token } from './models/token.model';
 import { SecurityConfig } from 'src/common/configs/config.interface';
+import { SendgridService } from 'src/sendgrid/sendgrid.service';
+import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
+import { ResetPwtInput } from './dto/reset-pwd.input';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +26,8 @@ export class AuthService {
     private readonly sms: SmsService,
     private readonly prisma: PrismaService,
     private readonly passwordService: PasswordService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly emailService: SendgridService
   ) {}
 
   async createUser(payload: SignupInput): Promise<Token> {
@@ -141,6 +145,47 @@ export class AuthService {
       });
     } catch (e) {
       throw new UnauthorizedException('refresh Token');
+    }
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findFirst({ where: { email } });
+    if (!user) throw new NotFoundException(`No user found for email: ${email}`);
+    const token = this.jwtService.sign(
+      { userId: user.id },
+      { secret: user.password, expiresIn: '1h' } // using old hashed password as a secret make it one time token
+    );
+    const body = `<p>
+    <p>This link will expire in 1 hour</p><br/>
+    <a href="https://portal.dev.anyaa.io/auth/resetPwd/?token=${token}">click on the link to reset your password</a></p>`;
+    this.emailService.send(
+      SendEmails(EMAIL_OPTIONS.FORGOT_PWT, user.email, body)
+    );
+    return user;
+  }
+
+  async resetPassword(payload: ResetPwtInput) {
+    try {
+      const { token, password } = payload;
+      const hashedPwd = await this.passwordService.hashPassword(password);
+      const decodedToken = this.jwtService.decode(token);
+      if (!decodedToken) throw new BadRequestException('Invalid token');
+      const id = decodedToken['userId']; // to get user id for current hash password for token verification
+
+      const user = await this.prisma.user.findUnique({ where: { id } });
+      if (user?.password) {
+        this.jwtService.verify(token, { secret: user.password }); // verify token using old password hash
+        const updatedUser = await this.prisma.user.update({
+          data: { password: hashedPwd },
+          where: {
+            id,
+          },
+        });
+        if (!updatedUser) throw new Error('Unable to update password');
+        return { success: true, message: 'Password updated successfully' };
+      } else throw new Error('Unable to update password');
+    } catch (err) {
+      return { success: false, message: err.message };
     }
   }
 }
