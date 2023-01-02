@@ -16,7 +16,7 @@ export const EMAIL_OPTIONS = {
   REVIEW_PRODUCT: 'REVIEW_PRODUCT',
 };
 
-export const SendEmails = (type: string, toEmail: string) => {
+export const SendEmails = (type: string, toEmail: string, body?: string) => {
   const mail = { to: toEmail, from: fromEmail };
 
   switch (type) {
@@ -58,9 +58,9 @@ export const SendEmails = (type: string, toEmail: string) => {
     case EMAIL_OPTIONS.FORGOT_PWT:
       return {
         ...mail,
-        subject: 'Order placement',
+        subject: 'Forgot Password',
         text: 'You have an Order',
-        html: '<p>You have an Order</p>',
+        html: body,
       };
     case EMAIL_OPTIONS.AMOUNT_REFUND:
       return {

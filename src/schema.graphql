@@ -305,6 +305,11 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DefaultResponse {
+  message: String!
+  success: Boolean!
+}
+
 type DeliveryAreas {
   active: Boolean!
   charge: Int!
@@ -398,11 +403,13 @@ type Mutation {
   deleteProduct(id: String!): Product!
   deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
+  forgotPassword(email: String!): User!
   initiatePaymentSession: PaymentSession!
   login(data: LoginInput!): Auth!
   phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
   removeCartItem(cartId: String!, productId: String!, sku: String!): Cart!
+  resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
   updateBooking(data: UpdateBookingInput!, id: String!): Booking!
@@ -660,6 +667,11 @@ type Query {
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
+}
+
+input ResetPwtInput {
+  password: String!
+  token: JWT!
 }
 
 """User role"""
