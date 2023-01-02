@@ -183,8 +183,11 @@ export class VendorsService {
       prefix = vendor.name.slice(0, 2).toUpperCase();
     } else if (vendorStrArr.length === 2) {
       prefix = vendorStrArr[0][0] + vendorStrArr[1][0];
-    } else {
+    } else if (vendorStrArr.length > 2) {
       prefix = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
+    } else {
+      // default vendor prefix if name doesn't exist for vendor
+      prefix = 'VE';
     }
     return prefix;
   }
