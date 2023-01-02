@@ -25,4 +25,16 @@ export class OrdersFilterInput implements Prisma.OrderWhereInput {
   deliveryMethod?: DeliveryMethods;
   @Field(() => PaymentMethods)
   PaymentMethods?: PaymentMethods;
+
+  @Field(() => String, { nullable: true })
+  firstName?: string;
+
+  @Field(() => String, { nullable: true })
+  lastName?: string;
+
+  @Field(() => String, { nullable: true })
+  phone?: string;
+
+  @Field(() => String, { nullable: true })
+  email?: string;
 }
