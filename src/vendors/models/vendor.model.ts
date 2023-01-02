@@ -14,6 +14,9 @@ export class Vendor extends BaseModel implements PrismaVendor {
   @Field()
   slug: string;
 
+  @Field(() => Int, { nullable: true })
+  MF_vendorCode: number;
+
   @Field()
   active: boolean;
 

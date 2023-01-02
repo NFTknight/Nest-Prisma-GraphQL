@@ -23,15 +23,29 @@ export class VendorsService {
   async createVendor(
     createVendorInput: CreateVendorInput,
     user: User
-  ): Promise<Vendor> {
+  ): Promise<any> {
     const vendor = await this.prisma.vendor.findFirst({
       where: { ownerId: user.id },
     });
 
     if (vendor) throw new BadRequestException('Vendor Already Exists For User');
 
+    const lastVendor = await this.prisma.vendor.findMany({
+      take: 1,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    let MF_vendorCode = lastVendor[0]?.MF_vendorCode;
+    if (typeof MF_vendorCode === 'number') MF_vendorCode = MF_vendorCode + 1;
+
     const res = await this.prisma.vendor.create({
-      data: { ...createVendorInput, ownerId: user.id },
+      data: {
+        ...createVendorInput,
+        MF_vendorCode,
+        ownerId: user.id,
+      },
     });
 
     this.emailService.send(
@@ -183,8 +197,11 @@ export class VendorsService {
       prefix = vendor.name.slice(0, 2).toUpperCase();
     } else if (vendorStrArr.length === 2) {
       prefix = vendorStrArr[0][0] + vendorStrArr[1][0];
-    } else {
+    } else if (vendorStrArr.length > 2) {
       prefix = vendorStrArr[0][0] + vendorStrArr[vendorStrArr.length - 1][0];
+    } else {
+      // default vendor prefix if name doesn't exist for vendor
+      prefix = 'VE';
     }
     return prefix;
   }

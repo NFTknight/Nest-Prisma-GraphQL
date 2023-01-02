@@ -37,6 +37,7 @@ model Vendor {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
   name   String
   slug   String
+  MF_vendorCode Int?
   active Boolean @default(true)
 
   info     VendorInfo?
