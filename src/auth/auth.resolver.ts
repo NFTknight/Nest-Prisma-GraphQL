@@ -20,6 +20,9 @@ import { RolesGuard } from './gql-signup.guard';
 import { Role } from '@prisma/client';
 import { UserRole } from './models/user.role.model';
 import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/models/user.model';
+import { ResetPwtInput } from './dto/reset-pwd.input';
+import { DefaultResponse } from 'src/common/models/response.model';
 
 @Resolver(() => Auth)
 export class AuthResolver {
@@ -86,6 +89,14 @@ export class AuthResolver {
   @Mutation(() => Token)
   async refreshToken(@Args() { token }: RefreshTokenInput) {
     return this.auth.refreshToken(token);
+  }
+  @Mutation(() => User)
+  async forgotPassword(@Args('email') email: string) {
+    return this.auth.forgotPassword(email);
+  }
+  @Mutation(() => DefaultResponse)
+  async resetPassword(@Args('data') data: ResetPwtInput) {
+    return this.auth.resetPassword(data);
   }
 
   @UseGuards(RolesGuard)
