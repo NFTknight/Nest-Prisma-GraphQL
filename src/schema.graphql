@@ -268,6 +268,14 @@ input CreateProductInput {
   vendorId: String!
 }
 
+input CreateReviewInput {
+  name: String!
+  productId: String!
+  rating: Float!
+  review: String!
+  variantTitle: String!
+}
+
 input CreateTagInput {
   active: Boolean!
   productIds: [String!]
@@ -378,6 +386,7 @@ type Mutation {
   addDeliveryAreas(areas: [AddDeliveryAreasInput!]!, id: String!): Vendor!
   addItemToCart(cartId: String!, data: CartItemInput!): Cart!
   addProductToCart(cartId: String!, data: CartItemInput!): Cart!
+  addReview(data: CreateReviewInput!): Review!
   addServiceToCart(cartId: String!, data: CartItemInput!): Cart!
   addWorkshopToCart(cartId: String!, data: CartItemInput!): Cart!
   changePassword(data: ChangePasswordInput!): User!
@@ -396,6 +405,7 @@ type Mutation {
   deleteForm(id: String!): Form!
   deleteOrder(id: String!): Order!
   deleteProduct(id: String!): Product!
+  deleteReview(id: String!): Review!
   deleteTag(id: String!): Tag!
   deleteVendor(id: String!): Vendor!
   initiatePaymentSession: PaymentSession!
@@ -413,6 +423,7 @@ type Mutation {
   updateForm(data: UpdateFormInput!, id: String!): Form!
   updateOrder(data: UpdateOrderInput!, id: String!): Order!
   updateProduct(data: UpdateProductInput!, id: String!): Product!
+  updateReview(data: UpdateReviewInput!, id: String!): Review!
   updateTag(data: UpdateTagInput!, id: String!): Tag!
   updateUser(data: UpdateUserInput!): User!
   updateUserRole(role: Role!, userId: String!): UserRole!
@@ -651,6 +662,7 @@ type Query {
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
+  getReviews: [Review!]!
   getTag(id: String!): Tag!
   getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [BookingTime!]!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
@@ -664,6 +676,20 @@ type Query {
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
+}
+
+type Review {
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  productId: String!
+  rating: Float!
+  review: String!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  variantTitle: String!
 }
 
 """User role"""
@@ -789,6 +815,14 @@ input UpdateProductInput {
   title_ar: String
   type: ProductType
   variants: [VariantInput!]
+}
+
+input UpdateReviewInput {
+  name: String
+  productId: String
+  rating: Float
+  review: String
+  variantTitle: String
 }
 
 input UpdateTagInput {
