@@ -43,6 +43,13 @@ spec:
                 secretKeyRef:
                   name: unifonic
                   key: app-id
+            - name: MYFATOORAH_API_URL
+              value: {{ .Values.myfatoorah.endpoint }}
+            - name: MYFATOORAH_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: myfatoorah
+                  key: token
             - name: SMSA_API_URL
               valueFrom:
                 secretKeyRef:

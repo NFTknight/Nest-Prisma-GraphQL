@@ -31,4 +31,7 @@ acme:
 storage:
   endpoint: https://ams3.digitaloceanspaces.com
   space: anyaa-dev
+
+myfatoorah:
+  endpoint: https://apitest.myfatoorah.com
   
