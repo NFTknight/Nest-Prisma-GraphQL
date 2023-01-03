@@ -60,4 +60,22 @@ export class AnalyticsService {
 
     return response;
   }
+
+  async numberOfDroppedBaskets(vendorId): Promise<number> {
+    const subtractHour = (date, hour) => {
+      date.setHours(date.getHours() - hour);
+      return date;
+    };
+    const numberOfDroppedBaskets = await this.prisma.cart.count({
+      where: {
+        AND: [
+          { vendorId },
+          {
+            createdAt: { lte: subtractHour(new Date(), 24) },
+          },
+        ],
+      },
+    });
+    return numberOfDroppedBaskets;
+  }
 }

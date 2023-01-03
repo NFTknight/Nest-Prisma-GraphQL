@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Query, Resolver } from '@nestjs/graphql';
 import { PrismaService } from 'nestjs-prisma';
 import { AnalyticsService } from './analytics.service';
 import { Analytics } from './models/analytics.models';
@@ -13,5 +13,10 @@ export class AnalyticsResolver {
   @Query(() => Analytics)
   getAnalytics(@Args('vendorId') id: string): Promise<Analytics> {
     return this.analyticsService.getAnalytics(id);
+  }
+
+  @Query(() => Int)
+  numberOfDroppedBaskets(@Args('vendorId') id: string): Promise<number> {
+    return this.analyticsService.numberOfDroppedBaskets(id);
   }
 }

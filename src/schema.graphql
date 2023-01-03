@@ -702,6 +702,7 @@ type Query {
   getVendorsView(pagination: PaginationArgs): VendorsView!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
+  numberOfDroppedBaskets(vendorId: String!): Int!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
 }
