@@ -9,6 +9,11 @@ input AddDeliveryAreasInput {
   label_ar: String!
 }
 
+type Analytics {
+  deliveryMethods: DeliveryMethodAnalytics!
+  paymentMethods: PaymentMethodAnalytics!
+}
+
 """Attendance Type"""
 enum AttendanceType {
   ONLINE
@@ -325,6 +330,12 @@ type DeliveryAreas {
   label_ar: String!
 }
 
+type DeliveryMethodAnalytics {
+  MANDOOB: Int!
+  PICKUP: Int!
+  SMSA: Int!
+}
+
 """Delivery Methods"""
 enum DeliveryMethods {
   MANDOOB
@@ -575,6 +586,13 @@ input PaginationArgs {
   pageSize: Int
 }
 
+type PaymentMethodAnalytics {
+  BANK_TRANSFER: Int!
+  CASH: Int!
+  ONLINE: Int!
+  STORE: Int!
+}
+
 """Payment Methods"""
 enum PaymentMethods {
   BANK_TRANSFER
@@ -655,7 +673,7 @@ type Query {
   getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
   getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
-  getAnalytics: String!
+  getAnalytics(vendorId: String!): Analytics!
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!

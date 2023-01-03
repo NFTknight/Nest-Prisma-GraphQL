@@ -1,6 +1,7 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { PrismaService } from 'nestjs-prisma';
 import { AnalyticsService } from './analytics.service';
+import { Analytics } from './models/analytics.models';
 
 @Resolver(() => String)
 export class AnalyticsResolver {
@@ -9,8 +10,8 @@ export class AnalyticsResolver {
     private readonly prisma: PrismaService
   ) {}
 
-  @Query(() => String)
-  getAnalytics(): Promise<string> {
-    return this.analyticsService.getAnalytics();
+  @Query(() => Analytics)
+  getAnalytics(@Args('vendorId') id: string): Promise<Analytics> {
+    return this.analyticsService.getAnalytics(id);
   }
 }
