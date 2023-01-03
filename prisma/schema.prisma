@@ -36,6 +36,7 @@ enum Role {
 model Vendor {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
   name   String
+  name_ar String?
   slug   String
   MF_vendorCode Int?
   active Boolean @default(true)

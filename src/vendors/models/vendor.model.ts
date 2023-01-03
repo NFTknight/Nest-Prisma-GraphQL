@@ -11,6 +11,9 @@ export class Vendor extends BaseModel implements PrismaVendor {
   @Field()
   name: string;
 
+  @Field(() => String, { nullable: true })
+  name_ar: string;
+
   @Field()
   slug: string;
 

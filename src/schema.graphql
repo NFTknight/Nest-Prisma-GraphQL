@@ -293,6 +293,7 @@ input CreateTagInput {
 
 input CreateVendorInput {
   name: String!
+  name_ar: String
   slug: String!
 }
 
@@ -905,6 +906,7 @@ input UpdateVendorInput {
   bank: UpdateVendorBankInput
   info: UpdateVendorInfoInput
   name: String
+  name_ar: String
   settings: UpdateVendorSettingsInput
 }
 
@@ -967,6 +969,7 @@ type Vendor {
   id: ID!
   info: VendorInfo
   name: String!
+  name_ar: String
   owner: User
   ownerId: String!
   settings: VendorSettings

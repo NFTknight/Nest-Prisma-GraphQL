@@ -74,6 +74,11 @@ spec:
                 secretKeyRef:
                   name: do-storage
                   key: secret-key
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sendgrid
+                  key: api-key
           resources: {{ toYaml .Values.resources | nindent 12 }}
           livenessProbe:
             httpGet:
