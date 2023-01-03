@@ -118,6 +118,9 @@ export class UpdateVendorInput {
   @Field()
   name?: string;
 
+  @Field({ nullable: true })
+  name_ar: string;
+
   @Field()
   active?: boolean;
 

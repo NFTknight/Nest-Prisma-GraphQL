@@ -7,6 +7,9 @@ export class CreateVendorInput {
   @IsNotEmpty()
   name: string;
 
+  @Field(() => String, { nullable: true })
+  name_ar?: string;
+
   @Field()
   @IsNotEmpty()
   slug: string;

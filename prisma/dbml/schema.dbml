@@ -20,6 +20,7 @@ Table User {
 Table Vendor {
   id String [pk]
   name String [not null]
+  name_ar String
   slug String [not null]
   MF_vendorCode Int
   active Boolean [not null, default: true]

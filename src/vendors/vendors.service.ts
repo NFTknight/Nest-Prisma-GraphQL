@@ -30,20 +30,10 @@ export class VendorsService {
 
     if (vendor) throw new BadRequestException('Vendor Already Exists For User');
 
-    const lastVendor = await this.prisma.vendor.findMany({
-      take: 1,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    let MF_vendorCode = lastVendor[0]?.MF_vendorCode;
-    if (typeof MF_vendorCode === 'number') MF_vendorCode = MF_vendorCode + 1;
-
     const res = await this.prisma.vendor.create({
       data: {
         ...createVendorInput,
-        MF_vendorCode,
+        MF_vendorCode: 1,
         ownerId: user.id,
       },
     });

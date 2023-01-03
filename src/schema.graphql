@@ -287,6 +287,7 @@ input CreateTagInput {
 
 input CreateVendorInput {
   name: String!
+  name_ar: String
   slug: String!
 }
 
@@ -686,6 +687,11 @@ type Query {
   trackShipment(trackingNumber: String!): WayBill!
 }
 
+input ResetPwtInput {
+  password: String!
+  token: JWT!
+}
+
 type Review {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -698,11 +704,6 @@ type Review {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   variantTitle: String!
-}
-
-input ResetPwtInput {
-  password: String!
-  token: JWT!
 }
 
 """User role"""
@@ -884,6 +885,7 @@ input UpdateVendorInput {
   bank: UpdateVendorBankInput
   info: UpdateVendorInfoInput
   name: String
+  name_ar: String
   settings: UpdateVendorSettingsInput
 }
 
@@ -946,6 +948,7 @@ type Vendor {
   id: ID!
   info: VendorInfo
   name: String!
+  name_ar: String
   owner: User
   ownerId: String!
   settings: VendorSettings
