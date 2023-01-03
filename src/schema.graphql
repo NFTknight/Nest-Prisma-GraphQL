@@ -689,6 +689,7 @@ type Query {
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
+  getRevenueAndTopProduct(vendorId: String!): RevenueProductAnalytics!
   getReviews: [Review!]!
   getReviewsByProductId(id: String!): [Review!]!
   getTag(id: String!): Tag!
@@ -710,6 +711,11 @@ type Query {
 input ResetPwtInput {
   password: String!
   token: JWT!
+}
+
+type RevenueProductAnalytics {
+  product: Product!
+  revenue: Float!
 }
 
 type Review {
