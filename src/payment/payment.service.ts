@@ -62,8 +62,8 @@ export class PaymentService {
       DisplayCurrencyIso: 'KWD',
       CustomerEmail: order.customerInfo.email,
       CustomerReference: order.orderId,
-      CallBackUrl: `http://api.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/confirmation`,
-      ErrorUrl: `http://api.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/failure`,
+      CallBackUrl: `https://app.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/confirmation`,
+      ErrorUrl: `https://app.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/failure`,
       InvoiceItems: order.items.map((item) => ({
         ItemName: `${item.productId}_${item.sku}`,
         Quantity: item.quantity,
