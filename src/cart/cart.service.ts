@@ -284,7 +284,7 @@ export class CartService {
     }
 
     // Email notification to vendor and customer when order is created
-    if (order.id) {
+    if (order.id && errors === undefined) {
       this.emailService.send(
         SendEmails(ORDER_OPTIONS.PURCHASED, order?.customerInfo?.email)
       );
