@@ -655,6 +655,7 @@ type Query {
   getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
   getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
+  getAnalytics: String!
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
@@ -686,6 +687,11 @@ type Query {
   trackShipment(trackingNumber: String!): WayBill!
 }
 
+input ResetPwtInput {
+  password: String!
+  token: JWT!
+}
+
 type Review {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -698,11 +704,6 @@ type Review {
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
   variantTitle: String!
-}
-
-input ResetPwtInput {
-  password: String!
-  token: JWT!
 }
 
 """User role"""
