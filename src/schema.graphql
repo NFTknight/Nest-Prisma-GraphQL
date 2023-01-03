@@ -11,6 +11,7 @@ input AddDeliveryAreasInput {
 
 type Analytics {
   deliveryMethods: DeliveryMethodAnalytics!
+  numberOfOrders: Int!
   paymentMethods: PaymentMethodAnalytics!
 }
 

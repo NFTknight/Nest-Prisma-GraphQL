@@ -19,6 +19,7 @@ export class AnalyticsService {
         BANK_TRANSFER: 0,
         STORE: 0,
       },
+      numberOfOrders: 0,
     };
 
     const deliverMethod = await this.prisma.order.groupBy({
@@ -27,6 +28,9 @@ export class AnalyticsService {
       _count: {
         deliveryMethod: true,
       },
+    });
+    const numberOfOrders = await this.prisma.order.count({
+      where: { vendorId },
     });
 
     const paymentMethod = await this.prisma.order.groupBy({
@@ -49,6 +53,9 @@ export class AnalyticsService {
         response.paymentMethods[group.paymentMethod] =
           group._count.paymentMethod;
       });
+    }
+    if (numberOfOrders) {
+      response['numberOfOrders'] = numberOfOrders;
     }
 
     return response;

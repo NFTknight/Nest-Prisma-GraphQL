@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { DeliveryMethodAnalytics } from './analytics.deliveryMethods.model';
 import { PaymentMethodAnalytics } from './analytics.paymentMethods';
 
@@ -9,4 +9,7 @@ export class Analytics {
 
   @Field(() => PaymentMethodAnalytics)
   paymentMethods: PaymentMethodAnalytics;
+
+  @Field(() => Int)
+  numberOfOrders: number;
 }
