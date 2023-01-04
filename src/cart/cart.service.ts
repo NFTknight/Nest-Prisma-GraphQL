@@ -49,11 +49,24 @@ export class CartService {
   }
 
   async getCartByCustomer(customerId: string, vendorId: string): Promise<Cart> {
-    return this.prisma.cart.findFirst({
+    const res = await this.prisma.cart.findFirst({
       where: {
         customerId: customerId.toString(),
         vendorId: vendorId.toString(),
       },
+    });
+
+    // logic to check if all the products in the cartItems are valid and existing
+    for (const item of res.items) {
+      const product = await this.prisma.product.findUnique({
+        where: { id: item.productId },
+      });
+      if (!product) {
+        await this.removeItemFromCart(res.id, item.productId, item.sku);
+      }
+    }
+    return await this.prisma.cart.findUnique({
+      where: { id: res.id },
     });
   }
 
