@@ -4,6 +4,7 @@ import { Cart } from './models/cart.model';
 
 import { CartItemInput } from './dto/cart.input';
 import {
+  CartItem,
   OrderStatus,
   PaymentMethods,
   Prisma,
@@ -55,19 +56,28 @@ export class CartService {
         vendorId: vendorId.toString(),
       },
     });
+    const cartItems = [...res.items];
 
     // logic to check if all the products in the cartItems are valid and existing
-    for (const item of res.items) {
+    for (const [i, item] of cartItems.entries()) {
       const product = await this.prisma.product.findUnique({
         where: { id: item.productId },
       });
       if (!product) {
         await this.removeItemFromCart(res.id, item.productId, item.sku);
+        cartItems.splice(i, 1);
       }
     }
-    return await this.prisma.cart.findUnique({
-      where: { id: res.id },
-    });
+    const totalPrice = cartItems.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    return {
+      ...res,
+      totalPrice,
+      items: cartItems,
+    };
   }
 
   async updateCartPrice(
