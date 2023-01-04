@@ -419,6 +419,7 @@ type Mutation {
   login(data: LoginInput!): Auth!
   phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
+  refundPayment(orderId: String!): RefundPaymentAPIResponse!
   removeCartItem(cartId: String!, productId: String!, sku: String!): Cart!
   resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
@@ -685,6 +686,19 @@ type Query {
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
+}
+
+type RefundPaymentAPIResponse {
+  errors: [ExecutePaymentError!]
+  responseData: RefundPaymentAPIResponseSuccess
+}
+
+type RefundPaymentAPIResponseSuccess {
+  Amount: String
+  Comment: String
+  Key: String
+  RefundId: Int
+  RefundReference: String
 }
 
 input ResetPwtInput {

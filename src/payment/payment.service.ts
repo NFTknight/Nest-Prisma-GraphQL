@@ -7,6 +7,7 @@ import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
 import { PaymentStatusApiRequest } from './dto/payment-status.dto';
+import { RefundPaymentApiRequest } from './dto/refund-payment.dto';
 import { PaymentSession } from './models/payment-session.model';
 
 const OrderInvoiceStatus = {
@@ -98,24 +99,20 @@ export class PaymentService {
       KeyType: 'invoiceid',
     };
 
-    const res = await firstValueFrom(
+    const response = await firstValueFrom(
       this.httpService
         .post(url, data, {
           headers: {
             Authorization: `Bearer ${this.paymentConfig.token}`,
           },
         })
-        .pipe(
-          map((res) => {
-            return res.data.Data;
-          })
-        )
+        .pipe(map((res) => res.data.Data))
     );
     let orderStatus = order.status;
-    if (res?.InvoiceStatus !== OrderInvoiceStatus.PENDING) {
+    if (response?.InvoiceStatus !== OrderInvoiceStatus.PENDING) {
       try {
         orderStatus =
-          res?.InvoiceStatus === OrderInvoiceStatus.PAID
+          response?.InvoiceStatus === OrderInvoiceStatus.PAID
             ? OrderStatus.PENDING
             : OrderStatus.FAILED;
 
@@ -130,7 +127,49 @@ export class PaymentService {
 
     return {
       orderStatus,
-      paymentStatus: res?.InvoiceStatus,
+      paymentStatus: response?.InvoiceStatus,
+    };
+  }
+
+  async refundPayment(orderId: string) {
+    const url = `${this.paymentConfig.url}/v2/MakeRefund`;
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order Not Found.');
+
+    const data: RefundPaymentApiRequest = {
+      Key: order.invoiceId,
+      KeyType: 'invoiceid',
+      RefundChargeOnCustomer: true,
+      ServiceChargeOnCustomer: true,
+      Amount: order.finalPrice,
+      Comment: `${order.invoiceId}`, // For reference, this key will return with response.
+      AmountDeductedFromSupplier: 0,
+    };
+
+    let responseData = {};
+    let errors = undefined;
+    try {
+      responseData = await firstValueFrom(
+        this.httpService
+          .post(url, data, {
+            headers: {
+              Authorization: `Bearer ${this.paymentConfig.token}`,
+            },
+          })
+          .pipe(map((res) => res.data?.Data))
+      );
+    } catch (error) {
+      errors = error.response.data.ValidationErrors;
+    }
+    return {
+      responseData,
+      errors,
     };
   }
 }
