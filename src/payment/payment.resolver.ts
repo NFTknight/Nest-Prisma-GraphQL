@@ -28,4 +28,9 @@ export class PaymentResolver {
   supplierRefundPayment(@Args('orderId') orderId: string) {
     return this.paymentService.supplierRefundPayment(orderId);
   }
+
+  @Query(() => RefundPaymentAPIResponse)
+  getRefundPaymentStatus(@Args('invoiceId') invoiceId: string) {
+    return this.paymentService.checkRefundPaymentStatus(invoiceId);
+  }
 }

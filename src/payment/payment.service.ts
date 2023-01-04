@@ -224,4 +224,34 @@ export class PaymentService {
       errors,
     };
   }
+
+  async checkRefundPaymentStatus(invoiceId: string) {
+    const url = `${this.paymentConfig.url}/v2/GetRefundStatus`;
+
+    const data: PaymentStatusApiRequest = {
+      Key: invoiceId,
+      KeyType: 'invoiceid',
+    };
+
+    let response = {};
+    let errors = undefined;
+    try {
+      response = await firstValueFrom(
+        this.httpService
+          .post(url, data, {
+            headers: {
+              Authorization: `Bearer ${this.paymentConfig.token}`,
+            },
+          })
+          .pipe(map((res) => res.data.Data))
+      );
+    } catch (error) {
+      errors = error.response.data.ValidationErrors;
+    }
+
+    return {
+      ...response,
+      errors,
+    };
+  }
 }

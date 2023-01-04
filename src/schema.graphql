@@ -672,6 +672,7 @@ type Query {
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
+  getRefundPaymentStatus(invoiceId: String!): RefundPaymentAPIResponse!
   getReviews: [Review!]!
   getReviewsByProductId(id: String!): [Review!]!
   getTag(id: String!): Tag!
@@ -700,6 +701,16 @@ type RefundPaymentAPIResponseSuccess {
   Key: String
   RefundId: Int
   RefundReference: String
+  RefundStatusResult: [RefundPaymentStatusRes!]
+}
+
+type RefundPaymentStatusRes {
+  Amount: Int
+  InvoiceId: Int
+  RefundAmount: Int
+  RefundId: Int
+  RefundReference: String
+  RefundStatus: String
 }
 
 input ResetPwtInput {
