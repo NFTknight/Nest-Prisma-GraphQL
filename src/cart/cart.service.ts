@@ -50,34 +50,39 @@ export class CartService {
   }
 
   async getCartByCustomer(customerId: string, vendorId: string): Promise<Cart> {
-    const res = await this.prisma.cart.findFirst({
-      where: {
-        customerId: customerId.toString(),
-        vendorId: vendorId.toString(),
-      },
-    });
-    const cartItems = [...res.items];
-
-    // logic to check if all the products in the cartItems are valid and existing
-    for (const [i, item] of cartItems.entries()) {
-      const product = await this.prisma.product.findUnique({
-        where: { id: item.productId },
+    try {
+      const res = await this.prisma.cart.findFirst({
+        where: {
+          customerId: customerId.toString(),
+          vendorId: vendorId.toString(),
+        },
       });
-      if (!product) {
-        await this.removeItemFromCart(res.id, item.productId, item.sku);
-        cartItems.splice(i, 1);
-      }
-    }
-    const totalPrice = cartItems.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+      if (!res) throw new BadRequestException('Cart not found for customer');
+      const cartItems = [...res.items];
 
-    return {
-      ...res,
-      totalPrice,
-      items: cartItems,
-    };
+      // logic to check if all the products in the cartItems are valid and existing
+      for (const [i, item] of cartItems.entries()) {
+        const product = await this.prisma.product.findUnique({
+          where: { id: item.productId },
+        });
+        if (!product) {
+          await this.removeItemFromCart(res.id, item.productId, item.sku);
+          cartItems.splice(i, 1);
+        }
+      }
+      const totalPrice = cartItems.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      );
+
+      return {
+        ...res,
+        totalPrice,
+        items: cartItems,
+      };
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
   async updateCartPrice(
