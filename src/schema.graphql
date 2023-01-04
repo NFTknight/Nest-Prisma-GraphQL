@@ -424,6 +424,7 @@ type Mutation {
   resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
+  supplierRefundPayment(orderId: String!): RefundPaymentAPIResponse!
   updateBooking(data: UpdateBookingInput!, id: String!): Booking!
   updateCart(cartId: String!, data: CartUpdateInput!): Cart!
   updateCartItem(cartId: String!, data: CartItemInput!): Cart!

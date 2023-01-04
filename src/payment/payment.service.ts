@@ -5,9 +5,13 @@ import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
+import { VendorsService } from 'src/vendors/vendors.service';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
 import { PaymentStatusApiRequest } from './dto/payment-status.dto';
-import { RefundPaymentApiRequest } from './dto/refund-payment.dto';
+import {
+  RefundPaymentApiRequest,
+  SupplierRefundPaymentApiRequest,
+} from './dto/refund-payment.dto';
 import { PaymentSession } from './models/payment-session.model';
 
 const OrderInvoiceStatus = {
@@ -23,7 +27,8 @@ export class PaymentService {
   constructor(
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly vendorService: VendorsService
   ) {
     this.paymentConfig = this.config.get<PaymentConfig>('payment');
   }
@@ -54,8 +59,6 @@ export class PaymentService {
         id: orderId,
       },
     });
-    // TODO callback url should be dynamic
-    // TODO DisplayCurrencyIso should be dynamic
     const data: ExecutePaymentApiRequest = {
       SessionId: sessionId,
       InvoiceValue: order.totalPrice,
@@ -150,6 +153,55 @@ export class PaymentService {
       Amount: order.finalPrice,
       Comment: `${order.invoiceId}`, // For reference, this key will return with response.
       AmountDeductedFromSupplier: 0,
+    };
+
+    let responseData = {};
+    let errors = undefined;
+    try {
+      responseData = await firstValueFrom(
+        this.httpService
+          .post(url, data, {
+            headers: {
+              Authorization: `Bearer ${this.paymentConfig.token}`,
+            },
+          })
+          .pipe(map((res) => res.data?.Data))
+      );
+    } catch (error) {
+      errors = error.response.data.ValidationErrors;
+    }
+    return {
+      responseData,
+      errors,
+    };
+  }
+
+  async supplierRefundPayment(orderId: string) {
+    const url = `${this.paymentConfig.url}/v2/MakeSupplierRefund`;
+
+    // Todo [QASIM]: Need to use orderService but for now skipping because of circular dependencies issue
+    // [NOTE]: forwardRef is not working in this case
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order Not Found.');
+
+    const vendor = await this.vendorService.getVendor(order.vendorId);
+
+    const data: SupplierRefundPaymentApiRequest = {
+      Key: order.invoiceId,
+      KeyType: 'invoiceid',
+      VendorDeductAmount: order.finalPrice,
+      Comment: `${order.invoiceId}`, // For reference, this key will return with response.
+      Suppliers: [
+        {
+          SupplierCode: vendor?.MF_vendorCode,
+          SupplierDeductedAmount: 0,
+        },
+      ],
     };
 
     let responseData = {};

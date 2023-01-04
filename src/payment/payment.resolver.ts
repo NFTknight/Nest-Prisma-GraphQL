@@ -23,4 +23,9 @@ export class PaymentResolver {
   refundPayment(@Args('orderId') orderId: string) {
     return this.paymentService.refundPayment(orderId);
   }
+
+  @Mutation(() => RefundPaymentAPIResponse)
+  supplierRefundPayment(@Args('orderId') orderId: string) {
+    return this.paymentService.supplierRefundPayment(orderId);
+  }
 }
