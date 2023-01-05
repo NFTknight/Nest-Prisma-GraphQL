@@ -9,6 +9,11 @@ input AddDeliveryAreasInput {
   label_ar: String!
 }
 
+input AddSubscriptionInput {
+  plan: SubscriptionPlan!
+  type: SubscriptionType!
+}
+
 """Attendance Type"""
 enum AttendanceType {
   ONLINE
@@ -289,6 +294,7 @@ input CreateVendorInput {
   name: String!
   name_ar: String
   slug: String!
+  subscription: AddSubscriptionInput
 }
 
 type CustomerInfo {
@@ -741,6 +747,19 @@ input SortOrder {
   field: String!
 }
 
+"""Subscription Plan"""
+enum SubscriptionPlan {
+  BASIC
+  BASIC_LITE
+  FREE_LIFE
+}
+
+"""Subscription Type"""
+enum SubscriptionType {
+  MONTHLY
+  YEARLY
+}
+
 type Tag {
   active: Boolean!
 
@@ -887,6 +906,7 @@ input UpdateVendorInput {
   name: String
   name_ar: String
   settings: UpdateVendorSettingsInput
+  subscription: AddSubscriptionInput
 }
 
 input UpdateVendorSettingsInput {
@@ -953,6 +973,7 @@ type Vendor {
   ownerId: String!
   settings: VendorSettings
   slug: String!
+  subscription: VendorSubscription
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
@@ -989,6 +1010,14 @@ type VendorSettings {
   deliveryAreas: [DeliveryAreas!]!
   deliveryMethods: [DeliveryMethods!]!
   paymentMethods: [PaymentMethods!]!
+}
+
+type VendorSubscription {
+  createdAt: DateTime!
+  freeTimeLeft: Int!
+  plan: SubscriptionPlan!
+  price: Float!
+  type: SubscriptionType!
 }
 
 type VendorView {
