@@ -113,6 +113,8 @@ export class CartResolver {
   ) {
     let cart: Cart | null = await this.cartService.getCart(cartId);
 
+    throwNotFoundException(cart, 'Cart');
+
     if (cart) {
       if (
         data.deliveryMethod === DeliveryMethods.MANDOOB &&
