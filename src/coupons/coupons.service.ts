@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCouponInput } from './dto/create-coupon.input';
@@ -8,6 +8,7 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { PaginatedCoupons } from './models/paginated-coupons.model';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class CouponsService {
@@ -19,7 +20,7 @@ export class CouponsService {
   async getCoupon(id: string): Promise<Coupon> {
     const coupon = await this.prisma.coupon.findUnique({ where: { id } });
 
-    if (!coupon) throw new NotFoundException('Coupon Not Found.');
+    throwNotFoundException(coupon, 'Coupon');
 
     return coupon;
   }
