@@ -12,6 +12,7 @@ import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from '@prisma/client';
 import { VendorView } from './models/vendor.model';
+import { getSubscriptionPrice } from 'src/utils/subscription';
 
 @Injectable()
 export class VendorsService {
@@ -24,15 +25,24 @@ export class VendorsService {
     createVendorInput: CreateVendorInput,
     user: User
   ): Promise<any> {
+    let subscriptionObj;
+    const { subscription } = createVendorInput;
     const vendor = await this.prisma.vendor.findFirst({
       where: { ownerId: user.id },
     });
 
     if (vendor) throw new BadRequestException('Vendor Already Exists For User');
 
+    if (subscription) {
+      subscriptionObj = {
+        ...subscription,
+        price: getSubscriptionPrice(subscription.type, subscription.plan),
+      };
+    }
     const res = await this.prisma.vendor.create({
       data: {
         ...createVendorInput,
+        subscription: subscriptionObj,
         MF_vendorCode: 1,
         ownerId: user.id,
       },
@@ -46,8 +56,20 @@ export class VendorsService {
   }
 
   updateVendor(id: string, updateVendorInput: UpdateVendorInput) {
+    let subscriptionObj;
+    const { subscription } = updateVendorInput;
+    if (subscription) {
+      subscriptionObj = {
+        ...subscription,
+        price: getSubscriptionPrice(subscription.type, subscription.plan),
+      };
+    }
     return this.prisma.vendor.update({
-      data: { ...updateVendorInput, updatedAt: new Date() },
+      data: {
+        ...updateVendorInput,
+        subscription: subscriptionObj,
+        updatedAt: new Date(),
+      },
       where: { id },
     });
   }
