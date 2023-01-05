@@ -57,7 +57,8 @@ export class CartService {
           vendorId: vendorId.toString(),
         },
       });
-      if (!res) throw new BadRequestException('Cart not found for customer');
+      if (!res) return null;
+
       const cartItems = [...res.items];
 
       // logic to check if all the products in the cartItems are valid and existing
