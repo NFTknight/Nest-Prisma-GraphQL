@@ -148,7 +148,7 @@ export class TagsService {
 
     const weekday = dayjs(date).format('dddd');
     const duration = dayjs.duration({
-      minutes: product.duration,
+      minutes: product.duration || 15,
     });
     const workdays = tag.workdays;
 
