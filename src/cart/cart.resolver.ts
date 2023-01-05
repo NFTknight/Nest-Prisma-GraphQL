@@ -11,8 +11,9 @@ import { CartService } from './cart.service';
 import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 import { OrderPayment } from 'src/orders/models/order-payment.model';
 import { DeliveryMethods } from '@prisma/client';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { CartItemService } from './services/cart-item.service';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Resolver(Cart)
 export class CartResolver {
@@ -144,7 +145,7 @@ export class CartResolver {
   async items(@Parent() { id: cartId }: Cart) {
     const cart = await this.cartService.getCart(cartId);
 
-    if (!cart) throw new NotFoundException('Cart not found');
+    throwNotFoundException(cart, 'Cart');
     return this.cartItemService.resolveItems(cart.items);
   }
 }

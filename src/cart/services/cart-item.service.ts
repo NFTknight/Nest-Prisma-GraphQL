@@ -1,12 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BookingStatus } from '@prisma/client';
 import { findIndex } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
+import { throwNotFoundException } from 'src/utils/validation';
 import { ProductsService } from '../../products/services/products.service';
 import { CartItemInput } from '../dto/cart.input';
 import { CartItem } from '../models/cart-item.model';
@@ -22,7 +19,7 @@ export class CartItemService {
   addProduct(product: Product, cart: Cart, item: CartItemInput) {
     const { sku, quantity } = item;
 
-    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+    throwNotFoundException(cart, 'Cart');
 
     const newCart = { ...cart };
 
@@ -30,8 +27,11 @@ export class CartItemService {
       (variant) => variant.sku === sku
     );
 
-    if (!productVariant)
-      throw new NotFoundException(`Product variant with sku ${sku} not found`);
+    throwNotFoundException(
+      productVariant,
+      '',
+      `Product variant with sku ${sku} not found`
+    );
 
     const existingProductIndex = findIndex(newCart?.items || [], {
       productId: product.id,

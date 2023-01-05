@@ -21,6 +21,7 @@ import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { PaymentService } from 'src/payment/payment.service';
 import { ProductsService } from 'src/products/services/products.service';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class CartService {
@@ -105,7 +106,7 @@ export class CartService {
   async addItemToCart(cartId: string, data: CartItemInput) {
     const cart = await this.getCart(cartId);
 
-    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+    throwNotFoundException(cart, 'Cart');
 
     const product = await this.prisma.product.findUniqueOrThrow({
       where: { id: data.productId },
@@ -146,7 +147,7 @@ export class CartService {
   async removeItemFromCart(cartId: string, productId: string, sku: string) {
     const cart = await this.getCart(cartId);
 
-    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+    throwNotFoundException(cart, 'Cart');
 
     const items = cart.items.filter(
       (item) => item.productId !== productId || item.sku !== sku
@@ -169,7 +170,7 @@ export class CartService {
   async updateCartItem(cartId: string, data: CartItemInput) {
     const cart = await this.getCart(cartId);
 
-    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+    throwNotFoundException(cart, 'Cart');
 
     const newItem = {
       ...find(cart.items, {
@@ -238,7 +239,7 @@ export class CartService {
   async checkoutCartAndCreateOrder(cartId: string, paymentSession?: string) {
     const cart = await this.getCart(cartId);
 
-    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+    throwNotFoundException(cart, 'Cart');
 
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
