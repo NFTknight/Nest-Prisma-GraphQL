@@ -59,6 +59,7 @@ model Vendor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   cart      Cart[]
+  subscription VendorSubscription?
 }
 
 type Certificate {
@@ -432,4 +433,23 @@ model Form {
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+enum SubscriptionPlan {
+  BASIC
+  BASIC_LITE
+  FREE_LIFE
+}
+
+enum SubscriptionType {
+  MONTHLY
+  YEARLY
+}
+
+type VendorSubscription {
+  createdAt DateTime  @default(now())
+  type SubscriptionType
+  plan SubscriptionPlan
+  price Float
+  freeTimeLeft Int @default(7)
 }
