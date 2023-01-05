@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DeliveryMethods, Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
