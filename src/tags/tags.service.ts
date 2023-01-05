@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateTagInput } from './dto/create-tag.input';
@@ -14,6 +14,7 @@ import * as Utc from 'dayjs/plugin/utc';
 import * as Timezone from 'dayjs/plugin/timezone';
 import * as Between from 'dayjs/plugin/isBetween';
 import { find } from 'lodash';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class TagsService {
@@ -30,7 +31,7 @@ export class TagsService {
   async getTag(id: string): Promise<Tag> {
     const tag = await this.prisma.tag.findUnique({ where: { id } });
 
-    if (!tag) throw new NotFoundException('Tag Not Found.');
+    throwNotFoundException(tag, 'Tag');
 
     return tag;
   }
@@ -67,6 +68,9 @@ export class TagsService {
 
   async updateTag(id: string, data: UpdateTagInput): Promise<Tag> {
     const tag = await this.prisma.tag.findUnique({ where: { id } });
+
+    throwNotFoundException(tag, 'Tag');
+
     const products = await this.prisma.product.findMany({
       where: { vendorId: tag.vendorId },
     });
