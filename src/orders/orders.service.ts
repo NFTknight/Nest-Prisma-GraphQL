@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DeliveryMethods, Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
@@ -20,6 +20,7 @@ import {
 import { Cart } from 'src/cart/models/cart.model';
 import { PaginatedOrders } from './models/paginated-orders.model';
 import { ProductsService } from 'src/products/services/products.service';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class OrdersService {
@@ -37,7 +38,7 @@ export class OrdersService {
       where: { id },
     });
 
-    if (!order) throw new NotFoundException('Order Not Found.');
+    throwNotFoundException(order, 'Order');
 
     return order;
   }
@@ -87,7 +88,8 @@ export class OrdersService {
         this.prisma.order.findMany({ where, skip, take, orderBy }),
       ]);
 
-      if (!res) throw new NotFoundException('data not found');
+      throwNotFoundException(res, '', 'Data not found!');
+
       return { totalCount: res[0], list: res[1] };
     } catch (err) {
       console.log('Err => ', err);

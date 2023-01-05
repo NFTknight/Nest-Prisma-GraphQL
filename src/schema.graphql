@@ -39,7 +39,7 @@ type Booking {
   order: Order
   orderId: String
   product: Product
-  productId: String!
+  productId: String
   slots: [BookingTime!]
   status: BookingStatus!
   tag: Tag
