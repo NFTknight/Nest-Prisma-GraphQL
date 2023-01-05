@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { ProductsService } from 'src/products/services/products.service';
@@ -18,6 +14,7 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { Booking } from 'src/bookings/models/booking.model';
+import { checkIfTimeInRange } from 'src/utils/general';
 import { throwNotFoundException } from 'src/utils/validation';
 @Injectable()
 export class BookingsService {
@@ -84,6 +81,15 @@ export class BookingsService {
   }
 
   async createBooking(data: CreateBookingInput): Promise<Booking> {
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
     const { vendorId, customerInfo, productId, tagId, slots, status } = data;
     // if the cart/product or order does not exist, this function will throw an error.
     const product = await this.productService.getProduct(productId);
@@ -91,8 +97,25 @@ export class BookingsService {
     throwNotFoundException(product, 'Product');
 
     await this.vendorService.getVendor(vendorId);
-    await this.tagService.getTag(tagId);
+    const tag = await this.tagService.getTag(tagId);
     // if all of these exist we can successfully create the booking.
+
+    let isAvailable = false;
+    slots.forEach((slot) => {
+      const from = new Date(`${slot?.from} UTC` || null);
+      const to = new Date(`${slot?.to} UTC` || null);
+      tag.workdays.some((workday) => {
+        if (
+          workday.day === days[from.getUTCDay() - 1] &&
+          checkIfTimeInRange(from, to, workday.from, workday.to)
+        ) {
+          isAvailable = true;
+          return true;
+        }
+      });
+    });
+
+    throwNotFoundException(isAvailable, '', 'Slot is not available');
 
     const vendorPrefix = await this.vendorService.getVendorOrderPrefix(
       vendorId
