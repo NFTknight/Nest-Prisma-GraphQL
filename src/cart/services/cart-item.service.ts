@@ -21,17 +21,19 @@ export class CartItemService {
 
   addProduct(product: Product, cart: Cart, item: CartItemInput) {
     const { sku, quantity } = item;
+
+    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+
     const newCart = { ...cart };
 
     const productVariant = product.variants.find(
       (variant) => variant.sku === sku
     );
 
-    if (!productVariant) {
+    if (!productVariant)
       throw new NotFoundException(`Product variant with sku ${sku} not found`);
-    }
 
-    const existingProductIndex = findIndex(newCart.items, {
+    const existingProductIndex = findIndex(newCart?.items || [], {
       productId: product.id,
       sku: productVariant.sku,
     });
@@ -66,6 +68,7 @@ export class CartItemService {
     const newCart = this.addProduct(product, cart, item);
 
     const newBookedSeats = product.bookedSeats + item.quantity;
+
     if (newBookedSeats > product.noOfSeats) {
       throw new BadRequestException(
         `The number of booked seats (${newBookedSeats}) exceeds the number of seats available (${product.noOfSeats})`

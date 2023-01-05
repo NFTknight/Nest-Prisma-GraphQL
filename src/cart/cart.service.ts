@@ -1,10 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
 import { CartItemInput } from './dto/cart.input';
 import {
-  CartItem,
   OrderStatus,
   PaymentMethods,
   Prisma,
@@ -71,6 +74,7 @@ export class CartService {
           cartItems.splice(i, 1);
         }
       }
+
       const totalPrice = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0
@@ -101,6 +105,8 @@ export class CartService {
   async addItemToCart(cartId: string, data: CartItemInput) {
     const cart = await this.getCart(cartId);
 
+    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+
     const product = await this.prisma.product.findUniqueOrThrow({
       where: { id: data.productId },
     });
@@ -111,6 +117,7 @@ export class CartService {
       case ProductType.PRODUCT:
         cartData = this.cartItemService.addProduct(product, cart, data);
         break;
+
       case ProductType.WORKSHOP:
         cartData = await this.cartItemService.addWorkshopToCart(
           product,
@@ -118,12 +125,14 @@ export class CartService {
           data
         );
         break;
+
       case ProductType.SERVICE:
         cartData = await this.cartItemService.addServiceToCart(
           product,
           cart,
           data
         );
+
       default:
         break;
     }
@@ -136,6 +145,8 @@ export class CartService {
 
   async removeItemFromCart(cartId: string, productId: string, sku: string) {
     const cart = await this.getCart(cartId);
+
+    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
 
     const items = cart.items.filter(
       (item) => item.productId !== productId || item.sku !== sku
@@ -157,6 +168,9 @@ export class CartService {
 
   async updateCartItem(cartId: string, data: CartItemInput) {
     const cart = await this.getCart(cartId);
+
+    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+
     const newItem = {
       ...find(cart.items, {
         productId: data.productId,
@@ -223,6 +237,9 @@ export class CartService {
 
   async checkoutCartAndCreateOrder(cartId: string, paymentSession?: string) {
     const cart = await this.getCart(cartId);
+
+    if (!cart) throw new NotFoundException('No Cart is found on this cartId');
+
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
     if (!cart.deliveryMethod) {
