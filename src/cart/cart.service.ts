@@ -65,6 +65,8 @@ export class CartService {
 
       const cartItems = [...res.items];
 
+      let shouldUpdateCart = false;
+
       // logic to check if all the products in the cartItems are valid and existing
       for (const [i, item] of cartItems.entries()) {
         const product = await this.prisma.product.findUnique({
@@ -73,8 +75,22 @@ export class CartService {
         if (!product || !product.active) {
           await this.removeItemFromCart(res.id, item.productId, item.sku);
           cartItems.splice(i, 1);
+        } else {
+          const updatedPrice =
+            product?.variants?.find((variant) => variant.sku === item.sku)
+              ?.price || item.price;
+
+          if (updatedPrice !== item.price) {
+            shouldUpdateCart = true;
+            cartItems[i] = {
+              ...item,
+              price: updatedPrice,
+            };
+          }
         }
       }
+
+      if (shouldUpdateCart) await this.updateCart(res.id, { items: cartItems });
 
       const totalPrice = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
