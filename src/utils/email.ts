@@ -24,56 +24,48 @@ export const SendEmails = (type: string, toEmail: string, body?: string) => {
       return {
         ...mail,
         subject: 'Order confirmation',
-        text: 'Order has been confirmed',
-        html: '<p>Order has been confirmed</p>',
+        templateId: 'd-b097c196b7f4413682a7f8011af9b75a',
       };
     case ORDER_OPTIONS.REJECTED:
       return {
         ...mail,
         subject: 'Order rejection',
-        text: 'order has been rejected',
-        html: '<p>order has been rejected</p>',
+        templateId: 'd-b93a7846c6834322a0f748c8f39dc02a',
       };
     case ORDER_OPTIONS.PURCHASED:
       return {
         ...mail,
         subject: 'Order placement',
-        text: 'Your Order has been sent to vendor',
-        html: '<p>Your Order has been sent to vendor</p>',
+        templateId: 'd-8fa0268372694f7a9fb62c384a590bb5',
       };
     case ORDER_OPTIONS.RECEIVED:
       return {
         ...mail,
         subject: 'Order placement',
-        text: 'You have an Order',
-        html: '<p>You have an Order</p>',
+        templateId: 'd-6231e2095f4e4feb9a1671b7c8294459',
       };
     case EMAIL_OPTIONS.WELCOME_VENDOR:
       return {
         ...mail,
-        subject: 'Order placement',
-        text: 'You have an Order',
-        html: '<p>You have an Order</p>',
+        subject: 'Welcome',
+        html: 'd-3b12fcdb4ed34514b55436bd57bd299e',
       };
     case EMAIL_OPTIONS.FORGOT_PWT:
       return {
         ...mail,
         subject: 'Forgot Password',
-        text: 'You have an Order',
         html: body,
       };
     case EMAIL_OPTIONS.AMOUNT_REFUND:
       return {
         ...mail,
         subject: 'Order placement',
-        text: 'You have an Order',
         html: '<p>You have an Order</p>',
       };
     case EMAIL_OPTIONS.REVIEW_PRODUCT:
       return {
         ...mail,
         subject: 'Order placement',
-        text: 'You have an Order',
         html: '<p>You have an Order</p>',
       };
     default:
