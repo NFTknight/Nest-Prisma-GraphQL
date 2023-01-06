@@ -9,6 +9,17 @@ input AddDeliveryAreasInput {
   label_ar: String!
 }
 
+type AddOn {
+  feature: String!
+  price: Float!
+}
+
+type AddOnsList {
+  list: [AddOn!]!
+  totalMonthly: Float!
+  totalYearly: Float!
+}
+
 input AddSubscriptionInput {
   plan: SubscriptionPlan!
   type: SubscriptionType!
@@ -1013,6 +1024,7 @@ type VendorSettings {
 }
 
 type VendorSubscription {
+  addOns: AddOnsList
   createdAt: DateTime!
   freeTimeLeft: Int!
   plan: SubscriptionPlan!

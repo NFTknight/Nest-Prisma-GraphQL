@@ -452,4 +452,16 @@ type VendorSubscription {
   plan SubscriptionPlan
   price Float
   freeTimeLeft Int @default(7)
+  addOns AddOnsList?
+}
+
+type AddOn {
+  feature String
+  price Float
+}
+
+type AddOnsList {
+  list          AddOn[]
+  totalMonthly  Float
+  totalYearly   Float
 }
