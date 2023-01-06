@@ -55,7 +55,7 @@ export class TagsService {
 
   async getTagsByProduct(productId: string): Promise<Tag[]> {
     return this.prisma.tag.findMany({
-      where: { productIds: { has: productId } },
+      where: { productIds: { has: productId }, active: true },
     });
   }
 

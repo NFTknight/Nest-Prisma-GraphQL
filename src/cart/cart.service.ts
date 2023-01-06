@@ -72,7 +72,6 @@ export class CartService {
         const product = await this.prisma.product.findUnique({
           where: { id: item.productId },
         });
-
         if (!product || !product.active) {
           await this.removeItemFromCart(res.id, item.productId, item.sku);
           cartItems.splice(i, 1);
