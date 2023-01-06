@@ -47,8 +47,8 @@ export const SendEmails = (type: string, toEmail: string, body?: string) => {
     case EMAIL_OPTIONS.WELCOME_VENDOR:
       return {
         ...mail,
-        subject: 'Order placement',
-        html: '<p>You have an Order</p>',
+        subject: 'Welcome',
+        html: 'd-3b12fcdb4ed34514b55436bd57bd299e',
       };
     case EMAIL_OPTIONS.FORGOT_PWT:
       return {
