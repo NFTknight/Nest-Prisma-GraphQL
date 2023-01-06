@@ -641,6 +641,7 @@ type Product {
 }
 
 input ProductFilterInput {
+  active: Boolean
   attendanceType: AttendanceType
   type: ProductType
 }
