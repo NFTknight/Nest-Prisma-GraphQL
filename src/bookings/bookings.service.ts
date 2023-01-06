@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { ProductsService } from 'src/products/services/products.service';
@@ -14,6 +14,8 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { Booking } from 'src/bookings/models/booking.model';
+import { checkIfTimeInRange } from 'src/utils/general';
+import { throwNotFoundException } from 'src/utils/validation';
 @Injectable()
 export class BookingsService {
   constructor(
@@ -29,7 +31,7 @@ export class BookingsService {
     if (!id) return null;
     const booking = await this.prisma.booking.findUnique({ where: { id } });
 
-    if (!booking) throw new NotFoundException('Booking Not Found.');
+    throwNotFoundException(booking, 'Booking');
 
     return booking;
   }
@@ -37,7 +39,8 @@ export class BookingsService {
   async getBookings(where: any): Promise<Booking[]> {
     const res = await this.prisma.booking.findMany({ where });
 
-    if (!res) throw new NotFoundException('Bookings Not Found.');
+    // this seems a overkill here, this can be removed
+    throwNotFoundException(res, 'Booking', 'Booking not founds');
 
     return res;
   }
@@ -63,7 +66,8 @@ export class BookingsService {
         orderBy,
       });
 
-      if (!list) throw new NotFoundException('Bookings Not Found.');
+      // this seems a overkill here, this can be removed
+      throwNotFoundException(list, 'Booking', 'Booking not founds');
 
       const totalCount = await this.prisma.booking.count();
 
@@ -77,19 +81,50 @@ export class BookingsService {
   }
 
   async createBooking(data: CreateBookingInput): Promise<Booking> {
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
     const { vendorId, customerInfo, productId, tagId, slots, status } = data;
     // if the cart/product or order does not exist, this function will throw an error.
     const product = await this.productService.getProduct(productId);
+
+    throwNotFoundException(product, 'Product');
+
     await this.vendorService.getVendor(vendorId);
-    await this.tagService.getTag(tagId);
+    const tag = await this.tagService.getTag(tagId);
     // if all of these exist we can successfully create the booking.
+
+    let isAvailable = false;
+    slots.forEach((slot) => {
+      const from = new Date(`${slot?.from} UTC` || null);
+      const to = new Date(`${slot?.to} UTC` || null);
+      tag.workdays.some((workday) => {
+        if (
+          workday.day === days[from.getUTCDay() - 1] &&
+          checkIfTimeInRange(from, to, workday.from, workday.to)
+        ) {
+          isAvailable = true;
+          return true;
+        }
+      });
+    });
+
+    throwNotFoundException(isAvailable, '', 'Slot is not available');
 
     const vendorPrefix = await this.vendorService.getVendorOrderPrefix(
       vendorId
     );
     const orderId = `${vendorPrefix}-${nanoid(8)}`.toUpperCase();
 
-    const productVariant = product.variants[0];
+    const productVariant = product?.variants?.[0];
+
+    throwNotFoundException(productVariant, '', 'Product Variant not found!');
 
     const order = await this.prisma.order.create({
       data: {
@@ -112,6 +147,9 @@ export class BookingsService {
         paymentMethod: PaymentMethods.STORE,
       },
     });
+
+    if (!order)
+      throw new InternalServerErrorException('Order creation failed!');
 
     return this.prisma.booking.create({
       data: {

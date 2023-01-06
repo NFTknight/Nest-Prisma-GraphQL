@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Product, Prisma, AttendanceType, CartItem } from '@prisma/client';
-import { CreateProductValidator } from 'src/utils/validation';
+import {
+  CreateProductValidator,
+  throwNotFoundException,
+} from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateProductInput } from '../dto/create-product.input';
 import { UpdateProductInput } from '../dto/update-product.input';
@@ -78,7 +81,7 @@ export class ProductsService {
 
       return {
         list: list,
-        totalCount: totalCount,
+        totalCount: totalCount || 0,
       };
     } catch (err) {
       throw new Error(err);
@@ -111,7 +114,7 @@ export class ProductsService {
 
       return {
         list,
-        totalCount,
+        totalCount: totalCount || 0,
       };
     } catch (err) {
       throw new Error(err);
@@ -121,7 +124,8 @@ export class ProductsService {
   async getProduct(id: string): Promise<Product> {
     const product = await this.prisma.product.findUnique({ where: { id } });
 
-    if (!product) throw new NotFoundException('Product Not Found.');
+    throwNotFoundException(product, 'Product');
+
     if (product.meetingLink) {
       if (product.badge)
         product.badge = { ...product.badge, label: AttendanceType.ONLINE };
@@ -168,7 +172,11 @@ export class ProductsService {
 
   async updateProduct(id: string, data: UpdateProductInput): Promise<Product> {
     const product = await this.prisma.product.findUnique({ where: { id } });
+
+    throwNotFoundException(product, 'Product');
+
     const { categoryId, tags, formId, ...restData } = data;
+
     const updateData: Prisma.ProductUpdateArgs['data'] = {
       ...restData,
     };
@@ -176,6 +184,7 @@ export class ProductsService {
     if (categoryId) {
       updateData.category = { connect: { id: categoryId } };
     }
+
     if (formId) {
       updateData.form = { connect: { id: formId } };
     }
@@ -220,6 +229,8 @@ export class ProductsService {
       include: { tags: true },
     });
 
+    throwNotFoundException(prod, 'Product');
+
     // remove the product from the tags
     for (const tag of prod.tags) {
       await this.prisma.tag.update({
@@ -255,7 +266,5 @@ export class ProductsService {
     ).then((data) => {
       return data.every((item) => item === true);
     });
-
-    return false;
   }
 }

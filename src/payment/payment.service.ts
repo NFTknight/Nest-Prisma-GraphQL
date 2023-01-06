@@ -5,6 +5,7 @@ import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
+import { throwNotFoundException } from 'src/utils/validation';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
 import { PaymentStatusApiRequest } from './dto/payment-status.dto';
 import { PaymentSession } from './models/payment-session.model';
@@ -53,6 +54,8 @@ export class PaymentService {
         id: orderId,
       },
     });
+
+    throwNotFoundException(order, 'Order');
     // TODO callback url should be dynamic
     // TODO DisplayCurrencyIso should be dynamic
     const data: ExecutePaymentApiRequest = {
@@ -91,7 +94,7 @@ export class PaymentService {
       },
     });
 
-    if (!order) throw new NotFoundException('Order Not Found.');
+    throwNotFoundException(order, 'Order');
 
     const data: PaymentStatusApiRequest = {
       Key: order.invoiceId,

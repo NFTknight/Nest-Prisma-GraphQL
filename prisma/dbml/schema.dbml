@@ -188,8 +188,8 @@ Table Booking {
   cart Cart
   orderId String
   order Order
-  productId String [not null]
-  product Product [not null]
+  productId String
+  product Product
   vendorId String [not null]
   vendor Vendor [not null]
   tagId String [not null]
@@ -307,7 +307,7 @@ Ref: Booking.cartId > Cart.id [delete: Set Null]
 
 Ref: Booking.orderId > Order.id
 
-Ref: Booking.productId > Product.id
+Ref: Booking.productId > Product.id [delete: Set Null]
 
 Ref: Booking.vendorId > Vendor.id
 
