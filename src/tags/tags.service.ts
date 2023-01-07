@@ -192,8 +192,8 @@ export class TagsService {
       // Check if the time is available.
       const isAvailable = !slots.some((s) => {
         return (
-          startFrom.isBetween(s.from, s.to, 'minute', '()') ||
-          startFrom.add(duration).isBetween(s.from, s.to, 'minute', '()')
+          startFrom.isBetween(s.from, s.to, 'minute', '[)') ||
+          startFrom.add(duration).isBetween(s.from, s.to, 'minute', '(]')
         );
       });
 
