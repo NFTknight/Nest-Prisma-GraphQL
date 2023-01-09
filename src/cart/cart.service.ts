@@ -388,9 +388,9 @@ export class CartService {
     }
     // Payment method is not ONLINE or online payment is successfully done
     if (errors === undefined) {
-      // await this.prisma.cart.delete({
-      //   where: { id: cartId },
-      // });
+      await this.prisma.cart.delete({
+        where: { id: cartId },
+      });
     }
 
     // Email notification to vendor and customer when order is created
