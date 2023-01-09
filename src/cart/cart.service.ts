@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,6 +10,8 @@ import { Cart } from './models/cart.model';
 
 import { CartItemInput } from './dto/cart.input';
 import {
+  Booking,
+  BookingStatus,
   OrderStatus,
   PaymentMethods,
   Prisma,
@@ -22,6 +26,7 @@ import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { PaymentService } from 'src/payment/payment.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
+import { UpdateBookingInput } from 'src/bookings/dto/update-booking.input';
 
 @Injectable()
 export class CartService {
@@ -317,6 +322,9 @@ export class CartService {
       });
     }
 
+    // to get all the bookings in cart
+    const bookings = await this.prisma.booking.findMany({ where: { cartId } });
+
     let payment = undefined;
     let errors = undefined;
 
@@ -338,9 +346,31 @@ export class CartService {
         errors = error.response.data.ValidationErrors;
       }
     }
-
+    const id = order.id.toString();
+    const newOrder = await this.prisma.order.findUnique({
+      where: { id: order.id },
+    });
     // Payment method is not ONLINE or online payment is successfully done
     if (errors === undefined) {
+      // update bookings to add order id and status for pending
+      if (bookings?.length && id) {
+        for (const item of bookings) {
+          console.log('herrrrrrr', newOrder);
+          console.log('herrrrrrr 222', id);
+          // const data = { orderId: order.id, status: BookingStatus.PENDING };
+          await this.prisma.booking.update({
+            where: { id: item.id },
+            data: {
+              orderId: newOrder.id,
+              // order: { connect: { id } },
+              // status: BookingStatus.PENDING,
+              // holdTimestamp: { unset: true },
+              // updatedAt: new Date(),
+            },
+          });
+        }
+      }
+
       await this.prisma.cart.delete({
         where: { id: cartId },
       });
