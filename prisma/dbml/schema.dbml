@@ -221,6 +221,7 @@ Enum DeliveryMethods {
   MANDOOB
   SMSA
   PICKUP
+  DIGITAL_PRODUCT
 }
 
 Enum PaymentMethods {
