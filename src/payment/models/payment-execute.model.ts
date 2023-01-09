@@ -15,7 +15,19 @@ export class ExecutePayment {
 }
 
 @ObjectType()
+export class VariableType {
+  @Field(() => String, { nullable: true })
+  title: string;
+  @Field(() => Number, { nullable: true })
+  quantity: number;
+  @Field(() => Number, { nullable: true })
+  itemQuantity: number;
+}
+
+@ObjectType()
 export class ExecutePaymentError {
   Name: string;
   Error: string;
+  @Field(() => VariableType, { nullable: true })
+  Variables: VariableType;
 }

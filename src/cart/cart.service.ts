@@ -268,8 +268,13 @@ export class CartService {
         );
         if (variant.quantity < item.quantity) {
           cartErrors.push({
-            Name: 'Product Quantity Issue:',
-            Error: `${variant.title} have only ${variant.quantity} available item, while you have added ${item.quantity}`,
+            Name: 'ProductIssue',
+            Error: 'ProductHaveLessQuantityAsCart',
+            Variables: {
+              title: variant.title,
+              quantity: variant.quantity,
+              itemQuantity: item.quantity,
+            },
           });
           await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
@@ -277,8 +282,13 @@ export class CartService {
       if (product.type === ProductType.WORKSHOP) {
         if (product.noOfSeats < item.quantity) {
           cartErrors.push({
-            Name: 'Workshop Seats Issue:',
-            Error: `${product.title} have only ${product.noOfSeats} available, while you are booking ${item.quantity} seats`,
+            Name: 'WorkshopIssue',
+            Error: 'WorkshopHaveLessSeatAsCart',
+            Variables: {
+              title: product.title,
+              quantity: product.noOfSeats,
+              itemQuantity: item.quantity,
+            },
           });
           await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
@@ -291,8 +301,11 @@ export class CartService {
         });
         if (!booking) {
           cartErrors.push({
-            Name: 'Service Not Available:',
-            Error: `${product.title} is not available`,
+            Name: 'ServiceIssue',
+            Error: 'ServiceIsNotAvailable',
+            Variables: {
+              title: product.title,
+            },
           });
           await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
@@ -301,6 +314,7 @@ export class CartService {
 
     if (cartErrors.length) {
       return {
+        ...cart,
         errors: cartErrors,
       };
     }
