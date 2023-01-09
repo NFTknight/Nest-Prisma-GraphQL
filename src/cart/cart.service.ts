@@ -22,6 +22,8 @@ import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { PaymentService } from 'src/payment/payment.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
+import { UserInputError } from 'apollo-server-express';
+import { formatApolloErrors } from 'apollo-server-errors';
 
 @Injectable()
 export class CartService {
@@ -257,7 +259,51 @@ export class CartService {
 
     throwNotFoundException(cart, 'Cart');
 
-    console.log({ items: cart.items });
+    const cartErrors = [];
+    for (const item of cart.items) {
+      const product = await this.productService.getProduct(item.productId);
+      if (product.type === ProductType.PRODUCT) {
+        const variant = product.variants.find(
+          (variant) => variant.sku === item.sku
+        );
+        if (variant.quantity < item.quantity) {
+          cartErrors.push({
+            Name: 'Product Quantity Issue:',
+            Error: `${variant.title} have only ${variant.quantity} available item, while you have added ${item.quantity}`,
+          });
+          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        }
+      }
+      if (product.type === ProductType.WORKSHOP) {
+        if (product.noOfSeats < item.quantity) {
+          cartErrors.push({
+            Name: 'Workshop Seats Issue:',
+            Error: `${product.title} have only ${product.noOfSeats} available, while you are booking ${item.quantity} seats`,
+          });
+          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        }
+      }
+      if (product.type === ProductType.SERVICE) {
+        const booking = await this.prisma.booking.findFirst({
+          where: {
+            cartId,
+          },
+        });
+        if (!booking) {
+          cartErrors.push({
+            Name: 'Service Not Available:',
+            Error: `${product.title} is not available`,
+          });
+          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        }
+      }
+    }
+
+    if (cartErrors.length) {
+      return {
+        errors: cartErrors,
+      };
+    }
 
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
@@ -340,7 +386,6 @@ export class CartService {
         errors = error.response.data.ValidationErrors;
       }
     }
-
     // Payment method is not ONLINE or online payment is successfully done
     if (errors === undefined) {
       // await this.prisma.cart.delete({
