@@ -328,6 +328,7 @@ type DeliveryAreas {
 
 """Delivery Methods"""
 enum DeliveryMethods {
+  DIGITAL_PRODUCT
   MANDOOB
   PICKUP
   SMSA
