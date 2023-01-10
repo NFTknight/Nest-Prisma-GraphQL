@@ -280,13 +280,13 @@ export class CartService {
         }
       }
       if (product.type === ProductType.WORKSHOP) {
-        if (product.noOfSeats < item.quantity) {
+        if (product.noOfSeats - product.bookedSeats < item.quantity) {
           cartErrors.push({
             Name: 'WorkshopIssue',
             Error: 'WorkshopHaveLessSeatAsCart',
             Variables: {
               title: product.title,
-              quantity: product.noOfSeats,
+              quantity: product.noOfSeats - product.bookedSeats,
               itemQuantity: item.quantity,
             },
           });
