@@ -63,7 +63,20 @@ export class TagsService {
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(data.vendorId);
     // if vendor exists we can successfully create the category.
-    return this.prisma.tag.create({ data });
+
+    const tag = await this.prisma.tag.create({ data });
+
+    for (const id of data.productIds) {
+      await this.prisma.product.update({
+        where: { id },
+        data: {
+          tagIds: {
+            push: [tag.id],
+          },
+        },
+      });
+    }
+    return tag;
   }
 
   async updateTag(id: string, data: UpdateTagInput): Promise<Tag> {
