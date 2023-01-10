@@ -871,10 +871,12 @@ input UpdateVendorInfoInput {
   description_ar: String
   email: String
   facebook: String
+  freelanceNum: String
   heroImage: String
   instagram: String
   location: LocationInput
   logo: String
+  maroofNum: String
   phone: String
   snapchat: String
   terms: String
@@ -976,10 +978,12 @@ type VendorInfo {
   description_ar: String
   email: String
   facebook: String
+  freelanceNum: String
   heroImage: String
   instagram: String
   location: Location
   logo: String
+  maroofNum: String
   phone: String
   snapchat: String
   terms: String
