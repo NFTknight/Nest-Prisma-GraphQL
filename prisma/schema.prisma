@@ -39,7 +39,7 @@ model Vendor {
   name_ar       String?
   slug          String
   MF_vendorCode Int?
-  active        Boolean @default(true)
+  active        Boolean @default(false)
 
   info     VendorInfo?
   bank     VendorBankInfo?

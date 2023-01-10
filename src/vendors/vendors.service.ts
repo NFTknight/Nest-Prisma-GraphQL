@@ -36,7 +36,6 @@ export class VendorsService {
         ...createVendorInput,
         MF_vendorCode: 1,
         ownerId: user.id,
-        active: false,
       },
     });
 
