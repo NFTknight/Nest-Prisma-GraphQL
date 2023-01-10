@@ -275,10 +275,12 @@ export class CartService {
         }
       }
       if (product.type === ProductType.WORKSHOP) {
-        if (product.noOfSeats < item.quantity) {
+        if (product.noOfSeats - product.bookedSeats < item.quantity) {
           cartErrors.push({
             Name: 'Workshop Seats Issue:',
-            Error: `${product.title} have only ${product.noOfSeats} available, while you are booking ${item.quantity} seats`,
+            Error: `${product.title} have only ${
+              product.noOfSeats - product.bookedSeats
+            } available, while you are booking ${item.quantity} seats`,
           });
           await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
