@@ -37,7 +37,7 @@ export class CouponsService {
     };
     const res = await this.prisma.$transaction([
       this.prisma.coupon.count({ where }),
-      this.prisma.coupon.findMany({ where, skip, take }),
+      this.prisma.coupon.findMany({ where, skip, take: take || undefined }),
     ]);
     return { totalCount: res[0], list: res[1] };
   }

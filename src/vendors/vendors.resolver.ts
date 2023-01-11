@@ -53,7 +53,7 @@ export class VendorsResolver {
     const { skip, take } = getPaginationArgs(pg);
     const vendors = await this.prismaService.vendor.findMany({
       skip,
-      take,
+      take: take || undefined,
     });
     const list = vendors.map(async (vendor: Vendor) => {
       const vendorView = await this.vendorsService.getVendorView(vendor.id);

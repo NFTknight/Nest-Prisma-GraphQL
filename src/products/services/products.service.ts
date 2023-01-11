@@ -56,7 +56,7 @@ export class ProductsService {
       const products = await this.prisma.product.findMany({
         where,
         skip,
-        take,
+        take: take || undefined,
         orderBy,
       });
 
@@ -106,7 +106,7 @@ export class ProductsService {
 
       const list = await this.prisma.product.findMany({
         skip,
-        take,
+        take: take || undefined,
         orderBy,
       });
 
