@@ -39,13 +39,13 @@ export class CartItemService {
     });
 
     if (existingProductIndex !== -1) {
-      // if the cart item exists, update the quantity
       if (
-        productVariant.quantity <
-        newCart.items[existingProductIndex].quantity + quantity
+        //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+        product.itemsInStock !== null &&
+        product.itemsInStock < newCart.items[existingProductIndex].quantity
       ) {
         throw new BadRequestException(
-          `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
+          `You can't add more than ${product.itemsInStock} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
         );
       }
 
