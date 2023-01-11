@@ -4,7 +4,7 @@ const getPaginationArgs = (
   pg: PaginationArgs | null
 ): { skip: number; take: number } => {
   let page = pg?.page || 1;
-  const take = pg?.pageSize || 10;
+  const take = pg?.pageSize || 0;
 
   if (page < 1) page = 1;
   const skip = (page - 1) * take;
