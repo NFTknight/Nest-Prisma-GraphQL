@@ -48,7 +48,7 @@ export class TagsService {
     };
     const res = await this.prisma.$transaction([
       this.prisma.tag.count({ where }),
-      this.prisma.tag.findMany({ where, skip, take }),
+      this.prisma.tag.findMany({ where, skip, take: take || undefined }),
     ]);
     return { totalCount: res[0], list: res[1] };
   }

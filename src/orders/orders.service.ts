@@ -85,7 +85,12 @@ export class OrdersService {
 
       const res = await this.prisma.$transaction([
         this.prisma.order.count({ where }),
-        this.prisma.order.findMany({ where, skip, take, orderBy }),
+        this.prisma.order.findMany({
+          where,
+          skip,
+          take: take || undefined,
+          orderBy,
+        }),
       ]);
 
       throwNotFoundException(res, '', 'Data not found!');
