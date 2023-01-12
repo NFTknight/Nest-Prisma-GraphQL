@@ -193,7 +193,7 @@ Table Booking {
   tag Tag [not null]
   status BookingStatus [not null]
   slots BookingTime[] [not null]
-  holdTimestamp DateTime [default: `now()`]
+  holdTimestamp DateTime
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }

@@ -420,7 +420,7 @@ model Booking {
   tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
   slots         BookingTime[]
-  holdTimestamp DateTime?     @default(now())
+  holdTimestamp DateTime?     
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
