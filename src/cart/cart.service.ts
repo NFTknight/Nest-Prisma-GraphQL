@@ -422,9 +422,14 @@ export class CartService {
         WeightUnit: 'KG',
         ContentDescription: 'Shipment contents description',
       };
-      wayBillData = await this.shippingService.createShipment(
-        WayBillRequestObject
-      );
+      await this.shippingService
+        .createShipment(WayBillRequestObject)
+        .then((data) => {
+          wayBillData = data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       if (wayBillData) {
         order = await this.prisma.order.update({
           where: { id: order.id },
