@@ -97,10 +97,14 @@ export class BookingsService {
     throwNotFoundException(product, 'Product');
 
     await this.vendorService.getVendor(vendorId);
-    const tag = await this.tagService.getTag(tagId);
+
+    /*
+     * Commenting slot validation as this endpoint will use by vendor to create booking.*
+     */
+    // const tag = await this.tagService.getTag(tagId);
     // if all of these exist we can successfully create the booking.
 
-    let isAvailable = false;
+    /*  let isAvailable = false;
     slots.forEach((slot) => {
       const from = new Date(`${slot?.from} UTC` || null);
       const to = new Date(`${slot?.to} UTC` || null);
@@ -115,7 +119,7 @@ export class BookingsService {
       });
     });
 
-    throwNotFoundException(isAvailable, '', 'Slot is not available');
+    throwNotFoundException(isAvailable, '', 'Slot is not available'); */
 
     const vendorPrefix = await this.vendorService.getVendorOrderPrefix(
       vendorId
