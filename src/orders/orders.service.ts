@@ -34,6 +34,7 @@ export class OrdersService {
   ) {}
 
   async getOrder(id: string): Promise<Order> {
+    if (!id) return null;
     const order = await this.prisma.order.findUnique({
       where: { id },
     });

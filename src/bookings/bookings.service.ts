@@ -153,7 +153,7 @@ export class BookingsService {
 
     return this.prisma.booking.create({
       data: {
-        order: { connect: { id: order.id } },
+        orderId: order.id,
         vendor: { connect: { id: vendorId } },
         tag: { connect: { id: tagId } },
         product: { connect: { id: productId } },

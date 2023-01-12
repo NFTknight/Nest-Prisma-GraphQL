@@ -161,7 +161,6 @@ Table Order {
   paymentMethod PaymentMethods [not null]
   vendorId String
   vendor Vendor
-  bookings Booking [not null]
   wayBill WayBill
   invoiceId String
   consigneeAddress CartAddress
@@ -186,7 +185,6 @@ Table Booking {
   cartId String
   cart Cart
   orderId String
-  order Order
   productId String
   product Product
   vendorId String [not null]
@@ -292,8 +290,6 @@ Ref: Order.cartId > Cart.id
 Ref: Order.vendorId > Vendor.id
 
 Ref: Booking.cartId > Cart.id [delete: Set Null]
-
-Ref: Booking.orderId > Order.id
 
 Ref: Booking.productId > Product.id [delete: Set Null]
 

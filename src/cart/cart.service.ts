@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ObjectId } from 'bson';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
@@ -322,9 +323,6 @@ export class CartService {
       });
     }
 
-    // to get all the bookings in cart
-    const bookings = await this.prisma.booking.findMany({ where: { cartId } });
-
     let payment = undefined;
     let errors = undefined;
 
@@ -346,30 +344,18 @@ export class CartService {
         errors = error.response.data.ValidationErrors;
       }
     }
-    const id = order.id.toString();
-    const newOrder = await this.prisma.order.findUnique({
-      where: { id: order.id },
-    });
     // Payment method is not ONLINE or online payment is successfully done
     if (errors === undefined) {
-      // update bookings to add order id and status for pending
-      if (bookings?.length && id) {
-        for (const item of bookings) {
-          console.log('herrrrrrr', newOrder);
-          console.log('herrrrrrr 222', id);
-          // const data = { orderId: order.id, status: BookingStatus.PENDING };
-          await this.prisma.booking.update({
-            where: { id: item.id },
-            data: {
-              orderId: newOrder.id,
-              // order: { connect: { id } },
-              // status: BookingStatus.PENDING,
-              // holdTimestamp: { unset: true },
-              // updatedAt: new Date(),
-            },
-          });
-        }
-      }
+      // update bookings in the cart to add order id, status for pending and remove holdTimeStamp
+      await this.prisma.booking.updateMany({
+        where: { cartId },
+        data: {
+          orderId: order.id,
+          status: BookingStatus.PENDING,
+          holdTimestamp: { unset: true },
+          updatedAt: new Date(),
+        },
+      });
 
       await this.prisma.cart.delete({
         where: { id: cartId },
