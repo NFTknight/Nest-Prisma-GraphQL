@@ -37,6 +37,7 @@ export class CartItemService {
       productId: product.id,
       sku: productVariant.sku,
     });
+    const deliveryCharges = newCart.totalPrice - newCart.subTotal;
 
     if (existingProductIndex !== -1) {
       if (
@@ -64,10 +65,11 @@ export class CartItemService {
     }
 
     // update the cart price
-    newCart.totalPrice = newCart.items.reduce(
+    newCart.subTotal = newCart.items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
+    newCart.totalPrice = newCart.subTotal + deliveryCharges;
 
     newCart.updatedAt = new Date();
 

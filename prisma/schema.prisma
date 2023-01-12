@@ -293,6 +293,7 @@ model Cart {
   customerId    String
   appliedCoupon String?
   totalPrice    Float
+  subTotal      Float?
   finalPrice    Float
 
   vendorId String? @db.ObjectId

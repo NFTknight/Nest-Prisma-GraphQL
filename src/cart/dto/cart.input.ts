@@ -109,4 +109,7 @@ export class CartUpdateInput {
 
   @Field(() => String, { nullable: true })
   deliveryArea?: string;
+
+  subTotal?: number;
+  totalPrice?: number;
 }
