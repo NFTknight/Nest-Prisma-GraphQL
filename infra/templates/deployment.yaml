@@ -84,11 +84,11 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 20
             httpGet:
-              path: /
+              path: /health
               port: {{ .Values.containerPort }}
           livenessProbe:
             initialDelaySeconds: 10
             periodSeconds: 20
             httpGet:
-              path: /
+              path: /health
               port: {{ .Values.containerPort }}
