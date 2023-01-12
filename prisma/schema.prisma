@@ -353,7 +353,6 @@ model Order {
   vendorId String? @db.ObjectId
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
-  bookings Booking[]
   wayBill  WayBill?
 
   invoiceId String?
@@ -413,16 +412,15 @@ model Booking {
   cartId        String?       @db.ObjectId
   cart          Cart?         @relation(fields: [cartId], references: [id], onDelete: SetNull)
   orderId       String?       @db.ObjectId
-  order         Order?        @relation(fields: [orderId], references: [id])
-  productId     String?       @db.ObjectId
-  product       Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId     String?        @db.ObjectId
+  product       Product?       @relation(fields: [productId], references: [id], onDelete: SetNull)
   vendorId      String        @db.ObjectId
   vendor        Vendor        @relation(fields: vendorId, references: id)
   tagId         String        @db.ObjectId
   tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
   slots         BookingTime[]
-  holdTimestamp DateTime?     @default(now())
+  holdTimestamp DateTime?     
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }

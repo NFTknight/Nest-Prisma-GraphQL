@@ -4,6 +4,8 @@ import { Cart } from './models/cart.model';
 
 import { CartItemInput } from './dto/cart.input';
 import {
+  Booking,
+  BookingStatus,
   DeliveryMethods,
   OrderStatus,
   PaymentMethods,
@@ -454,6 +456,17 @@ export class CartService {
 
     // Payment method is not ONLINE or online payment is successfully done
     if (errors === undefined) {
+      // update bookings in the cart to add order id, status for pending and remove holdTimeStamp
+      await this.prisma.booking.updateMany({
+        where: { cartId },
+        data: {
+          orderId: order.id,
+          status: BookingStatus.PENDING,
+          holdTimestamp: { unset: true },
+          updatedAt: new Date(),
+        },
+      });
+
       await this.prisma.cart.delete({
         where: { id: cartId },
       });
