@@ -63,7 +63,7 @@ export class CategoriesService {
       this.prisma.category.findMany({
         where,
         skip,
-        take,
+        take: take || undefined,
         orderBy,
         include: { products: true },
       }),

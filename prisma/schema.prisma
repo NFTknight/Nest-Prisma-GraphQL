@@ -34,12 +34,12 @@ enum Role {
 }
 
 model Vendor {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  name   String
-  name_ar String?
-  slug   String
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  name_ar       String?
+  slug          String
   MF_vendorCode Int?
-  active Boolean @default(true)
+  active        Boolean @default(false)
 
   info     VendorInfo?
   bank     VendorBankInfo?
@@ -83,13 +83,17 @@ type VendorInfo {
   whatsapp       String?
   vatNum         String?
   crNum          String?
-  certificates   Certificate[]
+
+  freelanceNum String?
+  maroofNum    String?
+  certificates Certificate[]
 }
 
 enum DeliveryMethods {
   MANDOOB
   SMSA
   PICKUP
+  DIGITAL_PRODUCT
 }
 
 enum PaymentMethods {
@@ -360,15 +364,14 @@ model Order {
   updatedAt DateTime @updatedAt
 }
 
-
 model Review {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
-  productId String
-  rating Float
+  name         String
+  productId    String
+  rating       Float
   variantTitle String
-  review String
+  review       String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -62,7 +62,7 @@ export class BookingsService {
 
       const list = await this.prisma.booking.findMany({
         skip,
-        take,
+        take: take || undefined,
         orderBy,
       });
 

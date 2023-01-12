@@ -86,7 +86,12 @@ export class OrdersService {
 
       const res = await this.prisma.$transaction([
         this.prisma.order.count({ where }),
-        this.prisma.order.findMany({ where, skip, take, orderBy }),
+        this.prisma.order.findMany({
+          where,
+          skip,
+          take: take || undefined,
+          orderBy,
+        }),
       ]);
 
       throwNotFoundException(res, '', 'Data not found!');
@@ -146,6 +151,7 @@ export class OrdersService {
         ShipDate: new Date().toISOString(),
         ShipmentCurrency: 'SAR',
         Weight: 15,
+        WaybillType: 'PDF',
         WeightUnit: 'KG',
         ContentDescription: 'Shipment contents description',
       };

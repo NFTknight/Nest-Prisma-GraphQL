@@ -39,9 +39,23 @@ export class CartItemService {
     });
 
     if (existingProductIndex !== -1) {
-      // if the cart item exists, update the quantity
+      if (
+        //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+        product.itemsInStock !== null &&
+        product.itemsInStock < newCart.items[existingProductIndex].quantity
+      ) {
+        throw new BadRequestException(
+          `You can't add more than ${product.itemsInStock} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
+        );
+      }
+
       newCart.items[existingProductIndex].quantity += quantity;
     } else {
+      if (productVariant.quantity < quantity) {
+        throw new BadRequestException(
+          `You can't add more than ${productVariant.quantity} no of products in your cart.`
+        );
+      }
       // if the cart item does not exist, create the item
       newCart.items.push({
         ...item,

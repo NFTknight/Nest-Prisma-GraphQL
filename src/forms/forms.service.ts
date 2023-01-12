@@ -32,7 +32,11 @@ export class FormService {
       const where = {
         vendorId,
       };
-      return await this.prisma.form.findMany({ where, skip, take });
+      return await this.prisma.form.findMany({
+        where,
+        skip,
+        take: take || undefined,
+      });
     } catch (err) {
       console.log('Err => ', err);
     }

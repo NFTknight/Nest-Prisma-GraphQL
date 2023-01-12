@@ -23,7 +23,7 @@ Table Vendor {
   name_ar String
   slug String [not null]
   MF_vendorCode Int
-  active Boolean [not null, default: true]
+  active Boolean [not null, default: false]
   info VendorInfo
   bank VendorBankInfo
   settings VendorSettings
@@ -219,6 +219,7 @@ Enum DeliveryMethods {
   MANDOOB
   SMSA
   PICKUP
+  DIGITAL_PRODUCT
 }
 
 Enum PaymentMethods {
