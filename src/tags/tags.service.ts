@@ -66,16 +66,17 @@ export class TagsService {
 
     const tag = await this.prisma.tag.create({ data });
 
-    for (const id of data.productIds) {
-      await this.prisma.product.update({
-        where: { id },
-        data: {
-          tagIds: {
-            push: [tag.id],
+    if (data?.productIds?.length)
+      for (const id of data.productIds) {
+        await this.prisma.product.update({
+          where: { id },
+          data: {
+            tagIds: {
+              push: [tag.id],
+            },
           },
-        },
-      });
-    }
+        });
+      }
     return tag;
   }
 
