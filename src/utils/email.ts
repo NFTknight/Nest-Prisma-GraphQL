@@ -48,7 +48,7 @@ export const SendEmails = (type: string, toEmail: string, body?: string) => {
       return {
         ...mail,
         subject: 'Welcome',
-        html: 'd-3b12fcdb4ed34514b55436bd57bd299e',
+        templateId: 'd-3b12fcdb4ed34514b55436bd57bd299e',
       };
     case EMAIL_OPTIONS.FORGOT_PWT:
       return {

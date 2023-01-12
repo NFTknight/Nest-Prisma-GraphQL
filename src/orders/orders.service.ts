@@ -190,8 +190,15 @@ export class OrdersService {
     ) {
       // Email notification
       this.emailService.send(SendEmails(data.status, res.customerInfo.email));
-      if (vendor?.info?.email)
+      if (vendor?.info?.email) {
         this.emailService.send(SendEmails(data.status, vendor.info.email));
+      } else {
+        // if vendor info doesn't have email
+        const user = await this.prisma.user.findUnique({
+          where: { id: vendor.ownerId },
+        });
+        if (user) this.emailService.send(SendEmails(data.status, user.email));
+      }
     }
 
     // if order is rejected delete all bookings otherwise update the status to PENDING OR CONFIRMED
