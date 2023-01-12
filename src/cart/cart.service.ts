@@ -444,13 +444,24 @@ export class CartService {
 
     // Email notification to vendor and customer when order is created
     if (order.id && errors === undefined) {
+      //
       this.emailService.send(
         SendEmails(ORDER_OPTIONS.PURCHASED, order?.customerInfo?.email)
       );
-      if (vendor?.info?.email)
+      if (vendor?.info?.email) {
         this.emailService.send(
           SendEmails(ORDER_OPTIONS.RECEIVED, vendor?.info?.email)
         );
+      } else {
+        // if vendor info doesn't have email
+        const user = await this.prisma.user.findUnique({
+          where: { id: vendor.ownerId },
+        });
+        if (user)
+          this.emailService.send(
+            SendEmails(ORDER_OPTIONS.RECEIVED, user.email)
+          );
+      }
     }
 
     return {
