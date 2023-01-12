@@ -345,6 +345,7 @@ type ExecutePayment {
 type ExecutePaymentError {
   Error: String!
   Name: String!
+  Variables: VariableType
 }
 
 type Form {
@@ -919,6 +920,12 @@ type User {
 type UserRole {
   role: Role!
   userId: String!
+}
+
+type VariableType {
+  itemQuantity: Int
+  quantity: Int
+  title: String
 }
 
 type Variant {
