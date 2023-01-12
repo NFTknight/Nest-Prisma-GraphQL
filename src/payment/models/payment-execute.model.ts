@@ -25,6 +25,5 @@ export class VariableType {
 export class ExecutePaymentError {
   Name: string;
   Error: string;
-  @Field(() => VariableType, { nullable: true })
-  Variables: VariableType;
+  Variables?: VariableType;
 }
