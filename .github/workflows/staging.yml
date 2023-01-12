@@ -1,4 +1,4 @@
-name: Staging Deploy
+name: Staging Deplo
 
 on:
   workflow_dispatch:
@@ -12,6 +12,7 @@ jobs:
   CD:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Install doctl # install the doctl on the runner
         uses: digitalocean/action-doctl@v2
         with:
