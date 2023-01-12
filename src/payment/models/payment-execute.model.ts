@@ -16,12 +16,9 @@ export class ExecutePayment {
 
 @ObjectType()
 export class VariableType {
-  @Field(() => String, { nullable: true })
-  title: string;
-  @Field(() => Number, { nullable: true })
-  quantity: number;
-  @Field(() => Number, { nullable: true })
-  itemQuantity: number;
+  title?: string;
+  quantity?: number;
+  itemQuantity?: number;
 }
 
 @ObjectType()
