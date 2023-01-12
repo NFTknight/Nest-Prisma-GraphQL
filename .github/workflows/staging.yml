@@ -1,4 +1,4 @@
-name: Staging Deplo
+name: Staging Deploy
 
 on:
   workflow_dispatch:
