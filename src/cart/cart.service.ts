@@ -383,6 +383,7 @@ export class CartService {
           ...(cart.shipperAddress && {
             shipperAddress: cart.shipperAddress,
           }),
+          subTotal: cart.subTotal,
           finalPrice: cart.totalPrice,
           totalPrice: cart.totalPrice,
           status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],

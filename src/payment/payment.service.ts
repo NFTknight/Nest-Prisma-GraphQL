@@ -60,7 +60,7 @@ export class PaymentService {
     // TODO DisplayCurrencyIso should be dynamic
     const data: ExecutePaymentApiRequest = {
       SessionId: sessionId,
-      InvoiceValue: order.totalPrice,
+      InvoiceValue: order.subTotal,
       CustomerName: `${order.customerInfo.firstName} ${order.customerInfo.lastName}`,
       DisplayCurrencyIso: 'KWD',
       CustomerEmail: order.customerInfo.email,

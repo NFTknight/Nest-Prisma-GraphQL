@@ -152,6 +152,7 @@ Table Order {
   cartId String
   cart Cart
   totalPrice Float [not null]
+  subTotal Float
   finalPrice Float [not null]
   appliedCoupon String
   items CartItem[] [not null]

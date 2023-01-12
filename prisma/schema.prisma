@@ -341,6 +341,7 @@ model Order {
   cart   Cart?   @relation(fields: [cartId], references: [id])
 
   totalPrice    Float
+  subTotal      Float?
   finalPrice    Float
   appliedCoupon String?
   items         CartItem[]
