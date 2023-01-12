@@ -1,17 +1,15 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
 import { CartItemInput } from './dto/cart.input';
 import {
+  DeliveryMethods,
   OrderStatus,
   PaymentMethods,
   Prisma,
   ProductType,
+  WayBill,
 } from '@prisma/client';
 import { CartItemService } from './services/cart-item.service';
 import { find, omit } from 'lodash';
@@ -22,8 +20,8 @@ import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { PaymentService } from 'src/payment/payment.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
-import { UserInputError } from 'apollo-server-express';
-import { formatApolloErrors } from 'apollo-server-errors';
+import { ShippingService } from 'src/shipping/shipping.service';
+import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
 
 @Injectable()
 export class CartService {
@@ -32,6 +30,7 @@ export class CartService {
     private readonly cartItemService: CartItemService,
     private readonly vendorService: VendorsService,
     private readonly emailService: SendgridService,
+    private readonly shippingService: ShippingService,
     private readonly paymentService: PaymentService,
     private readonly productService: ProductsService
   ) {}
@@ -388,6 +387,54 @@ export class CartService {
         errors = error.response.data.ValidationErrors;
       }
     }
+    let wayBillData: WayBill = null;
+
+    if (
+      order.status === OrderStatus.PENDING &&
+      order.deliveryMethod === DeliveryMethods.SMSA
+    ) {
+      const vendorData = await this.vendorService.getVendor(vendorId);
+
+      const WayBillRequestObject: CreateShipmentInput = {
+        ConsigneeAddress: {
+          ContactName: cart.consigneeAddress?.contactName,
+          ContactPhoneNumber: cart.consigneeAddress?.contactPhoneNumber,
+          //this is hardcoded for now
+          Country: 'SA',
+          City: 'Riyadh',
+          AddressLine1: cart.consigneeAddress?.addressLine1,
+        },
+        ShipperAddress: {
+          ContactName: vendorData.name || 'Company Name',
+          ContactPhoneNumber: vendorData?.info?.phone || '06012312312',
+          Country: 'SA',
+          City: 'Riyadh',
+          AddressLine1: vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
+        },
+        OrderNumber: order?.orderId,
+        DeclaredValue: 10,
+        CODAmount: 30,
+        Parcels: 1,
+        ShipDate: new Date().toISOString(),
+        ShipmentCurrency: 'SAR',
+        Weight: 15,
+        WaybillType: 'PDF',
+        WeightUnit: 'KG',
+        ContentDescription: 'Shipment contents description',
+      };
+      wayBillData = await this.shippingService.createShipment(
+        WayBillRequestObject
+      );
+      if (wayBillData) {
+        order = await this.prisma.order.update({
+          where: { id: order.id },
+          data: {
+            wayBill: wayBillData,
+          },
+        });
+      }
+    }
+
     // Payment method is not ONLINE or online payment is successfully done
     if (errors === undefined) {
       await this.prisma.cart.delete({

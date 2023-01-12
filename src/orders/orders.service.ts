@@ -150,6 +150,7 @@ export class OrdersService {
         ShipDate: new Date().toISOString(),
         ShipmentCurrency: 'SAR',
         Weight: 15,
+        WaybillType: 'PDF',
         WeightUnit: 'KG',
         ContentDescription: 'Shipment contents description',
       };
