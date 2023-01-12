@@ -80,11 +80,15 @@ spec:
                   name: sendgrid
                   key: api-key
           resources: {{ toYaml .Values.resources | nindent 12 }}
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: {{ .Values.containerPort }}
           readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 20
             httpGet:
-              path: /health
+              path: /
+              port: {{ .Values.containerPort }}
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            httpGet:
+              path: /
               port: {{ .Values.containerPort }}
