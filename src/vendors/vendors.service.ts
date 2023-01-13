@@ -46,14 +46,25 @@ export class VendorsService {
       SendEmails(EMAIL_OPTIONS.WELCOME_VENDOR, user.email)
     );
 
-    return res;
+    const owner = await this.prisma.user.findUnique({ where: { id: user.id } });
+
+    throwNotFoundException(owner, 'User');
+
+    return { ...res, owner };
   }
 
-  updateVendor(id: string, updateVendorInput: UpdateVendorInput) {
-    return this.prisma.vendor.update({
+  async updateVendor(id: string, updateVendorInput: UpdateVendorInput) {
+    const updatedVendor = await this.prisma.vendor.update({
       data: { ...updateVendorInput, updatedAt: new Date() },
       where: { id },
     });
+    const owner = await this.prisma.user.findUnique({
+      where: { id: updatedVendor.ownerId },
+    });
+
+    throwNotFoundException(owner, 'User');
+
+    return { ...updatedVendor, owner };
   }
 
   deleteVendor(id: string): Promise<Vendor> {
@@ -67,8 +78,12 @@ export class VendorsService {
     });
 
     throwNotFoundException(vendor, 'Vendor');
+    const user = await this.prisma.user.findUnique({
+      where: { id: vendor.ownerId },
+    });
 
-    return vendor;
+    throwNotFoundException(user, 'User');
+    return { ...vendor, owner: user };
   }
 
   async getVendorView(vendorId: string): Promise<VendorView> {
@@ -155,7 +170,13 @@ export class VendorsService {
 
     throwNotFoundException(vendor, 'Vendor');
 
-    return vendor;
+    const owner = await this.prisma.vendor.findUnique({
+      where: { id: vendor.ownerId },
+    });
+
+    throwNotFoundException(owner, 'User');
+
+    return { ...vendor, owner };
   }
 
   getVendors(): Promise<Vendor[]> {
