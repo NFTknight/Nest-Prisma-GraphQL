@@ -13,7 +13,7 @@ image:
 containerPort: 3000
 
 ingress:
-  tld: prod.anyaa.io
+  tld: anyaa.io
   domain: api
   path: /
 
@@ -31,4 +31,6 @@ acme:
 storage:
   endpoint: https://ams3.digitaloceanspaces.com
   space: anyaa-prod
-  
+
+myfatoorah:
+  endpoint: https://api.myfatoorah.com

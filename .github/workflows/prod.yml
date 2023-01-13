@@ -1,0 +1,35 @@
+name: Prod Deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  # TODO: Change variable to your image's name.
+  IMAGE_NAME: backend-api
+
+jobs:
+  #Push to Digital Ocean private Registry
+  CD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install doctl # install the doctl on the runner
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Set up kubectl
+        uses: matootie/dokube@v1.4.0
+        with:
+          personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          clusterName: anyaa-k8s
+          expirationTime: 300
+
+      - name: Upgrade deployment
+        run: |
+          helm upgrade --install --atomic --timeout 5m backend-api ./infra/ -f ./infra/values-prod.yaml \
+          --namespace prod --create-namespace
+
+      - name: Restart deployment
+        run: |
+          kubectl rollout restart deployment backend-api -n prod
