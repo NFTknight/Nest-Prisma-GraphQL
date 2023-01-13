@@ -224,9 +224,10 @@ export class VendorsService {
     throwNotFoundException(vendor, 'Vendor');
 
     let prefix = '';
-    const vendorStrArr = vendor.name.split(' ');
+    const vendorStrArr = vendor.name.trim()?.split(' ');
     if (vendorStrArr.length === 1) {
-      prefix = vendor.name.slice(0, 2).toUpperCase();
+      const abc = vendor.name.slice(0, 2);
+      prefix = abc.toUpperCase();
     } else if (vendorStrArr.length === 2) {
       prefix = vendorStrArr[0][0] + vendorStrArr[1][0];
     } else if (vendorStrArr.length > 2) {
