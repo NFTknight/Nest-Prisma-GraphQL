@@ -126,6 +126,7 @@ Table Cart {
   customerId String [not null]
   appliedCoupon String
   totalPrice Float [not null]
+  subTotal Float
   finalPrice Float [not null]
   vendorId String
   vendor Vendor
@@ -151,6 +152,7 @@ Table Order {
   cartId String
   cart Cart
   totalPrice Float [not null]
+  subTotal Float
   finalPrice Float [not null]
   appliedCoupon String
   items CartItem[] [not null]

@@ -69,6 +69,7 @@ export class CartService {
       const cartItems = [...res.items];
 
       let shouldUpdateCart = false;
+      let haveProductType = false;
 
       // logic to check if all the products in the cartItems are valid and existing
       for (const [i, item] of cartItems.entries()) {
@@ -79,6 +80,9 @@ export class CartService {
           await this.removeItemFromCart(res.id, item.productId, item.sku);
           cartItems.splice(i, 1);
         } else {
+          if (product.type === ProductType.PRODUCT) {
+            haveProductType = true;
+          }
           const updatedPrice =
             product?.variants?.find((variant) => variant.sku === item.sku)
               ?.price || item.price;
@@ -92,17 +96,35 @@ export class CartService {
           }
         }
       }
+      //this brings the deliveryCharges
+      const deliveryCharges = res.totalPrice - res.subTotal;
 
-      if (shouldUpdateCart) await this.updateCart(res.id, { items: cartItems });
-
-      const totalPrice = cartItems.reduce(
+      //this is to make sure subTotal is correct
+      const subTotal = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0
       );
 
+      const updatedCartObject = {
+        items: cartItems,
+        subTotal: subTotal,
+        totalPrice: subTotal + deliveryCharges,
+      };
+      if (!haveProductType) {
+        
+        updatedCartObject['totalPrice'] = subTotal;
+        updatedCartObject['deliveryMethod'] = null;
+        updatedCartObject['deliveryArea'] = null;
+      }
+
+      if (shouldUpdateCart || !haveProductType)
+        await this.updateCart(res.id, updatedCartObject);
+
       return {
         ...res,
-        totalPrice,
+        //returning newly calculated subTotal + deliveryCharges as new total
+        totalPrice: updatedCartObject.totalPrice,
+        subTotal: updatedCartObject.subTotal,
         items: cartItems,
       };
     } catch (e) {
@@ -363,6 +385,7 @@ export class CartService {
           ...(cart.shipperAddress && {
             shipperAddress: cart.shipperAddress,
           }),
+          subTotal: cart.subTotal,
           finalPrice: cart.totalPrice,
           totalPrice: cart.totalPrice,
           status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],

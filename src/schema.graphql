@@ -89,6 +89,7 @@ type Cart {
   items: [CartItem!]!
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
+  subTotal: Float
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -143,6 +144,8 @@ input CartUpdateInput {
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
   shippingAddress: CartAddressInput
+  subTotal: Int
+  totalPrice: Int
 }
 
 type Category {
@@ -462,6 +465,7 @@ type Order {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
+  subTotal: Float!
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -500,6 +504,7 @@ type OrderPayment {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
+  subTotal: Float!
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""

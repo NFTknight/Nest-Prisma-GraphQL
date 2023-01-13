@@ -14,11 +14,13 @@ import { DeliveryMethods } from '@prisma/client';
 import { BadRequestException } from '@nestjs/common';
 import { CartItemService } from './services/cart-item.service';
 import { throwNotFoundException } from 'src/utils/validation';
-
+import { PrismaService } from 'nestjs-prisma';
+const SMSA_DELVERY_CHARGE = 30;
 @Resolver(Cart)
 export class CartResolver {
   constructor(
     private readonly cartService: CartService,
+    private readonly prisma: PrismaService,
     private readonly cartItemService: CartItemService
   ) {}
 
@@ -124,8 +126,30 @@ export class CartResolver {
           'Delivery area is required if delivery method is MANDOOB'
         );
       }
-      if (data.deliveryMethod !== DeliveryMethods.MANDOOB)
+      if (
+        data.deliveryMethod &&
+        data.deliveryMethod !== DeliveryMethods.MANDOOB
+      )
         data.deliveryArea = null;
+
+      const vendor = await this.prisma.vendor.findUnique({
+        where: { id: cart.vendorId },
+      });
+
+      throwNotFoundException(vendor, 'Vendor');
+
+      if (vendor && data.deliveryArea) {
+        const deliveryCharges =
+          vendor.settings.deliveryAreas.find(
+            (item) => item.label === data.deliveryArea
+          )?.charge || 0;
+
+        data.totalPrice = cart.subTotal + deliveryCharges;
+      }
+
+      if (data.deliveryMethod === DeliveryMethods.SMSA) {
+        data.totalPrice = cart.subTotal + SMSA_DELVERY_CHARGE;
+      }
 
       cart = await this.cartService.updateCart(cartId, data);
     }

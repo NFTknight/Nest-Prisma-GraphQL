@@ -64,6 +64,9 @@ export class Order extends BaseModel implements PrismaOrder {
   totalPrice: number;
 
   @Field(() => Float)
+  subTotal: number;
+
+  @Field(() => Float)
   finalPrice: number;
 
   @Field(() => CartAddress, { nullable: true })
