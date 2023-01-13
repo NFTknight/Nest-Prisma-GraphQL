@@ -6,6 +6,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
 import { VendorsService } from 'src/vendors/vendors.service';
+import { throwNotFoundException } from 'src/utils/validation';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
 import { PaymentStatusApiRequest } from './dto/payment-status.dto';
 import {
@@ -59,9 +60,11 @@ export class PaymentService {
         id: orderId,
       },
     });
+
+    throwNotFoundException(order, 'Order');
     const data: ExecutePaymentApiRequest = {
       SessionId: sessionId,
-      InvoiceValue: order.totalPrice,
+      InvoiceValue: order.subTotal,
       CustomerName: `${order.customerInfo.firstName} ${order.customerInfo.lastName}`,
       DisplayCurrencyIso: 'KWD',
       CustomerEmail: order.customerInfo.email,
@@ -95,7 +98,7 @@ export class PaymentService {
       },
     });
 
-    if (!order) throw new NotFoundException('Order Not Found.');
+    throwNotFoundException(order, 'Order');
 
     const data: PaymentStatusApiRequest = {
       Key: order.invoiceId,

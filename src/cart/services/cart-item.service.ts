@@ -1,12 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BookingStatus } from '@prisma/client';
 import { findIndex } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
+import { throwNotFoundException } from 'src/utils/validation';
 import { ProductsService } from '../../products/services/products.service';
 import { CartItemInput } from '../dto/cart.input';
 import { CartItem } from '../models/cart-item.model';
@@ -21,25 +18,45 @@ export class CartItemService {
 
   addProduct(product: Product, cart: Cart, item: CartItemInput) {
     const { sku, quantity } = item;
+
+    throwNotFoundException(cart, 'Cart');
+
     const newCart = { ...cart };
 
     const productVariant = product.variants.find(
       (variant) => variant.sku === sku
     );
 
-    if (!productVariant) {
-      throw new NotFoundException(`Product variant with sku ${sku} not found`);
-    }
+    throwNotFoundException(
+      productVariant,
+      '',
+      `Product variant with sku ${sku} not found`
+    );
 
-    const existingProductIndex = findIndex(newCart.items, {
+    const existingProductIndex = findIndex(newCart?.items || [], {
       productId: product.id,
       sku: productVariant.sku,
     });
+    const deliveryCharges = newCart.totalPrice - newCart.subTotal;
 
     if (existingProductIndex !== -1) {
-      // if the cart item exists, update the quantity
+      if (
+        //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+        product.itemsInStock !== null &&
+        product.itemsInStock < newCart.items[existingProductIndex].quantity
+      ) {
+        throw new BadRequestException(
+          `You can't add more than ${product.itemsInStock} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
+        );
+      }
+
       newCart.items[existingProductIndex].quantity += quantity;
     } else {
+      if (productVariant.quantity < quantity) {
+        throw new BadRequestException(
+          `You can't add more than ${productVariant.quantity} no of products in your cart.`
+        );
+      }
       // if the cart item does not exist, create the item
       newCart.items.push({
         ...item,
@@ -48,10 +65,11 @@ export class CartItemService {
     }
 
     // update the cart price
-    newCart.totalPrice = newCart.items.reduce(
+    newCart.subTotal = newCart.items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
+    newCart.totalPrice = newCart.subTotal + deliveryCharges;
 
     newCart.updatedAt = new Date();
 
@@ -66,6 +84,7 @@ export class CartItemService {
     const newCart = this.addProduct(product, cart, item);
 
     const newBookedSeats = product.bookedSeats + item.quantity;
+
     if (newBookedSeats > product.noOfSeats) {
       throw new BadRequestException(
         `The number of booked seats (${newBookedSeats}) exceeds the number of seats available (${product.noOfSeats})`

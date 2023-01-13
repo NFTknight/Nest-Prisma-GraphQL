@@ -12,6 +12,7 @@ import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from '@prisma/client';
 import { VendorView } from './models/vendor.model';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class VendorsService {
@@ -35,6 +36,9 @@ export class VendorsService {
         ...createVendorInput,
         MF_vendorCode: 1,
         ownerId: user.id,
+        info: {
+          email: user.email,
+        },
       },
     });
 
@@ -62,7 +66,7 @@ export class VendorsService {
       where: { id },
     });
 
-    if (!vendor) throw new NotFoundException('Vendor Not Found');
+    throwNotFoundException(vendor, 'Vendor');
 
     return vendor;
   }
@@ -108,12 +112,16 @@ export class VendorsService {
       vendorPromise,
     ]);
 
+    throwNotFoundException(vendor, 'Vendor');
+
     const vendorName = vendor?.name || '';
     const vendorUrl = vendor?.info?.addressUrl || '';
     const ownerId = vendor.ownerId;
+
     const vendorOwner = await this.prisma.user.findUnique({
       where: { id: ownerId },
     });
+
     const accountManager =
       (vendorOwner.firstName || '') + ' ' + (vendorOwner.lastName || '');
 
@@ -135,7 +143,7 @@ export class VendorsService {
       where: { ownerId: id },
     });
 
-    if (!vendor) throw new NotFoundException('Vendor Not Found');
+    throwNotFoundException(vendor, 'Vendor');
 
     return vendor;
   }
@@ -145,7 +153,7 @@ export class VendorsService {
       where: { slug },
     });
 
-    if (!vendor) throw new NotFoundException('Vendor Not Found');
+    throwNotFoundException(vendor, 'Vendor');
 
     return vendor;
   }
@@ -180,6 +188,8 @@ export class VendorsService {
       where: { id: vendorId },
       select: { name: true },
     });
+
+    throwNotFoundException(vendor, 'Vendor');
 
     let prefix = '';
     const vendorStrArr = vendor.name.split(' ');

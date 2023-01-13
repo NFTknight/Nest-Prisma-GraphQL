@@ -68,7 +68,7 @@ export class OrdersResolver {
 
     const list = await this.prismaService.order.findMany({
       skip,
-      take,
+      take: take || undefined,
       orderBy,
     });
     const totalCount = await this.prismaService.order.count();

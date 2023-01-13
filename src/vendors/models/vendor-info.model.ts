@@ -60,4 +60,10 @@ export class VendorInfo implements PrismaVendorInfo {
 
   @Field({ nullable: true })
   crNum: string;
+
+  @Field({ nullable: true })
+  maroofNum: string;
+
+  @Field({ nullable: true })
+  freelanceNum: string;
 }
