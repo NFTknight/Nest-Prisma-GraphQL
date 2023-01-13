@@ -111,7 +111,6 @@ export class CartService {
         totalPrice: subTotal + deliveryCharges,
       };
       if (!haveProductType) {
-        
         updatedCartObject['totalPrice'] = subTotal;
         updatedCartObject['deliveryMethod'] = null;
         updatedCartObject['deliveryArea'] = null;
@@ -286,16 +285,13 @@ export class CartService {
     for (const item of cart.items) {
       const product = await this.productService.getProduct(item.productId);
       if (product.type === ProductType.PRODUCT) {
-        const variant = product.variants.find(
-          (variant) => variant.sku === item.sku
-        );
-        if (variant.quantity < item.quantity) {
+        if (product.itemsInStock < item.quantity) {
           cartErrors.push({
             Name: 'ProductIssue',
             Error: 'ProductHaveLessQuantityAsCart',
             Variables: {
-              title: variant.title,
-              quantity: variant.quantity,
+              title: product.title,
+              quantity: product.itemsInStock,
               itemQuantity: item.quantity,
             },
           });
