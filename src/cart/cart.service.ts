@@ -109,7 +109,7 @@ export class CartService {
         totalPrice: subTotal + deliveryCharges,
       };
       if (!haveProductType) {
-        console.log({ haveProductType });
+        
         updatedCartObject['totalPrice'] = subTotal;
         updatedCartObject['deliveryMethod'] = null;
         updatedCartObject['deliveryArea'] = null;
