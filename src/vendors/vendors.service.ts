@@ -67,8 +67,12 @@ export class VendorsService {
     });
 
     throwNotFoundException(vendor, 'Vendor');
+    const user = await this.prisma.user.findUnique({
+      where: { id: vendor.ownerId },
+    });
 
-    return vendor;
+    throwNotFoundException(user, 'User');
+    return { ...vendor, owner: user };
   }
 
   async getVendorView(vendorId: string): Promise<VendorView> {
