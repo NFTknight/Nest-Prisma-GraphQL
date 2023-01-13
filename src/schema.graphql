@@ -943,7 +943,7 @@ input VariantInput {
   default: Boolean
   image: String
   images: [String!]
-  price: Int!
+  price: Float!
   sku: String!
   title: String!
   title_ar: String!
