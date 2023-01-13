@@ -29,3 +29,7 @@ jobs:
         run: |
           helm upgrade --install --atomic --timeout 5m backend-api ./infra/ -f ./infra/values-staging.yaml \
           --namespace staging --create-namespace
+
+      - name: Restart deployment
+        run: |
+          kubectl rollout restart deployment backend-api -n staging
