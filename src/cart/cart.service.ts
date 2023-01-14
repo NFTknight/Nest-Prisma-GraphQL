@@ -156,7 +156,7 @@ export class CartService {
 
     switch (product.type) {
       case ProductType.PRODUCT:
-        cartData = this.cartItemService.addProduct(product, cart, data);
+        cartData = await this.cartItemService.addProduct(product, cart, data);
         break;
 
       case ProductType.WORKSHOP:
