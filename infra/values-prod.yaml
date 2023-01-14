@@ -33,4 +33,6 @@ storage:
   space: anyaa-prod
 
 myfatoorah:
-  endpoint: https://api.myfatoorah.com
+  endpoint: https://api-sa.myfatoorah.com
+  clienturl: https://anyaa.io
+  currency: SAR
