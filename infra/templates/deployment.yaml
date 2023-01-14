@@ -48,7 +48,7 @@ spec:
             - name: MYFATOORAH_CLIENT_URL
               value: {{ .Values.myfatoorah.clienturl }}
             - name: MYFATOORAH_CURRENCY
-              value: {{ .Values.myfatoorah.clienturl }}
+              value: {{ .Values.myfatoorah.currency }}
             - name: MYFATOORAH_API_TOKEN
               valueFrom:
                 secretKeyRef:
