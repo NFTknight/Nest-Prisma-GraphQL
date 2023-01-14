@@ -440,7 +440,7 @@ export class CartService {
           ContactPhoneNumber: cart.consigneeAddress?.contactPhoneNumber,
           //this is hardcoded for now
           Country: 'SA',
-          City: 'Riyadh',
+          City: cart.consigneeAddress?.city,
           AddressLine1: cart.consigneeAddress?.addressLine1,
         },
         ShipperAddress: {
@@ -451,7 +451,7 @@ export class CartService {
           AddressLine1: vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
         },
         OrderNumber: order?.orderId,
-        DeclaredValue: 10,
+        DeclaredValue: cart?.subTotal,
         CODAmount: 30,
         Parcels: 1,
         ShipDate: new Date().toISOString(),
