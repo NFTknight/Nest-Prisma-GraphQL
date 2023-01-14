@@ -40,8 +40,8 @@ export class StorageService {
         if (err) {
           reject(err);
         } else {
-          //change to env var
-          resolve('https://ik.imagekit.io/anyaa/prod/' + data.Key);
+          //change to imagekit env var
+          resolve(data.Location);
         }
       });
     });
