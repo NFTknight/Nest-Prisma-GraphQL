@@ -77,7 +77,7 @@ export class CartItemService {
       where: { id: product.id },
       data: {
         itemsInStock: {
-          decrement: item.quantity,
+          decrement: newCart.items[existingProductIndex].quantity,
         },
       },
     });
