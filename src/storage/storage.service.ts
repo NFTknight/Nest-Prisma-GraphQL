@@ -40,7 +40,8 @@ export class StorageService {
         if (err) {
           reject(err);
         } else {
-          resolve('https://ik.imagekit.io/anyaa/' + data.Key);
+          //change to env var
+          resolve('https://ik.imagekit.io/anyaa/prod/' + data.Key);
         }
       });
     });
