@@ -284,7 +284,10 @@ export class CartService {
     const cartErrors = [];
     for (const item of cart.items) {
       const product = await this.productService.getProduct(item.productId);
-      if (product.type === ProductType.PRODUCT) {
+      if (
+        product.type === ProductType.PRODUCT &&
+        product.itemsInStock !== null
+      ) {
         if (product.itemsInStock < item.quantity) {
           cartErrors.push({
             Name: 'ProductIssue',
@@ -340,7 +343,10 @@ export class CartService {
 
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
-    if (!cart.deliveryMethod) {
+    if (
+      !cart.deliveryMethod &&
+      cart?.items?.some((item) => item?.product?.type === ProductType.PRODUCT)
+    ) {
       throw new BadRequestException('delivery method is required');
     } else if (!cart.paymentMethod) {
       throw new BadRequestException('Payment method is required');
