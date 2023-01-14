@@ -284,7 +284,10 @@ export class CartService {
     const cartErrors = [];
     for (const item of cart.items) {
       const product = await this.productService.getProduct(item.productId);
-      if (product.type === ProductType.PRODUCT) {
+      if (
+        product.type === ProductType.PRODUCT &&
+        product.itemsInStock !== null
+      ) {
         if (product.itemsInStock < item.quantity) {
           cartErrors.push({
             Name: 'ProductIssue',
