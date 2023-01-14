@@ -127,6 +127,24 @@ export class OrdersService {
       // if the order does not exist, this function will throw an error.
       cartItem = await this.cartService.getCartAndDelete(order.cartId);
     }
+
+    if (order.cartId && order.status === OrderStatus.PENDING) {
+      for (const [i, item] of order.items.entries()) {
+        const product = await this.prisma.product.findUnique({
+          where: { id: item.productId },
+        });
+        if (product.type === ProductType.WORKSHOP) {
+          await this.prisma.product.update({
+            where: { id: product.id },
+            data: {
+              bookedSeats: {
+                increment: item.quantity,
+              },
+            },
+          });
+        }
+      }
+    }
     if (
       order.cartId &&
       order.status === OrderStatus.PENDING &&
