@@ -16,7 +16,7 @@ export class CartItemService {
     private readonly productService: ProductsService
   ) {}
 
-  async addProduct(product: Product, cart: Cart, item: CartItemInput) {
+  addProduct(product: Product, cart: Cart, item: CartItemInput) {
     const { sku, quantity } = item;
 
     throwNotFoundException(cart, 'Cart');
@@ -72,15 +72,6 @@ export class CartItemService {
     newCart.totalPrice = newCart.subTotal + deliveryCharges;
 
     newCart.updatedAt = new Date();
-
-    await this.prisma.product.update({
-      where: { id: product.id },
-      data: {
-        itemsInStock: {
-          decrement: item.quantity,
-        },
-      },
-    });
 
     return newCart;
   }
