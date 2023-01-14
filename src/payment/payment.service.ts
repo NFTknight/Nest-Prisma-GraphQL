@@ -29,7 +29,7 @@ export class PaymentService {
   }
 
   initiateSession() {
-    const url = `${this.paymentConfig.url}/v2/InitiateSession`;
+    const url = `https://api-sa.myfatoorah.com/v2/InitiateSession`; //${this.paymentConfig.url}
     return firstValueFrom(
       this.httpService
         .post<{
@@ -48,7 +48,7 @@ export class PaymentService {
   }
 
   async executePayment(orderId: string, sessionId: string, vendorSlug: string) {
-    const url = `${this.paymentConfig.url}/v2/ExecutePayment`;
+    const url = `https://api-sa.myfatoorah.com/v2/ExecutePayment`; //change env var ${this.paymentConfig.url}
     const order = await this.prisma.order.findUnique({
       where: {
         id: orderId,
@@ -62,11 +62,11 @@ export class PaymentService {
       SessionId: sessionId,
       InvoiceValue: order.subTotal,
       CustomerName: `${order.customerInfo.firstName} ${order.customerInfo.lastName}`,
-      DisplayCurrencyIso: this.paymentConfig.currency,
+      DisplayCurrencyIso: 'SAR', //change to env var this.paymentConfig.currency
       CustomerEmail: order.customerInfo.email,
       CustomerReference: order.orderId,
-      CallBackUrl: `${this.paymentConfig.clientUrl}/${vendorSlug}/checkout/${orderId}/confirmation`,
-      ErrorUrl: `${this.paymentConfig.clientUrl}/${vendorSlug}/checkout/${orderId}/failure`,
+      CallBackUrl: `https://anyaa.io/${vendorSlug}/checkout/${orderId}/confirmation`, //change to env var ${this.paymentConfig.clientUrl}
+      ErrorUrl: `https://anyaa.io/${vendorSlug}/checkout/${orderId}/failure`,
       InvoiceItems: order.items.map((item) => ({
         ItemName: `${item.productId}_${item.sku}`,
         Quantity: item.quantity,
@@ -86,7 +86,7 @@ export class PaymentService {
   }
 
   async checkPaymentStatus(orderId: string) {
-    const url = `${this.paymentConfig.url}/v2/GetPaymentStatus`;
+    const url = `https://api-sa.myfatoorah.com/v2/GetPaymentStatus`; //${this.paymentConfig.url}
 
     const order = await this.prisma.order.findUnique({
       where: {
