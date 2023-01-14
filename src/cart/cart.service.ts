@@ -343,7 +343,10 @@ export class CartService {
 
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
-    if (!cart.deliveryMethod) {
+    if (
+      !cart.deliveryMethod &&
+      cart?.items?.some((item) => item?.product?.type === ProductType.PRODUCT)
+    ) {
       throw new BadRequestException('delivery method is required');
     } else if (!cart.paymentMethod) {
       throw new BadRequestException('Payment method is required');
