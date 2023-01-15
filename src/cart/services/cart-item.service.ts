@@ -91,12 +91,12 @@ export class CartItemService {
       );
     }
 
-    // update the booked seats
+    //update the booked seats
     await this.prisma.product.update({
       where: { id: product.id },
       data: {
         bookedSeats: {
-          increment: 0,
+          increment: item.quantity,
         },
       },
     });
