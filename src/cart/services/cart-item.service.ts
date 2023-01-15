@@ -83,13 +83,13 @@ export class CartItemService {
   ): Promise<Cart> {
     const newCart = this.addProduct(product, cart, item);
 
-    const newBookedSeats = product.bookedSeats + item.quantity;
+    // const newBookedSeats = product.bookedSeats + item.quantity;
 
-    if (newBookedSeats > product.noOfSeats) {
-      throw new BadRequestException(
-        `The number of booked seats (${newBookedSeats}) exceeds the number of seats available (${product.noOfSeats})`
-      );
-    }
+    // if (newBookedSeats > product.noOfSeats) {
+    //   throw new BadRequestException(
+    //     `The number of booked seats (${newBookedSeats}) exceeds the number of seats available (${product.noOfSeats})`
+    //   );
+    // }
 
     // update the booked seats
     // await this.prisma.product.update({
