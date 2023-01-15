@@ -492,9 +492,9 @@ export class CartService {
         },
       });
 
-      await this.prisma.cart.delete({
-        where: { id: cartId },
-      });
+      // await this.prisma.cart.delete({
+      //   where: { id: cartId },
+      // });
     }
 
     // Email notification to vendor and customer when order is created
