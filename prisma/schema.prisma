@@ -205,8 +205,8 @@ type VariantOption {
   sku      String
   price    Float
   quantity Float?   @default(1)
-  image    String?
-  images   String[]
+  // image    String?
+  // images   String[]
   title    String
   title_ar String
 }
