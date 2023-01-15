@@ -17,9 +17,9 @@ export class VariantInput {
   @Field(() => Float)
   price: number;
 
-  // @Field()
-  // image?: string;
+  @Field()
+  image?: string;
 
-  // @Field()
-  // images?: string[];
+  @Field()
+  images?: string[];
 }
