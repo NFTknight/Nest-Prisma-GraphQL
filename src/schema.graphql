@@ -661,6 +661,7 @@ enum ProductType {
 }
 
 type Query {
+  createWorkshop(cartId: String!, productId: String!): Workshop!
   getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
   getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
@@ -689,6 +690,7 @@ type Query {
   getVendorView(vendorId: String!): VendorView!
   getVendors(filter: VendorFilterInput): [Vendor!]!
   getVendorsView(pagination: PaginationArgs): VendorsView!
+  getWorkshop(id: String!): Workshop!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
@@ -1064,4 +1066,16 @@ input WorkDayInput {
   day: Weekday!
   from: String!
   to: String!
+}
+
+type Workshop {
+  cartId: String
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  productId: String
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
 }
