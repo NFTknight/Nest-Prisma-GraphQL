@@ -10,4 +10,8 @@ export class CreateWorkshopInput {
   @Field()
   @IsNotEmpty()
   cartId: string;
+
+  @Field()
+  @IsNotEmpty()
+  quantity: number;
 }

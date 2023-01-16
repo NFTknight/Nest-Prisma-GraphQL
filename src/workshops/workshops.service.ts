@@ -1,12 +1,11 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { ProductsService } from 'src/products/services/products.service';
-import { OrderStatus, PaymentMethods } from '@prisma/client';
 import { VendorsService } from 'src/vendors/vendors.service';
-import { nanoid } from 'nanoid';
 import { Workshop } from './models/workshop.model';
 import { throwNotFoundException } from 'src/utils/validation';
-import { CreateWorkshopInput } from './dto/workshops.input';
+import { CreateWorkshopInput } from './dto/create.workshops.input';
+import { UpdateWorkshopInput } from './dto/update.workshops.input';
 @Injectable()
 export class WorkshopService {
   constructor(
@@ -19,23 +18,37 @@ export class WorkshopService {
     if (!id) return null;
     const workshop = await this.prisma.workshop.findUnique({ where: { id } });
 
-    throwNotFoundException(workshop, 'Booking');
+    throwNotFoundException(workshop, 'Workshop');
 
     return workshop;
   }
 
   async createWorkshop(data: CreateWorkshopInput): Promise<Workshop> {
-    const { productId, cartId } = data;
+    const { productId, cartId, quantity } = data;
 
     const workshop = this.prisma.workshop.create({
       data: {
         productId,
         cartId,
+        quantity,
       },
     });
     return workshop;
   }
 
+  async updateWorkshop(
+    id: string,
+    data: UpdateWorkshopInput
+  ): Promise<Workshop> {
+    return this.prisma.workshop.update({
+      where: { id },
+      data: { ...data, updatedAt: new Date() },
+    });
+  }
+
+  // async deleteBooking(id: string): Promise<Booking> {
+  //   return await this.prisma.booking.delete({ where: { id } });
+  // }
   // async getBookings(where: any): Promise<Booking[]> {
   //   const res = await this.prisma.booking.findMany({ where });
 

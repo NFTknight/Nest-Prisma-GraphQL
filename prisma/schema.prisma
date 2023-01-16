@@ -433,6 +433,7 @@ model Workshop {
   productId String?  @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  quantity  Int?     @default(1)
 }
 
 model Form {

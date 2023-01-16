@@ -661,7 +661,7 @@ enum ProductType {
 }
 
 type Query {
-  createWorkshop(cartId: String!, productId: String!): Workshop!
+  createWorkshop(cartId: String!, productId: String!, quantity: Int!): Workshop!
   getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
   getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
@@ -695,6 +695,7 @@ type Query {
   me: User!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
+  updateWorkshop(data: UpdateWorkshopInput!, id: String!): Workshop!
 }
 
 input ResetPwtInput {
@@ -907,6 +908,10 @@ input UpdateVendorSettingsInput {
   paymentMethods: [PaymentMethods!]
 }
 
+input UpdateWorkshopInput {
+  quantity: Int!
+}
+
 type User {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
@@ -1075,6 +1080,7 @@ type Workshop {
   createdAt: DateTime!
   id: ID!
   productId: String
+  quantity: Int!
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
