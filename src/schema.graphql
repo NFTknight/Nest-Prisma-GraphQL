@@ -872,6 +872,7 @@ input UpdateVendorInfoInput {
   address: String
   addressUrl: String
   certificates: [Certificate!]
+  city: String
   crNum: String
   description: String
   description_ar: String
@@ -991,6 +992,7 @@ type VendorInfo {
   address: String
   addressUrl: String
   certificates: [Certificates!]
+  city: String
   crNum: String
   description: String
   description_ar: String

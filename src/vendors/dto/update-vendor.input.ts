@@ -44,6 +44,9 @@ class UpdateVendorInfoInput implements VendorInfo {
   email: string;
 
   @Field({ nullable: true })
+  city: string;
+
+  @Field({ nullable: true })
   addressUrl: string;
 
   @Field({ nullable: true })
