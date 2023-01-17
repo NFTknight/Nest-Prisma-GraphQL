@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { BookingStatus } from '@prisma/client';
+import { BookingStatus, ProductType } from '@prisma/client';
 import { findIndex } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
@@ -42,6 +42,7 @@ export class CartItemService {
     if (existingProductIndex !== -1) {
       if (
         //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+        product.type === ProductType.PRODUCT &&
         product.itemsInStock !== null &&
         product.itemsInStock < newCart.items[existingProductIndex].quantity
       ) {
@@ -52,7 +53,10 @@ export class CartItemService {
 
       newCart.items[existingProductIndex].quantity += quantity;
     } else {
-      if (productVariant.quantity < quantity) {
+      if (
+        product.type === ProductType.PRODUCT &&
+        productVariant.quantity < quantity
+      ) {
         throw new BadRequestException(
           `You can't add more than ${productVariant.quantity} no of products in your cart.`
         );
