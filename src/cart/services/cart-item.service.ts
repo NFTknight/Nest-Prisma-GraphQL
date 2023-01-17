@@ -44,15 +44,18 @@ export class CartItemService {
     if (existingProductIndex !== -1) {
       if (
         //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+        product.type === ProductType.PRODUCT &&
         product.itemsInStock !== null &&
         product.itemsInStock < newCart.items[existingProductIndex].quantity
       ) {
         throw new BadRequestException(
           `You can't add more than ${product.itemsInStock} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
         );
+      } else {
+        if (product.type === ProductType.PRODUCT)
+          newCart.items[existingProductIndex].quantity += quantity;
       }
 
-      newCart.items[existingProductIndex].quantity += quantity;
       if (product.type === ProductType.WORKSHOP) {
         const workshopBooking = await this.prisma.workshop.findFirst({
           where: {
@@ -60,23 +63,25 @@ export class CartItemService {
             cartId: cart.id,
           },
         });
-        console.log('Code is here');
         if (!!workshopBooking) {
           this.workshopService.updateWorkshop(workshopBooking.id, {
-            quantity: (newCart.items[existingProductIndex].quantity +=
-              quantity),
+            quantity: newCart.items[existingProductIndex].quantity + quantity,
           });
+          newCart.items[existingProductIndex].quantity += quantity;
         } else {
-          console.log('This is working!');
           await this.workshopService.createWorkshop({
             productId: product.id,
             cartId: cart.id,
             quantity: quantity,
           });
+          newCart.items[existingProductIndex].quantity = quantity;
         }
       }
     } else {
-      if (productVariant.quantity < quantity) {
+      if (
+        product.type === ProductType.PRODUCT &&
+        productVariant.quantity < quantity
+      ) {
         throw new BadRequestException(
           `You can't add more than ${productVariant.quantity} no of products in your cart.`
         );

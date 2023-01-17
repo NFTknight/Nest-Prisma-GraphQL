@@ -465,7 +465,7 @@ type Order {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
-  subTotal: Float!
+  subTotal: Float
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -504,7 +504,7 @@ type OrderPayment {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
-  subTotal: Float!
+  subTotal: Float
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
