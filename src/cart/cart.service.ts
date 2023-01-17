@@ -447,7 +447,7 @@ export class CartService {
           ContactName: vendorData.name || 'Company Name',
           ContactPhoneNumber: vendorData?.info?.phone || '06012312312',
           Country: 'SA',
-          City: 'Riyadh',
+          City: vendorData?.info?.city || 'Riyadh',
           AddressLine1: vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
         },
         OrderNumber: order?.orderId,

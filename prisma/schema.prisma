@@ -70,6 +70,7 @@ type VendorInfo {
   address        String?
   phone          String?
   email          String?
+  city           String?
   addressUrl     String?
   description    String?
   description_ar String?
