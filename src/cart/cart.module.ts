@@ -6,6 +6,7 @@ import { ProductsModule } from 'src/products/products.module';
 import { SendgridModule } from 'src/sendgrid/sendgrid.module';
 import { ShippingService } from 'src/shipping/shipping.service';
 import { VendorsModule } from 'src/vendors/vendors.module';
+import { WorkshopService } from 'src/workshops/workshops.service';
 import { CartResolver } from './cart.resolver';
 import { CartService } from './cart.service';
 import { CartItemService } from './services/cart-item.service';
@@ -19,7 +20,13 @@ import { CartItemService } from './services/cart-item.service';
     PaymentModule,
     HttpModule,
   ],
-  providers: [CartItemService, CartService, CartResolver, ShippingService],
+  providers: [
+    CartItemService,
+    CartService,
+    CartResolver,
+    ShippingService,
+    WorkshopService,
+  ],
   exports: [CartService, CartItemService],
 })
 export class CartModule {}

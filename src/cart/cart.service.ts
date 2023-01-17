@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
-import { CartItemInput } from './dto/cart.input';
+import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 import {
   Booking,
   BookingStatus,
@@ -95,6 +95,14 @@ export class CartService {
             };
           }
         }
+        if (product.type === ProductType.WORKSHOP) {
+          const isWorkShopExists = await this.prisma.workshop.findFirst({
+            where: { productId: product.id, cartId: res.id },
+          });
+          if (!isWorkShopExists) {
+            cartItems.splice(i, 1);
+          }
+        }
       }
       //this brings the deliveryCharges
       const deliveryCharges = res.totalPrice - res.subTotal;
@@ -112,8 +120,12 @@ export class CartService {
       };
       if (!haveProductType) {
         updatedCartObject['totalPrice'] = subTotal;
-        updatedCartObject['deliveryMethod'] = null;
-        updatedCartObject['deliveryArea'] = null;
+        if (updatedCartObject['deliveryMethod']) {
+          updatedCartObject['deliveryMethod'] = null;
+        }
+        if (updatedCartObject['deliveryArea']) {
+          updatedCartObject['deliveryArea'] = null;
+        }
       }
 
       if (shouldUpdateCart || !haveProductType)
@@ -152,7 +164,7 @@ export class CartService {
       where: { id: data.productId },
     });
 
-    let cartData: Prisma.CartUpdateArgs['data'] = {};
+    let cartData = {};
 
     switch (product.type) {
       case ProductType.PRODUCT:
@@ -270,9 +282,10 @@ export class CartService {
 
   //this should not type any, but this was generating error on assigning it a type
   async updateCart(cartId: string, data: any) {
+    console.log({ data });
     return this.prisma.cart.update({
       where: { id: cartId },
-      data: data,
+      data: { ...data },
     });
   }
 

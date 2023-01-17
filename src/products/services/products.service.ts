@@ -77,6 +77,21 @@ export class ProductsService {
         return product;
       });
 
+      for (const [i, item] of list.entries()) {
+        const quantity = await this.prisma.workshop.aggregate({
+          where: {
+            productId: item.id,
+          },
+          _sum: {
+            quantity: true,
+          },
+        });
+
+        if (quantity?._sum?.quantity) {
+          list[i].bookedSeats += quantity?._sum?.quantity;
+        }
+      }
+
       const totalCount = await this.prisma.product.count({ where });
 
       return {
@@ -110,6 +125,20 @@ export class ProductsService {
         orderBy,
       });
 
+      for (const [i, item] of list.entries()) {
+        const quantity = await this.prisma.workshop.aggregate({
+          _sum: {
+            quantity: true,
+          },
+          where: {
+            productId: item.id,
+          },
+        });
+
+        if (quantity?._sum?.quantity) {
+          list[i].bookedSeats += quantity?._sum?.quantity;
+        }
+      }
       const totalCount = await this.prisma.product.count();
 
       return {
@@ -134,6 +163,19 @@ export class ProductsService {
       if (product.badge)
         product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
       else product.badge = { label: AttendanceType.PHYSICAL };
+    }
+
+    const quantity = await this.prisma.workshop.aggregate({
+      _sum: {
+        quantity: true,
+      },
+      where: {
+        productId: product.id,
+      },
+    });
+
+    if (quantity?._sum?.quantity) {
+      product.bookedSeats += quantity?._sum?.quantity;
     }
 
     return product;

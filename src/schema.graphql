@@ -144,8 +144,8 @@ input CartUpdateInput {
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
   shippingAddress: CartAddressInput
-  subTotal: Int
-  totalPrice: Int
+  subTotal: Float
+  totalPrice: Float
 }
 
 type Category {
