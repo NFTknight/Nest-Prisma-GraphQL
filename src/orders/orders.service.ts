@@ -239,6 +239,24 @@ export class OrdersService {
         //delete cart if customer Order is pending.
         if (data.status === OrderStatus.PENDING)
           this.prisma.cart.delete({ where: { id: res.cartId } });
+
+        if (data.status === OrderStatus.CONFIRMED) {
+          for (const item of order.items) {
+            const product = await this.productsService.getProduct(
+              item.productId
+            );
+            if (product.type === ProductType.WORKSHOP) {
+              await this.prisma.product.update({
+                where: { id: product.id },
+                data: {
+                  bookedSeats: {
+                    increment: item.quantity,
+                  },
+                },
+              });
+            }
+          }
+        }
       }
     }
 
