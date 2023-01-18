@@ -1,3 +1,5 @@
+import { BadRequestException } from '@nestjs/common';
+
 export const checkIfTimeInRange = (
   from: Date,
   to: Date,
@@ -23,4 +25,11 @@ const setHoursMinsToDate = (_date: Date, time: string) => {
   const splittedTime = time?.split(':') || ['0', '0'];
   date.setUTCHours(Number(splittedTime[0]), Number(splittedTime[1]));
   return date;
+};
+
+export const getReadableDate = (dateString: string) => {
+  const date = new Date(dateString);
+  if (!date) throw new BadRequestException('Valid date is required');
+
+  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 };

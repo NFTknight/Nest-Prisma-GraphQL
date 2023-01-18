@@ -4,16 +4,12 @@ import * as dayjs from 'dayjs';
 import { findIndex } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
+import { getReadableDate } from 'src/utils/general';
 import { throwNotFoundException } from 'src/utils/validation';
 import { ProductsService } from '../../products/services/products.service';
 import { CartItemInput } from '../dto/cart.input';
 import { CartItem } from '../models/cart-item.model';
 import { Cart } from '../models/cart.model';
-
-const getReadableDate = (dateString) => {
-  const date = new Date(dateString);
-  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-};
 
 @Injectable()
 export class CartItemService {
@@ -87,8 +83,8 @@ export class CartItemService {
           // this matches the dates exists or not...
           const slotAvailable = availableSlots.findIndex(
             (availableSlots) =>
-              getReadableDate(availableSlots.from) ===
-              getReadableDate(slot.from)
+              getReadableDate(availableSlots.from.toString()) ===
+              getReadableDate(slot.from.toString())
           );
 
           if (slotAvailable !== -1) {
