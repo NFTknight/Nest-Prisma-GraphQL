@@ -1,5 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { DeliveryMethods, Order, OrderStatus, Prisma } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import {
+  DeliveryMethods,
+  Order,
+  OrderStatus,
+  Prisma,
+  ProductType,
+} from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
@@ -20,6 +26,7 @@ import {
 import { Cart } from 'src/cart/models/cart.model';
 import { PaginatedOrders } from './models/paginated-orders.model';
 import { ProductsService } from 'src/products/services/products.service';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class OrdersService {
@@ -33,11 +40,12 @@ export class OrdersService {
   ) {}
 
   async getOrder(id: string): Promise<Order> {
+    if (!id) return null;
     const order = await this.prisma.order.findUnique({
       where: { id },
     });
 
-    if (!order) throw new NotFoundException('Order Not Found.');
+    throwNotFoundException(order, 'Order');
 
     return order;
   }
@@ -84,10 +92,16 @@ export class OrdersService {
 
       const res = await this.prisma.$transaction([
         this.prisma.order.count({ where }),
-        this.prisma.order.findMany({ where, skip, take, orderBy }),
+        this.prisma.order.findMany({
+          where,
+          skip,
+          take: take || undefined,
+          orderBy,
+        }),
       ]);
 
-      if (!res) throw new NotFoundException('data not found');
+      throwNotFoundException(res, '', 'Data not found!');
+
       return { totalCount: res[0], list: res[1] };
     } catch (err) {
       console.log('Err => ', err);
@@ -107,19 +121,19 @@ export class OrdersService {
     const order = await this.getOrder(id);
     let wayBillData: WayBill = null;
     const { vendorId } = order;
+    const vendorData = await this.vendorService.getVendor(vendorId);
 
     if (order.cartId && order.status === OrderStatus.PENDING) {
       // if the order does not exist, this function will throw an error.
       cartItem = await this.cartService.getCartAndDelete(order.cartId);
     }
+
     if (
       order.cartId &&
       order.status === OrderStatus.PENDING &&
       order.deliveryMethod === DeliveryMethods.SMSA &&
       !order.wayBill
     ) {
-      const vendorData = await this.vendorService.getVendor(vendorId);
-
       const WayBillRequestObject: CreateShipmentInput = {
         ConsigneeAddress: {
           ContactName: cartItem.consigneeAddress?.contactName,
@@ -133,7 +147,7 @@ export class OrdersService {
           ContactName: vendorData.name || 'Company Name',
           ContactPhoneNumber: vendorData?.info?.phone || '06012312312',
           Country: 'SA',
-          City: 'Riyadh',
+          City: vendorData?.info?.city || 'Riyadh',
           AddressLine1: vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
         },
         OrderNumber: order?.orderId,
@@ -143,6 +157,7 @@ export class OrdersService {
         ShipDate: new Date().toISOString(),
         ShipmentCurrency: 'SAR',
         Weight: 15,
+        WaybillType: 'PDF',
         WeightUnit: 'KG',
         ContentDescription: 'Shipment contents description',
       };
@@ -182,14 +197,35 @@ export class OrdersService {
     ) {
       // Email notification
       this.emailService.send(SendEmails(data.status, res.customerInfo.email));
-      if (vendor?.info?.email)
-        this.emailService.send(SendEmails(data.status, vendor.info.email));
+      if (vendorData?.info?.email) {
+        this.emailService.send(SendEmails(data.status, vendorData.info.email));
+      } else {
+        // if vendor info doesn't have email
+        const user = await this.prisma.user.findUnique({
+          where: { id: vendorData?.ownerId },
+        });
+        if (user) this.emailService.send(SendEmails(data.status, user.email));
+      }
     }
 
     // if order is rejected delete all bookings otherwise update the status to PENDING OR CONFIRMED
     if (res.id) {
       if (data.status === OrderStatus.REJECTED) {
         await this.prisma.booking.deleteMany({ where: { orderId: res.id } });
+        for (const [i, item] of order.items.entries()) {
+          console.log({ item });
+          const product = await this.prisma.product.findUnique({
+            where: { id: item.productId },
+          });
+          if (product.type === ProductType.WORKSHOP) {
+            await this.prisma.product.update({
+              where: { id: product.id },
+              data: {
+                bookedSeats: product.bookedSeats - item.quantity,
+              },
+            });
+          }
+        }
       } else if (
         data.status === OrderStatus.PENDING ||
         data.status === OrderStatus.CONFIRMED
@@ -203,6 +239,24 @@ export class OrdersService {
         //delete cart if customer Order is pending.
         if (data.status === OrderStatus.PENDING)
           this.prisma.cart.delete({ where: { id: res.cartId } });
+
+        if (data.status === OrderStatus.CONFIRMED) {
+          for (const item of order.items) {
+            const product = await this.productsService.getProduct(
+              item.productId
+            );
+            if (product.type === ProductType.WORKSHOP) {
+              await this.prisma.product.update({
+                where: { id: product.id },
+                data: {
+                  bookedSeats: {
+                    increment: item.quantity,
+                  },
+                },
+              });
+            }
+          }
+        }
       }
     }
 

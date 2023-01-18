@@ -17,7 +17,7 @@ export class Category extends BaseModel {
 
   active: boolean;
 
-  @Field(() => Int, { nullable: false })
+  @Field(() => Int, { nullable: true })
   sortOrder?: number;
   slug?: string;
 }

@@ -5,6 +5,7 @@ import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
+import { throwNotFoundException } from 'src/utils/validation';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
 import { PaymentStatusApiRequest } from './dto/payment-status.dto';
 import { PaymentSession } from './models/payment-session.model';
@@ -53,17 +54,19 @@ export class PaymentService {
         id: orderId,
       },
     });
+
+    throwNotFoundException(order, 'Order');
     // TODO callback url should be dynamic
     // TODO DisplayCurrencyIso should be dynamic
     const data: ExecutePaymentApiRequest = {
       SessionId: sessionId,
-      InvoiceValue: order.totalPrice,
+      InvoiceValue: order.subTotal,
       CustomerName: `${order.customerInfo.firstName} ${order.customerInfo.lastName}`,
-      DisplayCurrencyIso: 'KWD',
+      DisplayCurrencyIso: this.paymentConfig.currency,
       CustomerEmail: order.customerInfo.email,
       CustomerReference: order.orderId,
-      CallBackUrl: `http://api.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/confirmation`,
-      ErrorUrl: `http://api.dev.anyaa.io/${vendorSlug}/checkout/${orderId}/failure`,
+      CallBackUrl: `${this.paymentConfig.clientUrl}/${vendorSlug}/checkout/${orderId}/confirmation`,
+      ErrorUrl: `${this.paymentConfig.clientUrl}/${vendorSlug}/checkout/${orderId}/failure`,
       InvoiceItems: order.items.map((item) => ({
         ItemName: `${item.productId}_${item.sku}`,
         Quantity: item.quantity,
@@ -91,7 +94,7 @@ export class PaymentService {
       },
     });
 
-    if (!order) throw new NotFoundException('Order Not Found.');
+    throwNotFoundException(order, 'Order');
 
     const data: PaymentStatusApiRequest = {
       Key: order.invoiceId,

@@ -1,9 +1,5 @@
 import { PrismaService } from 'nestjs-prisma';
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateVendorInput } from './dto/create-vendor.input';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { User } from 'src/users/models/user.model';
@@ -12,6 +8,8 @@ import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { Vendor } from '@prisma/client';
 import { VendorView } from './models/vendor.model';
+import { throwNotFoundException } from 'src/utils/validation';
+import { VendorFilterInput } from './dto/get-vendor-filter.input';
 
 @Injectable()
 export class VendorsService {
@@ -35,6 +33,9 @@ export class VendorsService {
         ...createVendorInput,
         MF_vendorCode: 1,
         ownerId: user.id,
+        info: {
+          email: user.email,
+        },
       },
     });
 
@@ -62,7 +63,7 @@ export class VendorsService {
       where: { id },
     });
 
-    if (!vendor) throw new NotFoundException('Vendor Not Found');
+    throwNotFoundException(vendor, 'Vendor');
 
     return vendor;
   }
@@ -108,12 +109,16 @@ export class VendorsService {
       vendorPromise,
     ]);
 
+    throwNotFoundException(vendor, 'Vendor');
+
     const vendorName = vendor?.name || '';
     const vendorUrl = vendor?.info?.addressUrl || '';
     const ownerId = vendor.ownerId;
+
     const vendorOwner = await this.prisma.user.findUnique({
       where: { id: ownerId },
     });
+
     const accountManager =
       (vendorOwner.firstName || '') + ' ' + (vendorOwner.lastName || '');
 
@@ -135,7 +140,7 @@ export class VendorsService {
       where: { ownerId: id },
     });
 
-    if (!vendor) throw new NotFoundException('Vendor Not Found');
+    throwNotFoundException(vendor, 'Vendor');
 
     return vendor;
   }
@@ -145,13 +150,27 @@ export class VendorsService {
       where: { slug },
     });
 
-    if (!vendor) throw new NotFoundException('Vendor Not Found');
+    throwNotFoundException(vendor, 'Vendor');
 
     return vendor;
   }
 
-  getVendors(): Promise<Vendor[]> {
-    return this.prisma.vendor.findMany();
+  getVendors(filter: VendorFilterInput): Promise<Vendor[]> {
+    let where = {};
+    if (typeof filter.active === 'boolean') {
+      where = {
+        ...where,
+        active: filter.active,
+      };
+    }
+
+    where = {
+      active: filter.active || undefined,
+      name: { in: filter?.name } || undefined,
+      name_ar: { in: filter?.name_ar } || undefined,
+    };
+
+    return this.prisma.vendor.findMany({ where });
   }
 
   addDeliveryAreas(
@@ -181,10 +200,13 @@ export class VendorsService {
       select: { name: true },
     });
 
+    throwNotFoundException(vendor, 'Vendor');
+
     let prefix = '';
-    const vendorStrArr = vendor.name.split(' ');
+    const vendorStrArr = vendor.name.trim()?.split(' ');
     if (vendorStrArr.length === 1) {
-      prefix = vendor.name.slice(0, 2).toUpperCase();
+      const abc = vendor.name.slice(0, 2);
+      prefix = abc.toUpperCase();
     } else if (vendorStrArr.length === 2) {
       prefix = vendorStrArr[0][0] + vendorStrArr[1][0];
     } else if (vendorStrArr.length > 2) {

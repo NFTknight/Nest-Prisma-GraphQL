@@ -40,6 +40,7 @@ export class StorageService {
         if (err) {
           reject(err);
         } else {
+          //change to imagekit env var
           resolve(data.Location);
         }
       });

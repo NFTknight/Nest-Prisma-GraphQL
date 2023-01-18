@@ -32,6 +32,9 @@ export class Cart extends BaseModel implements PrismaCart {
   @Field(() => Float)
   totalPrice: number;
 
+  @Field(() => Float, { nullable: true })
+  subTotal: number;
+
   @Field(() => Float)
   finalPrice: number;
 

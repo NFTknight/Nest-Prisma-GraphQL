@@ -45,7 +45,7 @@ type Booking {
   order: Order
   orderId: String
   product: Product
-  productId: String!
+  productId: String
   slots: [BookingTime!]
   status: BookingStatus!
   tag: Tag
@@ -95,6 +95,7 @@ type Cart {
   items: [CartItem!]!
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
+  subTotal: Float
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -149,6 +150,8 @@ input CartUpdateInput {
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
   shippingAddress: CartAddressInput
+  subTotal: Int
+  totalPrice: Int
 }
 
 type Category {
@@ -159,7 +162,7 @@ type Category {
   id: ID!
   products: [Product!]!
   slug: String
-  sortOrder: Int!
+  sortOrder: Int
   title: String!
   title_ar: String!
 
@@ -340,6 +343,7 @@ type DeliveryMethodAnalytics {
 
 """Delivery Methods"""
 enum DeliveryMethods {
+  DIGITAL_PRODUCT
   MANDOOB
   PICKUP
   SMSA
@@ -356,6 +360,7 @@ type ExecutePayment {
 type ExecutePaymentError {
   Error: String!
   Name: String!
+  Variables: VariableType
 }
 
 type Form {
@@ -472,6 +477,7 @@ type Order {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
+  subTotal: Float
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -510,6 +516,7 @@ type OrderPayment {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
+  subTotal: Float
   totalPrice: Float!
 
   """Identifies the date and time when the object was last updated."""
@@ -660,6 +667,7 @@ type Product {
 }
 
 input ProductFilterInput {
+  active: Boolean
   attendanceType: AttendanceType
   type: ProductType
 }
@@ -699,7 +707,7 @@ type Query {
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendorView(vendorId: String!): VendorView!
-  getVendors: [Vendor!]!
+  getVendors(filter: VendorFilterInput): [Vendor!]!
   getVendorsView(pagination: PaginationArgs): VendorsView!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
@@ -885,15 +893,18 @@ input UpdateVendorInfoInput {
   address: String
   addressUrl: String
   certificates: [Certificate!]
+  city: String
   crNum: String
   description: String
   description_ar: String
   email: String
   facebook: String
+  freelanceNum: String
   heroImage: String
   instagram: String
   location: LocationInput
   logo: String
+  maroofNum: String
   phone: String
   snapchat: String
   terms: String
@@ -938,6 +949,12 @@ type UserRole {
   userId: String!
 }
 
+type VariableType {
+  itemQuantity: Int
+  quantity: Int
+  title: String
+}
+
 type Variant {
   default: Boolean
   image: String
@@ -953,7 +970,7 @@ input VariantInput {
   default: Boolean
   image: String
   images: [String!]
-  price: Int!
+  price: Float!
   sku: String!
   title: String!
   title_ar: String!
@@ -986,19 +1003,28 @@ type VendorBank {
   iban: String!
 }
 
+input VendorFilterInput {
+  active: Boolean
+  name: [String!]
+  name_ar: [String!]
+}
+
 type VendorInfo {
   address: String
   addressUrl: String
   certificates: [Certificates!]
+  city: String
   crNum: String
   description: String
   description_ar: String
   email: String
   facebook: String
+  freelanceNum: String
   heroImage: String
   instagram: String
   location: Location
   logo: String
+  maroofNum: String
   phone: String
   snapchat: String
   terms: String

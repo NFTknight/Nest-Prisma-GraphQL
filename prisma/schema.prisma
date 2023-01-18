@@ -34,12 +34,12 @@ enum Role {
 }
 
 model Vendor {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  name   String
-  name_ar String?
-  slug   String
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  name_ar       String?
+  slug          String
   MF_vendorCode Int?
-  active Boolean @default(true)
+  active        Boolean @default(false)
 
   info     VendorInfo?
   bank     VendorBankInfo?
@@ -70,6 +70,7 @@ type VendorInfo {
   address        String?
   phone          String?
   email          String?
+  city           String?
   addressUrl     String?
   description    String?
   description_ar String?
@@ -83,13 +84,17 @@ type VendorInfo {
   whatsapp       String?
   vatNum         String?
   crNum          String?
-  certificates   Certificate[]
+
+  freelanceNum String?
+  maroofNum    String?
+  certificates Certificate[]
 }
 
 enum DeliveryMethods {
   MANDOOB
   SMSA
   PICKUP
+  DIGITAL_PRODUCT
 }
 
 enum PaymentMethods {
@@ -289,6 +294,7 @@ model Cart {
   customerId    String
   appliedCoupon String?
   totalPrice    Float
+  subTotal      Float?
   finalPrice    Float
 
   vendorId String? @db.ObjectId
@@ -336,6 +342,7 @@ model Order {
   cart   Cart?   @relation(fields: [cartId], references: [id])
 
   totalPrice    Float
+  subTotal      Float?      @default(0)
   finalPrice    Float
   appliedCoupon String?
   items         CartItem[]
@@ -349,8 +356,7 @@ model Order {
   vendorId String? @db.ObjectId
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
-  bookings Booking[]
-  wayBill  WayBill?
+  wayBill WayBill?
 
   invoiceId String?
 
@@ -361,15 +367,14 @@ model Order {
   updatedAt DateTime @updatedAt
 }
 
-
 model Review {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
-  productId String
-  rating Float
+  name         String
+  productId    String
+  rating       Float
   variantTitle String
-  review String
+  review       String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -410,16 +415,15 @@ model Booking {
   cartId        String?       @db.ObjectId
   cart          Cart?         @relation(fields: [cartId], references: [id], onDelete: SetNull)
   orderId       String?       @db.ObjectId
-  order         Order?        @relation(fields: [orderId], references: [id])
-  productId     String        @db.ObjectId
-  product       Product       @relation(fields: [productId], references: [id])
+  productId     String?       @db.ObjectId
+  product       Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   vendorId      String        @db.ObjectId
   vendor        Vendor        @relation(fields: vendorId, references: id)
   tagId         String        @db.ObjectId
   tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
   slots         BookingTime[]
-  holdTimestamp DateTime?     @default(now())
+  holdTimestamp DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
