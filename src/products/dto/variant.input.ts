@@ -20,6 +20,6 @@ export class VariantInput {
   @Field()
   image?: string;
 
-  @Field()
+  @Field(() => [String], { nullable: true })
   images?: string[];
 }
