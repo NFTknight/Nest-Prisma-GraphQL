@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BookingStatus, ProductType } from '@prisma/client';
+import * as dayjs from 'dayjs';
 import { findIndex } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
@@ -8,6 +9,11 @@ import { ProductsService } from '../../products/services/products.service';
 import { CartItemInput } from '../dto/cart.input';
 import { CartItem } from '../models/cart-item.model';
 import { Cart } from '../models/cart.model';
+
+const getReadableDate = (dateString) => {
+  const date = new Date(dateString);
+  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+};
 
 @Injectable()
 export class CartItemService {
@@ -68,7 +74,47 @@ export class CartItemService {
       });
     }
 
-    // update the cart price
+    if (product.type == ProductType.SERVICE) {
+      const updatedCartItem = newCart.items.filter(
+        (cartItem) => cartItem.productId === item.productId
+      );
+      let isAdded = false;
+      updatedCartItem.map((cartItem) => {
+        //these are the slots in a particular date....
+        const availableSlots = cartItem.slots;
+
+        item.slots.map((slot) => {
+          // this matches the dates exists or not...
+          const slotAvailable = availableSlots.findIndex(
+            (availableSlots) =>
+              getReadableDate(availableSlots.from) ===
+              getReadableDate(slot.from)
+          );
+
+          if (slotAvailable !== -1) {
+            isAdded = true;
+            //this is whether the booking already exists for a particular date for same timestamp
+            if (
+              !availableSlots.find(
+                (availableSlot) => availableSlot.from === slot.from
+              )
+            )
+              availableSlots.push(slot);
+          }
+        });
+      });
+      if (!isAdded) {
+        newCart.items = [
+          ...newCart.items,
+          {
+            ...item,
+            price:
+              product?.variants?.find((variant) => variant.sku === item.sku)
+                ?.price || 0,
+          },
+        ];
+      }
+    }
     newCart.subTotal = newCart.items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
