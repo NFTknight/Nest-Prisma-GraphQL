@@ -10,7 +10,6 @@ import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { SendEmails } from 'src/utils/email';
-import { Vendor } from 'src/vendors/models/vendor.model';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
@@ -110,73 +109,64 @@ export class OrdersService {
   }
 
   async updateOrder(id: string, data: UpdateOrderInput): Promise<Order> {
-    let vendor: Vendor | null = null;
-    if (data.vendorId) {
-      // if the vendor does not exist, this function will throw an error.
-      vendor = await this.vendorService.getVendor(data.vendorId);
-    }
-
-    let cartItem: Cart | null = null;
+    let cart: Cart | null = null;
+    let wayBillData: WayBill = null;
 
     const order = await this.getOrder(id);
-    let wayBillData: WayBill = null;
-    const { vendorId } = order;
-    const vendorData = await this.vendorService.getVendor(vendorId);
+    const vendorData = await this.vendorService.getVendor(order.vendorId);
 
     if (order.cartId && order.status === OrderStatus.PENDING) {
-      // if the order does not exist, this function will throw an error.
-      cartItem = await this.cartService.getCartAndDelete(order.cartId);
+      // if the cart does not exist, this function will throw an error.
+      cart = await this.cartService.getCartAndDelete(order.cartId);
+
+      if (order.deliveryMethod === DeliveryMethods.SMSA && !order.wayBill) {
+        const WayBillRequestObject: CreateShipmentInput = {
+          ConsigneeAddress: {
+            ContactName: cart.consigneeAddress?.contactName,
+            ContactPhoneNumber: cart.consigneeAddress?.contactPhoneNumber,
+            //this is hardcoded for now
+            Country: 'SA',
+            City: cart.consigneeAddress?.city,
+            AddressLine1: cart.consigneeAddress?.addressLine1,
+          },
+          ShipperAddress: {
+            ContactName: vendorData.name || 'Company Name',
+            ContactPhoneNumber: vendorData?.info?.phone || '06012312312',
+            Country: 'SA',
+            City: vendorData?.info?.city || 'Riyadh',
+            AddressLine1:
+              vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
+          },
+          OrderNumber: order?.orderId,
+          DeclaredValue: 10,
+          CODAmount: 30,
+          Parcels: 1,
+          ShipDate: new Date().toISOString(),
+          ShipmentCurrency: 'SAR',
+          Weight: 15,
+          WaybillType: 'PDF',
+          WeightUnit: 'KG',
+          ContentDescription: 'Shipment contents description',
+        };
+
+        wayBillData = await this.shippingService.createShipment(
+          WayBillRequestObject
+        );
+      }
     }
 
-    if (
-      order.cartId &&
-      order.status === OrderStatus.PENDING &&
-      order.deliveryMethod === DeliveryMethods.SMSA &&
-      !order.wayBill
-    ) {
-      const WayBillRequestObject: CreateShipmentInput = {
-        ConsigneeAddress: {
-          ContactName: cartItem.consigneeAddress?.contactName,
-          ContactPhoneNumber: cartItem.consigneeAddress?.contactPhoneNumber,
-          //this is hardcoded for now
-          Country: 'SA',
-          City: cartItem.consigneeAddress?.city,
-          AddressLine1: cartItem.consigneeAddress?.addressLine1,
-        },
-        ShipperAddress: {
-          ContactName: vendorData.name || 'Company Name',
-          ContactPhoneNumber: vendorData?.info?.phone || '06012312312',
-          Country: 'SA',
-          City: vendorData?.info?.city || 'Riyadh',
-          AddressLine1: vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
-        },
-        OrderNumber: order?.orderId,
-        DeclaredValue: 10,
-        CODAmount: 30,
-        Parcels: 1,
-        ShipDate: new Date().toISOString(),
-        ShipmentCurrency: 'SAR',
-        Weight: 15,
-        WaybillType: 'PDF',
-        WeightUnit: 'KG',
-        ContentDescription: 'Shipment contents description',
-      };
-
-      wayBillData = await this.shippingService.createShipment(
-        WayBillRequestObject
-      );
-    }
     const cartObject = {
-      finalPrice: cartItem?.finalPrice || 0,
-      totalPrice: cartItem?.totalPrice || 0,
-      items: cartItem?.items,
-      appliedCoupon: cartItem?.appliedCoupon,
-      consigneeAddress: cartItem?.consigneeAddress || null,
-      shipperAddress: cartItem?.shipperAddress || null,
+      finalPrice: cart?.finalPrice || 0,
+      totalPrice: cart?.totalPrice || 0,
+      items: cart?.items,
+      appliedCoupon: cart?.appliedCoupon,
+      consigneeAddress: cart?.consigneeAddress || null,
+      shipperAddress: cart?.shipperAddress || null,
     };
+
     let updatingOrderObject: any = data;
 
-    if (cartItem && Object.keys(cartItem).length) {
+    if (cart && Object.keys(cart).length) {
       updatingOrderObject = { ...updatingOrderObject, ...cartObject };
     }
 
@@ -212,8 +202,7 @@ export class OrdersService {
     if (res.id) {
       if (data.status === OrderStatus.REJECTED) {
         await this.prisma.booking.deleteMany({ where: { orderId: res.id } });
-        for (const [i, item] of order.items.entries()) {
-          console.log({ item });
+        for (const item of order.items) {
           const product = await this.prisma.product.findUnique({
             where: { id: item.productId },
           });
@@ -261,7 +250,7 @@ export class OrdersService {
     }
 
     await this.productsService.updateProductVariantQuantities(
-      cartItem?.items || []
+      cart?.items || []
     );
 
     return { ...res, ...updatingOrderObject, updatedAt: new Date() };
