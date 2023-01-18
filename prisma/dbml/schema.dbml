@@ -103,7 +103,6 @@ Table Product {
   minPreorderDays Int
   noOfSeats Int
   bookedSeats Int [default: 0]
-  itemsInStock Int
   variants VariantOption[] [not null]
   sortOrder Int [not null, default: 0]
   attendanceType AttendanceType

@@ -284,17 +284,17 @@ export class CartService {
     const cartErrors = [];
     for (const item of cart.items) {
       const product = await this.productService.getProduct(item.productId);
-      if (
-        product.type === ProductType.PRODUCT &&
-        product.itemsInStock !== null
-      ) {
-        if (product.itemsInStock < item.quantity) {
+      const variant = product.variants.find(
+        (variant) => variant.sku === item.sku
+      );
+      if (product.type === ProductType.PRODUCT && variant.quantity !== null) {
+        if (variant.quantity < item.quantity) {
           cartErrors.push({
             Name: 'ProductIssue',
             Error: 'ProductHaveLessQuantityAsCart',
             Variables: {
               title: product.title,
-              quantity: product.itemsInStock,
+              quantity: variant.quantity,
               itemQuantity: item.quantity,
             },
           });
