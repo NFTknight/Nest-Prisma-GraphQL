@@ -283,12 +283,7 @@ export class CartService {
     const cart = await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
-    if (!cart) throw new BadRequestException('Cart doesnt exists');
-
-    if (!cart?.consigneeAddress)
-      throw new BadRequestException(
-        'Consignee Address doenst exist for the cart'
-      );
+    if (!cart) throw new BadRequestException('Cart does not exists');
 
     // cart deletion
     await this.prisma.cart.delete({
@@ -538,40 +533,41 @@ export class CartService {
 
   createWayBillData = async (order: Order, vendor: Vendor) => {
     let wayBillData: WayBill = null;
-    const WayBillRequestObject: CreateShipmentInput = {
-      ConsigneeAddress: {
-        ContactName: order.consigneeAddress?.contactName,
-        ContactPhoneNumber: order.consigneeAddress?.contactPhoneNumber,
-        //this is hardcoded for now
-        Country: 'SA',
-        City: order.consigneeAddress?.city,
-        AddressLine1: order.consigneeAddress?.addressLine1,
-      },
-      ShipperAddress: {
-        ContactName: vendor.name || 'Company Name',
-        ContactPhoneNumber: vendor?.info?.phone || '06012312312',
-        Country: 'SA',
-        City: vendor?.info?.city || 'Riyadh',
-        AddressLine1: vendor?.info?.address || 'Ar Rawdah, Jeddah 23434',
-      },
-      OrderNumber: order?.orderId,
-      DeclaredValue: order?.subTotal,
-      CODAmount: 30,
-      Parcels: 1,
-      ShipDate: new Date().toISOString(),
-      ShipmentCurrency: 'SAR',
-      Weight: 15,
-      WaybillType: 'PDF',
-      WeightUnit: 'KG',
-      ContentDescription: 'Shipment contents description',
-    };
-
-    await this.shippingService
-      .createShipment(WayBillRequestObject)
-      .then((data) => {
-        wayBillData = data;
-      })
-      .catch((err) => console.log(err));
+    if (order.consigneeAddress) {
+      const WayBillRequestObject: CreateShipmentInput = {
+        ConsigneeAddress: {
+          ContactName: order.consigneeAddress?.contactName,
+          ContactPhoneNumber: order.consigneeAddress?.contactPhoneNumber,
+          //this is hardcoded for now
+          Country: 'SA',
+          City: order.consigneeAddress?.city,
+          AddressLine1: order.consigneeAddress?.addressLine1,
+        },
+        ShipperAddress: {
+          ContactName: vendor.name || 'Company Name',
+          ContactPhoneNumber: vendor?.info?.phone || '06012312312',
+          Country: 'SA',
+          City: vendor?.info?.city || 'Riyadh',
+          AddressLine1: vendor?.info?.address || 'Ar Rawdah, Jeddah 23434',
+        },
+        OrderNumber: order?.orderId,
+        DeclaredValue: order?.subTotal,
+        CODAmount: 30,
+        Parcels: 1,
+        ShipDate: new Date().toISOString(),
+        ShipmentCurrency: 'SAR',
+        Weight: 15,
+        WaybillType: 'PDF',
+        WeightUnit: 'KG',
+        ContentDescription: 'Shipment contents description',
+      };
+      await this.shippingService
+        .createShipment(WayBillRequestObject)
+        .then((data) => {
+          wayBillData = data;
+        })
+        .catch((err) => console.log(err));
+    }
 
     return wayBillData;
   };

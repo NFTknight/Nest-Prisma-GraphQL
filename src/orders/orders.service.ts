@@ -177,7 +177,11 @@ export class OrdersService {
           },
         });
 
-        if (data.status === OrderStatus.PENDING && res.cartId) {
+        if (
+          (data.status === OrderStatus.PENDING ||
+            order.status === OrderStatus.PENDING) &&
+          res.cartId
+        ) {
           // remove cart: all details are now in order
           await this.prisma.cart.delete({ where: { id: res.cartId } });
 
