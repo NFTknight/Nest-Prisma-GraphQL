@@ -18,11 +18,7 @@ import { OrdersFilterInput } from 'src/common/filter/filter.input';
 import { WayBill } from 'src/shipping/models/waybill.model';
 import { ShippingService } from 'src/shipping/shipping.service';
 
-import {
-  CreateShipmentInput,
-  UpdateOrderInput,
-} from './dto/update-order.input';
-import { Cart } from 'src/cart/models/cart.model';
+import { UpdateOrderInput } from './dto/update-order.input';
 import { PaginatedOrders } from './models/paginated-orders.model';
 import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
@@ -109,66 +105,21 @@ export class OrdersService {
   }
 
   async updateOrder(id: string, data: UpdateOrderInput): Promise<Order> {
-    let cart: Cart | null = null;
     let wayBillData: WayBill = null;
 
     const order = await this.getOrder(id);
     const vendorData = await this.vendorService.getVendor(order.vendorId);
 
-    if (order.cartId && order.status === OrderStatus.PENDING) {
-      // if the cart does not exist, this function will throw an error.
-      cart = await this.cartService.getCartAndDelete(order.cartId);
-
-      if (order.deliveryMethod === DeliveryMethods.SMSA && !order.wayBill) {
-        const WayBillRequestObject: CreateShipmentInput = {
-          ConsigneeAddress: {
-            ContactName: cart.consigneeAddress?.contactName,
-            ContactPhoneNumber: cart.consigneeAddress?.contactPhoneNumber,
-            //this is hardcoded for now
-            Country: 'SA',
-            City: cart.consigneeAddress?.city,
-            AddressLine1: cart.consigneeAddress?.addressLine1,
-          },
-          ShipperAddress: {
-            ContactName: vendorData.name || 'Company Name',
-            ContactPhoneNumber: vendorData?.info?.phone || '06012312312',
-            Country: 'SA',
-            City: vendorData?.info?.city || 'Riyadh',
-            AddressLine1:
-              vendorData?.info?.address || 'Ar Rawdah, Jeddah 23434',
-          },
-          OrderNumber: order?.orderId,
-          DeclaredValue: 10,
-          CODAmount: 30,
-          Parcels: 1,
-          ShipDate: new Date().toISOString(),
-          ShipmentCurrency: 'SAR',
-          Weight: 15,
-          WaybillType: 'PDF',
-          WeightUnit: 'KG',
-          ContentDescription: 'Shipment contents description',
-        };
-
-        wayBillData = await this.shippingService.createShipment(
-          WayBillRequestObject
-        );
-      }
+    if (
+      (data.status === OrderStatus.PENDING ||
+        order.status === OrderStatus.PENDING) &&
+      order.deliveryMethod === DeliveryMethods.SMSA &&
+      !order.wayBill
+    ) {
+      wayBillData = await this.cartService.createWayBillData(order, vendorData);
     }
-
-    const cartObject = {
-      finalPrice: cart?.finalPrice || 0,
-      totalPrice: cart?.totalPrice || 0,
-      items: cart?.items,
-      appliedCoupon: cart?.appliedCoupon,
-      consigneeAddress: cart?.consigneeAddress || null,
-      shipperAddress: cart?.shipperAddress || null,
-    };
 
     let updatingOrderObject: any = data;
-
-    if (cart && Object.keys(cart).length) {
-      updatingOrderObject = { ...updatingOrderObject, ...cartObject };
-    }
 
     if (wayBillData?.sawb) {
       updatingOrderObject = { ...updatingOrderObject, wayBill: wayBillData };
@@ -225,9 +176,20 @@ export class OrdersService {
             status: data.status,
           },
         });
-        //delete cart if customer Order is pending.
-        if (data.status === OrderStatus.PENDING)
-          this.prisma.cart.delete({ where: { id: res.cartId } });
+
+        if (
+          (data.status === OrderStatus.PENDING ||
+            order.status === OrderStatus.PENDING) &&
+          res.cartId
+        ) {
+          // remove cart: all details are now in order
+          await this.prisma.cart.delete({ where: { id: res.cartId } });
+
+          // decrement product's variant's quantity as order is now created
+          await this.productsService.decrementProductVariantQuantities(
+            order?.items || []
+          );
+        }
 
         if (data.status === OrderStatus.CONFIRMED) {
           for (const item of order.items) {
@@ -248,10 +210,6 @@ export class OrdersService {
         }
       }
     }
-
-    await this.productsService.updateProductVariantQuantities(
-      cart?.items || []
-    );
 
     return { ...res, ...updatingOrderObject, updatedAt: new Date() };
   }

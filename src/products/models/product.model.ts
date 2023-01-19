@@ -76,9 +76,6 @@ export class Product extends BaseModel implements PrismaProduct {
   bookedSeats: number;
 
   @Field(() => Int, { nullable: true })
-  itemsInStock: number;
-
-  @Field(() => Int, { nullable: true })
   sortOrder: number;
 
   @Field(() => AttendanceType, { nullable: true })
