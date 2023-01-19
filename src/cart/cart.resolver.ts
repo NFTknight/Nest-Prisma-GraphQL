@@ -89,12 +89,18 @@ export class CartResolver {
   async removeCartItem(
     @Args('cartId') cartId: string,
     @Args('productId') productId: string,
-    @Args('sku') sku: string
+    @Args('sku') sku: string,
+    @Args('date', {
+      type: () => String,
+      nullable: true,
+    })
+    date?: string
   ) {
     const updatedCart = await this.cartService.removeItemFromCart(
       cartId,
       productId,
-      sku
+      sku,
+      date || ''
     );
 
     return updatedCart;

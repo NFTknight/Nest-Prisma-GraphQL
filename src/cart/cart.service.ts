@@ -24,6 +24,7 @@ import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
 import { ShippingService } from 'src/shipping/shipping.service';
 import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
+import { getReadableDate } from 'src/utils/general';
 
 @Injectable()
 export class CartService {
@@ -184,14 +185,42 @@ export class CartService {
     });
   }
 
-  async removeItemFromCart(cartId: string, productId: string, sku: string) {
+  async removeItemFromCart(
+    cartId: string,
+    productId: string,
+    sku: string,
+    date = ''
+  ) {
     const cart = await this.getCart(cartId);
-
     throwNotFoundException(cart, 'Cart');
 
-    const items = cart.items.filter(
-      (item) => item.productId !== productId || item.sku !== sku
-    );
+    const product = await this.productService.getProduct(productId);
+    let items = [];
+
+    if (product.type === ProductType.SERVICE) {
+      if (!date)
+        throw new BadRequestException(
+          'Date is required to remove Item of type Service'
+        );
+      const sameServiceItems = cart.items.filter(
+        (item) => item.productId === productId && item.sku === sku
+      );
+      const remainingServiceItem = sameServiceItems.filter((serviceItem) => {
+        return serviceItem.slots.every(
+          (slot) =>
+            getReadableDate(slot.from.toString()) !==
+            getReadableDate(date || '')
+        );
+      });
+      items = cart.items.filter(
+        (item) => item.productId !== productId || item.sku !== sku
+      );
+      items = [...items, ...remainingServiceItem];
+    } else {
+      items = cart.items.filter(
+        (item) => item.productId !== productId || item.sku !== sku
+      );
+    }
 
     const totalPrice = items.reduce(
       (acc, item) => acc + item.price * item.quantity,
