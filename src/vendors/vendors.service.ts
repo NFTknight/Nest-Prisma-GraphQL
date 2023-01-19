@@ -205,8 +205,8 @@ export class VendorsService {
     let prefix = '';
     const vendorStrArr = vendor.name.trim()?.split(' ');
     if (vendorStrArr.length === 1) {
-      const abc = vendor.name.slice(0, 2);
-      prefix = abc.toUpperCase();
+      const vendorNameInitials = vendor.name.slice(0, 2);
+      prefix = vendorNameInitials.toUpperCase();
     } else if (vendorStrArr.length === 2) {
       prefix = vendorStrArr[0][0] + vendorStrArr[1][0];
     } else if (vendorStrArr.length > 2) {
