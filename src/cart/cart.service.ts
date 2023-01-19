@@ -77,6 +77,7 @@ export class CartService {
         const product = await this.prisma.product.findUnique({
           where: { id: item.productId },
         });
+
         if (!product || !product.active) {
           await this.removeItemFromCart(res.id, item.productId, item.sku);
           cartItems.splice(i, 1);
@@ -84,6 +85,17 @@ export class CartService {
           if (product.type === ProductType.PRODUCT) {
             haveProductType = true;
           }
+
+          if (product.type === ProductType.SERVICE) {
+            const bookings = await this.prisma.booking.findMany({
+              where: { cartId: res.id, productId: product.id },
+            });
+
+            if (!bookings.length) {
+              cartItems.splice(i, 1);
+            }
+          }
+
           const updatedPrice =
             product?.variants?.find((variant) => variant.sku === item.sku)
               ?.price || item.price;
