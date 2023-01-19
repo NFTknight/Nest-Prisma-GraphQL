@@ -72,7 +72,8 @@ export class CartItemService {
 
     if (product.type == ProductType.SERVICE) {
       const updatedCartItem = newCart.items.filter(
-        (cartItem) => cartItem.productId === item.productId
+        (cartItem) =>
+          cartItem.productId === item.productId && cartItem.sku === item.sku
       );
       let isAdded = false;
       updatedCartItem.map((cartItem) => {
@@ -91,11 +92,12 @@ export class CartItemService {
             isAdded = true;
             //this is whether the booking already exists for a particular date for same timestamp
             if (
-              !availableSlots.find(
+              availableSlots.findIndex(
                 (availableSlot) => availableSlot.from === slot.from
-              )
-            )
+              ) === -1
+            ) {
               availableSlots.push(slot);
+            }
           }
         });
       });
