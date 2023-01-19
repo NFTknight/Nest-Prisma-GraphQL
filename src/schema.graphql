@@ -116,6 +116,7 @@ input CartAddressInput {
 }
 
 type CartItem {
+  Tag: Tag
   answers: String
   price: Float!
   product: Product
@@ -124,6 +125,8 @@ type CartItem {
   sku: String!
   slots: [BookingTime!]
   tagId: String
+  title: String
+  title_ar: String
 }
 
 input CartItemInput {

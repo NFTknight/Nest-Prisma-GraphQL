@@ -18,7 +18,7 @@ export class FormResponse {
 }
 
 @ObjectType()
-export class Order extends BaseModel implements PrismaOrder {
+export class Order extends BaseModel {
   @IsString()
   orderId: string;
 
