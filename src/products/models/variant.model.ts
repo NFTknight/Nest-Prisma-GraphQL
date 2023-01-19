@@ -24,6 +24,7 @@ export class Variant implements VariantOption {
   @Field(() => String, { nullable: true })
   image: string;
 
-  @Field(() => [String], { nullable: true })
-  images: string[];
+  // removing temporarily
+  // @Field(() => [String], { nullable: true })
+  // images: string[];
 }

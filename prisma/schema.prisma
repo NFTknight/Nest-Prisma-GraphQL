@@ -205,9 +205,10 @@ type VariantOption {
   default  Boolean?
   sku      String
   price    Float
-  quantity Int?   @default(1)
+  quantity Int?     @default(1)
   image    String?
-  images   String[]
+  // removing temporarily
+  // images   String[]
   title    String
   title_ar String
 }
