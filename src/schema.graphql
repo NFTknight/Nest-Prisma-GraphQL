@@ -83,6 +83,7 @@ type Cart {
   customerId: String!
   customerInfo: CustomerInfo
   deliveryArea: String
+  deliveryCharges: Float
   deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
@@ -140,7 +141,9 @@ input CartUpdateInput {
   consigneeAddress: CartAddressInput
   customerInfo: CustomerInput
   deliveryArea: String
+  deliveryCharges: Int
   deliveryMethod: DeliveryMethods
+  finalPrice: Int
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
   shippingAddress: CartAddressInput
@@ -394,6 +397,7 @@ input LoginInput {
 }
 
 type Mutation {
+  addCouponToCart(cartId: String!, id: String!): Cart!
   addDeliveryAreas(areas: [AddDeliveryAreasInput!]!, id: String!): Vendor!
   addItemToCart(cartId: String!, data: CartItemInput!): Cart!
   addProductToCart(cartId: String!, data: CartItemInput!): Cart!
@@ -425,6 +429,7 @@ type Mutation {
   phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
   removeCartItem(cartId: String!, date: String, productId: String!, sku: String!): Cart!
+  removeCouponFromCart(cartId: String!, id: String!): Cart!
   resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!

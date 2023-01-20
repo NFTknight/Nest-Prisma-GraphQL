@@ -18,7 +18,7 @@ export class CartItemService {
     private readonly productService: ProductsService
   ) {}
 
-  addProduct(product: Product, cart: Cart, item: CartItemInput) {
+  async addProduct(product: Product, cart: Cart, item: CartItemInput) {
     const { sku, quantity } = item;
 
     throwNotFoundException(cart, 'Cart');
@@ -39,7 +39,6 @@ export class CartItemService {
       productId: product.id,
       sku: productVariant.sku,
     });
-    const deliveryCharges = newCart.totalPrice - newCart.subTotal;
 
     if (existingProductIndex !== -1) {
       if (
@@ -111,11 +110,28 @@ export class CartItemService {
         ];
       }
     }
+
     newCart.subTotal = newCart.items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
-    newCart.totalPrice = newCart.subTotal + deliveryCharges;
+
+    if (!newCart.appliedCoupon) {
+      newCart.finalPrice = newCart.subTotal;
+    } else {
+      const coupon = await this.prisma.coupon.findUnique({
+        where: { id: newCart.appliedCoupon },
+      });
+
+      if (coupon) {
+        newCart.finalPrice =
+          newCart.subTotal - (newCart.subTotal * coupon.discount) / 100;
+      } else {
+        newCart.appliedCoupon = '';
+      }
+    }
+
+    newCart.totalPrice = newCart.finalPrice + newCart?.deliveryCharges || 0;
 
     newCart.updatedAt = new Date();
 

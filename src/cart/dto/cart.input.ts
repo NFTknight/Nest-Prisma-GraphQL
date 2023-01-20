@@ -112,4 +112,6 @@ export class CartUpdateInput {
 
   subTotal?: number;
   totalPrice?: number;
+  finalPrice?: number;
+  deliveryCharges?: number;
 }

@@ -132,6 +132,7 @@ export class CartResolver {
           'Delivery area is required if delivery method is MANDOOB'
         );
       }
+
       if (
         data.deliveryMethod &&
         data.deliveryMethod !== DeliveryMethods.MANDOOB
@@ -149,16 +150,20 @@ export class CartResolver {
           vendor.settings.deliveryAreas.find(
             (item) => item.label === data.deliveryArea
           )?.charge || 0;
-
-        data.totalPrice = cart.subTotal + deliveryCharges;
+        // do logic here
+        data.totalPrice = cart.finalPrice + deliveryCharges;
+        data.deliveryCharges = deliveryCharges;
       }
 
       if (data.deliveryMethod === DeliveryMethods.SMSA) {
-        data.totalPrice = cart.subTotal + SMSA_DELVERY_CHARGE;
+        // do logic here
+        data.totalPrice = cart.finalPrice + SMSA_DELVERY_CHARGE;
+        data.deliveryCharges = SMSA_DELVERY_CHARGE;
       }
 
       cart = await this.cartService.updateCart(cartId, data);
     }
+
     return cart;
   }
 
