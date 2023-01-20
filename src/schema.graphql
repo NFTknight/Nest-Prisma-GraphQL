@@ -934,8 +934,7 @@ type VariableType {
 type Variant {
   default: Boolean
   image: String
-  images: [String!]
-  price: Int!
+  price: Float!
   quantity: Int!
   sku: String!
   title: String!
@@ -945,7 +944,6 @@ type Variant {
 input VariantInput {
   default: Boolean
   image: String
-  images: [String!]
   price: Float!
   sku: String!
   title: String!
