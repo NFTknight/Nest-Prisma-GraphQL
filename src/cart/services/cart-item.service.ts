@@ -44,11 +44,11 @@ export class CartItemService {
       if (
         //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
         product.type === ProductType.PRODUCT &&
-        product.itemsInStock !== null &&
-        product.itemsInStock < newCart.items[existingProductIndex].quantity
+        productVariant.quantity !== null &&
+        productVariant.quantity < newCart.items[existingProductIndex].quantity
       ) {
         throw new BadRequestException(
-          `You can't add more than ${product.itemsInStock} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
+          `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
         );
       }
 
@@ -71,7 +71,8 @@ export class CartItemService {
 
     if (product.type == ProductType.SERVICE) {
       const updatedCartItem = newCart.items.filter(
-        (cartItem) => cartItem.productId === item.productId
+        (cartItem) =>
+          cartItem.productId === item.productId && cartItem.sku === item.sku
       );
       let isAdded = false;
       updatedCartItem.map((cartItem) => {
@@ -90,11 +91,12 @@ export class CartItemService {
             isAdded = true;
             //this is whether the booking already exists for a particular date for same timestamp
             if (
-              !availableSlots.find(
+              availableSlots.findIndex(
                 (availableSlot) => availableSlot.from === slot.from
-              )
-            )
+              ) === -1
+            ) {
               availableSlots.push(slot);
+            }
           }
         });
       });

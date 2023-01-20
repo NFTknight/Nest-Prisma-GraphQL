@@ -258,7 +258,6 @@ input CreateProductInput {
   formId: String
   image: String!
   images: [String!]
-  itemsInStock: Int
   location: LocationInput
   meetingLink: String
   minPreorderDays: Int
@@ -631,7 +630,6 @@ type Product {
   id: ID!
   image: String!
   images: [String!]
-  itemsInStock: Int
   location: Location
   meetingLink: String
   minPreorderDays: Int
@@ -829,7 +827,6 @@ input UpdateProductInput {
   formId: String
   image: String
   images: [String!]
-  itemsInStock: Int
   location: LocationInput
   meetingLink: String
   minPreorderDays: Int
