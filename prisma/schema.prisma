@@ -70,6 +70,7 @@ type VendorInfo {
   address        String?
   phone          String?
   email          String?
+  city           String?
   addressUrl     String?
   description    String?
   description_ar String?
@@ -204,9 +205,10 @@ type VariantOption {
   default  Boolean?
   sku      String
   price    Float
-  quantity Float?   @default(1)
+  quantity Int?     @default(1)
   image    String?
-  images   String[]
+  // removing temporarily
+  // images   String[]
   title    String
   title_ar String
 }
@@ -250,7 +252,6 @@ model Product {
   minPreorderDays  Int?
   noOfSeats        Int?
   bookedSeats      Int?            @default(0)
-  itemsInStock     Int?
   variants         VariantOption[]
   sortOrder        Int             @default(0)
   attendanceType   AttendanceType?
