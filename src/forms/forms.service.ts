@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { PaginationArgs } from 'src/common/pagination/pagination.input';
+import { throwNotFoundException } from 'src/utils/validation';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateFormInput, UpdateFormInput } from './dto/form.input';
 import { Form } from './models/forms.model';
@@ -15,10 +16,12 @@ export class FormService {
 
   async getForm(id: string): Promise<Form> {
     if (!id) return null;
+
     const form = await this.prisma.form.findUnique({
       where: { id },
     });
-    if (!form) throw new NotFoundException('Form not Found.');
+
+    throwNotFoundException(form, 'Form');
 
     return form;
   }
@@ -29,7 +32,11 @@ export class FormService {
       const where = {
         vendorId,
       };
-      return await this.prisma.form.findMany({ where, skip, take });
+      return await this.prisma.form.findMany({
+        where,
+        skip,
+        take: take || undefined,
+      });
     } catch (err) {
       console.log('Err => ', err);
     }

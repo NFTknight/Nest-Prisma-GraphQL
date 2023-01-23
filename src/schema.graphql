@@ -14,18 +14,39 @@ type Analytics {
   numberOfOrders: Int!
   paymentMethods: PaymentMethodAnalytics!
 }
+type AddOn {
+  feature: String!
+  price: Float!
+}
 
-"""Attendance Type"""
+type AddOnsList {
+  list: [AddOn!]!
+  totalMonthly: Float!
+  totalYearly: Float!
+}
+
+input AddSubscriptionInput {
+  plan: SubscriptionPlan!
+  type: SubscriptionType!
+}
+
+"""
+Attendance Type
+"""
 enum AttendanceType {
   ONLINE
   PHYSICAL
 }
 
 type Auth {
-  """JWT access token"""
+  """
+  JWT access token
+  """
   accessToken: JWT!
 
-  """JWT refresh token"""
+  """
+  JWT refresh token
+  """
   refreshToken: JWT!
   user: User!
 }
@@ -38,20 +59,24 @@ type Booking {
   cart: Cart
   cartId: String
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   holdTimestamp: DateTime
   id: ID!
   order: Order
   orderId: String
   product: Product
-  productId: String!
+  productId: String
   slots: [BookingTime!]
   status: BookingStatus!
   tag: Tag
   tagId: String!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: String!
@@ -62,7 +87,9 @@ input BookingSlotInput {
   to: DateTime!
 }
 
-"""Booking Status"""
+"""
+Booking Status
+"""
 enum BookingStatus {
   CONFIRMED
   HOLD
@@ -84,7 +111,9 @@ type Cart {
   appliedCoupon: String
   consigneeAddress: CartAddress
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   customerId: String!
   customerInfo: CustomerInfo
@@ -95,9 +124,12 @@ type Cart {
   items: [CartItem!]!
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
+  subTotal: Float
   totalPrice: Float!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendorId: String!
 }
@@ -121,6 +153,7 @@ input CartAddressInput {
 }
 
 type CartItem {
+  Tag: Tag
   answers: String
   price: Float!
   product: Product
@@ -129,6 +162,8 @@ type CartItem {
   sku: String!
   slots: [BookingTime!]
   tagId: String
+  title: String
+  title_ar: String
 }
 
 input CartItemInput {
@@ -149,21 +184,27 @@ input CartUpdateInput {
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
   shippingAddress: CartAddressInput
+  subTotal: Float
+  totalPrice: Float
 }
 
 type Category {
   active: Boolean!
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   id: ID!
   products: [Product!]!
   slug: String
-  sortOrder: Int!
+  sortOrder: Int
   title: String!
   title_ar: String!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
@@ -204,12 +245,16 @@ type Coupon {
   active: Boolean!
   code: String!
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   discount: Float!
   id: ID!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
@@ -258,7 +303,6 @@ input CreateProductInput {
   formId: String
   image: String!
   images: [String!]
-  itemsInStock: Int
   location: LocationInput
   meetingLink: String
   minPreorderDays: Int
@@ -293,7 +337,9 @@ input CreateTagInput {
 
 input CreateVendorInput {
   name: String!
+  name_ar: String
   slug: String!
+  subscription: AddSubscriptionInput
 }
 
 type CustomerInfo {
@@ -337,8 +383,11 @@ type DeliveryMethodAnalytics {
   SMSA: Int!
 }
 
-"""Delivery Methods"""
+"""
+Delivery Methods
+"""
 enum DeliveryMethods {
+  DIGITAL_PRODUCT
   MANDOOB
   PICKUP
   SMSA
@@ -355,16 +404,21 @@ type ExecutePayment {
 type ExecutePaymentError {
   Error: String!
   Name: String!
+  Variables: VariableType
 }
 
 type Form {
   content: String!
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   id: ID!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
@@ -430,10 +484,17 @@ type Mutation {
   login(data: LoginInput!): Auth!
   phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
-  removeCartItem(cartId: String!, productId: String!, sku: String!): Cart!
+  refundPayment(orderId: String!): RefundPaymentAPIResponse!
+  removeCartItem(
+    cartId: String!
+    date: String
+    productId: String!
+    sku: String!
+  ): Cart!
   resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
+  supplierRefundPayment(orderId: String!): RefundPaymentAPIResponse!
   updateBooking(data: UpdateBookingInput!, id: String!): Booking!
   updateCart(cartId: String!, data: CartUpdateInput!): Cart!
   updateCartItem(cartId: String!, data: CartItemInput!): Cart!
@@ -458,7 +519,9 @@ type Order {
   cartId: String
   consigneeAddress: CartAddress
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   customerId: String
   customerInfo: CustomerInfo
@@ -471,9 +534,12 @@ type Order {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
+  subTotal: Float
   totalPrice: Float!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: String!
@@ -494,7 +560,9 @@ type OrderPayment {
   cartId: String
   consigneeAddress: CartAddress
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   customerId: String
   customerInfo: CustomerInfo
@@ -509,16 +577,21 @@ type OrderPayment {
   paymentMethod: PaymentMethods
   shipperAddress: CartAddress
   status: OrderStatus!
+  subTotal: Float
   totalPrice: Float!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: String!
   wayBill: WayBill
 }
 
-"""Order status"""
+"""
+Order status
+"""
 enum OrderStatus {
   COMPLETED
   CONFIRMED
@@ -543,7 +616,9 @@ type OtpResponse {
   to: String!
 }
 
-"""OTP status code"""
+"""
+OTP status code
+"""
 enum OtpStatusCode {
   ALREADY_VERIFIED
   ATTEMPTS_EXCEEDED
@@ -594,7 +669,9 @@ type PaymentMethodAnalytics {
   STORE: Int!
 }
 
-"""Payment Methods"""
+"""
+Payment Methods
+"""
 enum PaymentMethods {
   BANK_TRANSFER
   CASH
@@ -624,7 +701,9 @@ type Product {
   category: Category
   categoryId: String
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   customerLocation: Boolean
   description: String!
@@ -637,7 +716,6 @@ type Product {
   id: ID!
   image: String!
   images: [String!]
-  itemsInStock: Int
   location: Location
   meetingLink: String
   minPreorderDays: Int
@@ -651,7 +729,9 @@ type Product {
   title_ar: String!
   type: ProductType!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   variants: [Variant!]
   vendor: Vendor!
@@ -659,11 +739,14 @@ type Product {
 }
 
 input ProductFilterInput {
+  active: Boolean
   attendanceType: AttendanceType
   type: ProductType
 }
 
-"""Product Type"""
+"""
+Product Type
+"""
 enum ProductType {
   PRODUCT
   SERVICE
@@ -671,41 +754,112 @@ enum ProductType {
 }
 
 type Query {
-  getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
-  getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
-  getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
+  createWorkshop(cartId: String!, productId: String!, quantity: Int!): Workshop!
+  getAllBookings(
+    pagination: PaginationArgs
+    sortBooking: SortOrder
+  ): PaginatedBookings!
+  getAllOrders(
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+  ): PaginatedOrders!
+  getAllProducts(
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+  ): PaginatedProducts!
   getAnalytics(vendorId: String!): Analytics!
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
-  getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
+  getCategories(
+    active: Boolean
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+    vendorId: String!
+  ): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
-  getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedCoupons!
+  getCoupons(
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+    vendorId: String
+  ): PaginatedCoupons!
   getCustomerCart(customerId: String!, vendorId: String!): Cart!
   getForm(id: String!): Form!
   getForms(pagination: PaginationArgs, vendorId: String): [Form!]!
   getOrder(id: String!): Order!
   getOrderPaymentStatus(orderId: String!): GetPaymentStatusResponse!
-  getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
+  getOrders(
+    filter: OrdersFilterInput
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+    vendorId: String
+  ): PaginatedOrders!
   getProduct(id: String!): Product!
-  getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
+  getProducts(
+    categoryId: String
+    filter: ProductFilterInput
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+    vendorId: String!
+  ): PaginatedProducts!
   getRevenueAndTopProduct(vendorId: String!): RevenueProductAnalytics!
+  getProducts(
+    categoryId: String
+    filter: ProductFilterInput
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+    vendorId: String!
+  ): PaginatedProducts!
+  getRefundPaymentStatus(invoiceId: String!): RefundPaymentAPIResponse!
   getReviews: [Review!]!
   getReviewsByProductId(id: String!): [Review!]!
   getTag(id: String!): Tag!
-  getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [BookingTime!]!
-  getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
+  getTagAvailabilityByDate(
+    date: String!
+    productId: String!
+    tagId: String!
+  ): [BookingTime!]!
+  getTags(
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+    vendorId: String
+  ): PaginatedTags!
   getTagsByProduct(productId: String!): [Tag!]!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendorView(vendorId: String!): VendorView!
-  getVendors: [Vendor!]!
+  getVendors(filter: VendorFilterInput): [Vendor!]!
   getVendorsView(pagination: PaginationArgs): VendorsView!
+  getWorkshop(id: String!): Workshop!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
   numberOfDroppedBaskets(vendorId: String!): Int!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
+  updateWorkshop(data: UpdateWorkshopInput!, id: String!): Workshop!
+}
+
+type RefundPaymentAPIResponse {
+  errors: [ExecutePaymentError!]
+  responseData: RefundPaymentAPIResponseSuccess
+}
+
+type RefundPaymentAPIResponseSuccess {
+  Amount: String
+  Comment: String
+  Key: String
+  RefundId: Int
+  RefundReference: String
+  RefundStatusResult: [RefundPaymentStatusRes!]
+}
+
+type RefundPaymentStatusRes {
+  Amount: Int
+  InvoiceId: Int
+  RefundAmount: Int
+  RefundId: Int
+  RefundReference: String
+  RefundStatus: String
 }
 
 input ResetPwtInput {
@@ -719,7 +873,9 @@ type RevenueProductAnalytics {
 }
 
 type Review {
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   id: ID!
   name: String!
@@ -727,12 +883,16 @@ type Review {
   rating: Float!
   review: String!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   variantTitle: String!
 }
 
-"""User role"""
+"""
+User role
+"""
 enum Role {
   ADMIN
   AGENT
@@ -767,17 +927,38 @@ input SortOrder {
   field: String!
 }
 
+"""
+Subscription Plan
+"""
+enum SubscriptionPlan {
+  BASIC
+  BASIC_LITE
+  FREE_LIFE
+}
+
+"""
+Subscription Type
+"""
+enum SubscriptionType {
+  MONTHLY
+  YEARLY
+}
+
 type Tag {
   active: Boolean!
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   id: ID!
   products: [Product!]!
   title: String!
   title_ar: String!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: String
@@ -785,10 +966,14 @@ type Tag {
 }
 
 type Token {
-  """JWT access token"""
+  """
+  JWT access token
+  """
   accessToken: JWT!
 
-  """JWT refresh token"""
+  """
+  JWT refresh token
+  """
   refreshToken: JWT!
 }
 
@@ -842,7 +1027,6 @@ input UpdateProductInput {
   formId: String
   image: String
   images: [String!]
-  itemsInStock: Int
   location: LocationInput
   meetingLink: String
   minPreorderDays: Int
@@ -890,15 +1074,18 @@ input UpdateVendorInfoInput {
   address: String
   addressUrl: String
   certificates: [Certificate!]
+  city: String
   crNum: String
   description: String
   description_ar: String
   email: String
   facebook: String
+  freelanceNum: String
   heroImage: String
   instagram: String
   location: LocationInput
   logo: String
+  maroofNum: String
   phone: String
   snapchat: String
   terms: String
@@ -911,7 +1098,9 @@ input UpdateVendorInput {
   bank: UpdateVendorBankInput
   info: UpdateVendorInfoInput
   name: String
+  name_ar: String
   settings: UpdateVendorSettingsInput
+  subscription: AddSubscriptionInput
 }
 
 input UpdateVendorSettingsInput {
@@ -920,8 +1109,14 @@ input UpdateVendorSettingsInput {
   paymentMethods: [PaymentMethods!]
 }
 
+input UpdateWorkshopInput {
+  quantity: Int!
+}
+
 type User {
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   email: String!
   firstName: String
@@ -930,7 +1125,9 @@ type User {
   phone: String
   role: Role!
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
   vendor: Vendor
   vendorId: String
@@ -942,11 +1139,16 @@ type UserRole {
   userId: String!
 }
 
+type VariableType {
+  itemQuantity: Int
+  quantity: Int
+  title: String
+}
+
 type Variant {
   default: Boolean
   image: String
-  images: [String!]
-  price: Int!
+  price: Float!
   quantity: Int!
   sku: String!
   title: String!
@@ -956,8 +1158,7 @@ type Variant {
 input VariantInput {
   default: Boolean
   image: String
-  images: [String!]
-  price: Int!
+  price: Float!
   sku: String!
   title: String!
   title_ar: String!
@@ -968,17 +1169,23 @@ type Vendor {
   active: Boolean!
   bank: VendorBank
 
-  """Identifies the date and time when the object was created."""
+  """
+  Identifies the date and time when the object was created.
+  """
   createdAt: DateTime!
   id: ID!
   info: VendorInfo
   name: String!
+  name_ar: String
   owner: User
   ownerId: String!
   settings: VendorSettings
   slug: String!
+  subscription: VendorSubscription
 
-  """Identifies the date and time when the object was last updated."""
+  """
+  Identifies the date and time when the object was last updated.
+  """
   updatedAt: DateTime!
 }
 
@@ -989,19 +1196,28 @@ type VendorBank {
   iban: String!
 }
 
+input VendorFilterInput {
+  active: Boolean
+  name: [String!]
+  name_ar: [String!]
+}
+
 type VendorInfo {
   address: String
   addressUrl: String
   certificates: [Certificates!]
+  city: String
   crNum: String
   description: String
   description_ar: String
   email: String
   facebook: String
+  freelanceNum: String
   heroImage: String
   instagram: String
   location: Location
   logo: String
+  maroofNum: String
   phone: String
   snapchat: String
   terms: String
@@ -1013,6 +1229,15 @@ type VendorSettings {
   deliveryAreas: [DeliveryAreas!]!
   deliveryMethods: [DeliveryMethods!]!
   paymentMethods: [PaymentMethods!]!
+}
+
+type VendorSubscription {
+  addOns: AddOnsList
+  createdAt: DateTime!
+  freeTimeLeft: Int!
+  plan: SubscriptionPlan!
+  price: Float!
+  type: SubscriptionType!
 }
 
 type VendorView {
@@ -1064,4 +1289,21 @@ input WorkDayInput {
   day: Weekday!
   from: String!
   to: String!
+}
+
+type Workshop {
+  cartId: String
+
+  """
+  Identifies the date and time when the object was created.
+  """
+  createdAt: DateTime!
+  id: ID!
+  productId: String
+  quantity: Int!
+
+  """
+  Identifies the date and time when the object was last updated.
+  """
+  updatedAt: DateTime!
 }

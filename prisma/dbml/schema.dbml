@@ -20,9 +20,10 @@ Table User {
 Table Vendor {
   id String [pk]
   name String [not null]
+  name_ar String
   slug String [not null]
   MF_vendorCode Int
-  active Boolean [not null, default: true]
+  active Boolean [not null, default: false]
   info VendorInfo
   bank VendorBankInfo
   settings VendorSettings
@@ -38,6 +39,7 @@ Table Vendor {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   cart Cart [not null]
+  subscription VendorSubscription
 }
 
 Table Tag {
@@ -102,7 +104,6 @@ Table Product {
   minPreorderDays Int
   noOfSeats Int
   bookedSeats Int [default: 0]
-  itemsInStock Int
   variants VariantOption[] [not null]
   sortOrder Int [not null, default: 0]
   attendanceType AttendanceType
@@ -125,6 +126,7 @@ Table Cart {
   customerId String [not null]
   appliedCoupon String
   totalPrice Float [not null]
+  subTotal Float
   finalPrice Float [not null]
   vendorId String
   vendor Vendor
@@ -150,6 +152,7 @@ Table Order {
   cartId String
   cart Cart
   totalPrice Float [not null]
+  subTotal Float [default: 0]
   finalPrice Float [not null]
   appliedCoupon String
   items CartItem[] [not null]
@@ -160,7 +163,6 @@ Table Order {
   paymentMethod PaymentMethods [not null]
   vendorId String
   vendor Vendor
-  bookings Booking [not null]
   wayBill WayBill
   invoiceId String
   consigneeAddress CartAddress
@@ -185,18 +187,26 @@ Table Booking {
   cartId String
   cart Cart
   orderId String
-  order Order
-  productId String [not null]
-  product Product [not null]
+  productId String
+  product Product
   vendorId String [not null]
   vendor Vendor [not null]
   tagId String [not null]
   tag Tag [not null]
   status BookingStatus [not null]
   slots BookingTime[] [not null]
-  holdTimestamp DateTime [default: `now()`]
+  holdTimestamp DateTime
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+}
+
+Table Workshop {
+  id String [pk]
+  cartId String
+  productId String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  quantity Int [default: 1]
 }
 
 Table Form {
@@ -220,6 +230,7 @@ Enum DeliveryMethods {
   MANDOOB
   SMSA
   PICKUP
+  DIGITAL_PRODUCT
 }
 
 Enum PaymentMethods {
@@ -266,6 +277,17 @@ Enum BookingStatus {
   REJECTED
 }
 
+Enum SubscriptionPlan {
+  BASIC
+  BASIC_LITE
+  FREE_LIFE
+}
+
+Enum SubscriptionType {
+  MONTHLY
+  YEARLY
+}
+
 Ref: Vendor.ownerId - User.id
 
 Ref: Tag.vendorId > Vendor.id [delete: Set Null]
@@ -292,9 +314,7 @@ Ref: Order.vendorId > Vendor.id
 
 Ref: Booking.cartId > Cart.id [delete: Set Null]
 
-Ref: Booking.orderId > Order.id
-
-Ref: Booking.productId > Product.id
+Ref: Booking.productId > Product.id [delete: Set Null]
 
 Ref: Booking.vendorId > Vendor.id
 

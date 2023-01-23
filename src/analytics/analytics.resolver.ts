@@ -14,11 +14,15 @@ export class AnalyticsResolver {
     private readonly prisma: PrismaService
   ) {}
 
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
   @Query(() => Analytics)
   getAnalytics(@Args('vendorId') id: string): Promise<Analytics> {
     return this.analyticsService.getAnalytics(id);
   }
 
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
   @Query(() => Int)
   numberOfDroppedBaskets(@Args('vendorId') id: string): Promise<number> {
     return this.analyticsService.numberOfDroppedBaskets(id);

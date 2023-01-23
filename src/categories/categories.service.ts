@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCategoryInput } from './dto/create-category.input';
@@ -9,6 +9,7 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import { Product } from '@prisma/client';
 import { PaginatedCategories } from './models/paginated-categories.model';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class CategoriesService {
@@ -24,7 +25,7 @@ export class CategoriesService {
       include: { products: true },
     });
 
-    if (!category) throw new NotFoundException('Category Not Found.');
+    throwNotFoundException(category, 'Category');
 
     return category;
   }
@@ -37,11 +38,14 @@ export class CategoriesService {
   ): Promise<PaginatedCategories> {
     const { skip, take } = getPaginationArgs(pg);
 
+    if (!vendorId) throw new BadRequestException('Vendor Id is required');
+
     const where = {
       vendorId,
     };
 
     let orderBy = {};
+
     if (sortOrder) {
       orderBy[sortOrder.field] = sortOrder.direction;
     } else {
@@ -49,19 +53,22 @@ export class CategoriesService {
         sortOrder: 'asc',
       };
     }
+
     if (typeof active === 'boolean') {
       where['active'] = active;
     }
+
     const res = await this.prisma.$transaction([
       this.prisma.category.count({ where }),
       this.prisma.category.findMany({
         where,
         skip,
-        take,
+        take: take || undefined,
         orderBy,
         include: { products: true },
       }),
     ]);
+
     return { totalCount: res[0], list: res[1] };
   }
 

@@ -15,7 +15,15 @@ export class ExecutePayment {
 }
 
 @ObjectType()
+export class VariableType {
+  title?: string;
+  quantity?: number;
+  itemQuantity?: number;
+}
+
+@ObjectType()
 export class ExecutePaymentError {
   Name: string;
   Error: string;
+  Variables?: VariableType;
 }

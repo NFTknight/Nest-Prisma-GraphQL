@@ -11,6 +11,7 @@ import { IsEmail } from 'class-validator';
 import { LocationInput } from 'src/products/dto/location.input';
 import { DeliveryAreas } from '../models/vendor-settings.model';
 import { AddDeliveryAreasInput } from './add-delivery-areas.input';
+import { AddSubscriptionInput } from './add-subscription-input';
 
 registerEnumType(DeliveryMethods, {
   name: 'DeliveryMethods',
@@ -42,6 +43,9 @@ class UpdateVendorInfoInput implements VendorInfo {
   @Field({ nullable: true })
   @IsEmail()
   email: string;
+
+  @Field({ nullable: true })
+  city: string;
 
   @Field({ nullable: true })
   addressUrl: string;
@@ -84,6 +88,12 @@ class UpdateVendorInfoInput implements VendorInfo {
 
   @Field({ nullable: true })
   crNum: string;
+
+  @Field({ nullable: true })
+  maroofNum: string;
+
+  @Field({ nullable: true })
+  freelanceNum: string;
 }
 
 @InputType()
@@ -118,6 +128,9 @@ export class UpdateVendorInput {
   @Field()
   name?: string;
 
+  @Field({ nullable: true })
+  name_ar: string;
+
   @Field()
   active?: boolean;
 
@@ -129,4 +142,7 @@ export class UpdateVendorInput {
 
   @Field()
   settings?: UpdateVendorSettingsInput;
+
+  @Field(() => AddSubscriptionInput, { nullable: true })
+  subscription?: AddSubscriptionInput;
 }

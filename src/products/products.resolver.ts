@@ -22,7 +22,7 @@ import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { ProductFilterInput } from 'src/common/filter/filter.input';
 import { TagsService } from 'src/tags/tags.service';
 import { Tag } from 'src/tags/models/tag.model';
-import { SetMetadata, UseGuards } from '@nestjs/common';
+import { BadRequestException, SetMetadata, UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { FormService } from 'src/forms/forms.service';
 import { RolesGuard } from 'src/auth/gql-signup.guard';
@@ -50,6 +50,10 @@ export class ProductsResolver {
     @Args('sortOrder', { nullable: true }) sortOrder: SortOrder,
     @Args('filter', { nullable: true }) filter: ProductFilterInput
   ): Promise<PaginatedProducts> {
+    //somthing FE sends undefined as a string...
+    if (vendorId === 'undefined')
+      throw new BadRequestException('Vendor id is required');
+
     return this.productService.getProducts(
       vendorId,
       categoryId,

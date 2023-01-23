@@ -39,6 +39,7 @@ export class CreateShipmentInput {
   ShipmentCurrency: string;
   Weight: number;
   WeightUnit: string;
+  WaybillType: string;
   ContentDescription: string;
 
   @Field(() => AddressEntity)

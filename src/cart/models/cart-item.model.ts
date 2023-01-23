@@ -1,11 +1,11 @@
 import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
 import { IsNotEmpty } from 'class-validator';
 import { BookingTime } from 'src/bookings/models/booking-time.model';
-import { CartItem as ICartItem } from '@prisma/client';
 import { Product } from 'src/products/models/product.model';
+import { Tag } from 'src/tags/models/tag.model';
 
 @ObjectType()
-export class CartItem implements ICartItem {
+export class CartItem {
   @Field()
   @IsNotEmpty()
   productId: string;
@@ -21,11 +21,20 @@ export class CartItem implements ICartItem {
   @Field({ nullable: true })
   answers: string;
 
+  @Field({ nullable: true })
+  title?: string;
+
+  @Field({ nullable: true })
+  title_ar?: string;
+
   @Field(() => Int)
   quantity: number;
 
   @Field({ nullable: true })
   tagId: string;
+
+  @Field({ nullable: true })
+  Tag?: Tag;
 
   @Field(() => [BookingTime], { nullable: true })
   slots: BookingTime[];

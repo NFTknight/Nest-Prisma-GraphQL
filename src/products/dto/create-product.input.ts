@@ -61,9 +61,6 @@ export class CreateProductInput {
   tags: string[];
 
   @Field(() => Int)
-  itemsInStock?: number;
-
-  @Field(() => Int)
   sortOrder?: number;
 
   @Field(() => AttendanceType, { nullable: true })

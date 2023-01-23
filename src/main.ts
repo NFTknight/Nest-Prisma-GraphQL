@@ -11,7 +11,9 @@ import { BadRequestException } from '@nestjs/common/exceptions';
 import { json } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+  });
   const logger = new Logger('bootstrap');
 
   app.use(json({ limit: '8mb' }));

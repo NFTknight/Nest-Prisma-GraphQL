@@ -21,6 +21,7 @@ export class GqlConfigService implements GqlOptionsFactory {
       debug: graphqlConfig.debug,
       playground: graphqlConfig.playgroundEnabled,
       context: ({ req }) => ({ req }),
+      cors: true,
     };
   }
 }

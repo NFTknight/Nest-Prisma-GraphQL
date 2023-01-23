@@ -31,8 +31,9 @@ export class Booking extends BaseModel implements PrismaBooking {
   @Field(() => Vendor)
   vendor?: Vendor;
 
+  @Field(() => String, { nullable: true })
   productId: string;
-  @Field(() => Product)
+  @Field(() => Product, { nullable: true })
   product?: Product;
 
   @Field(() => BookingStatus)
