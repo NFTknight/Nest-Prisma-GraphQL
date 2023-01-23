@@ -18,7 +18,7 @@ export class FormResponse {
 }
 
 @ObjectType()
-export class Order extends BaseModel implements PrismaOrder {
+export class Order extends BaseModel {
   @IsString()
   orderId: string;
 
@@ -62,6 +62,9 @@ export class Order extends BaseModel implements PrismaOrder {
 
   @Field(() => Float)
   totalPrice: number;
+
+  @Field(() => Float, { nullable: true })
+  subTotal: number;
 
   @Field(() => Float)
   finalPrice: number;

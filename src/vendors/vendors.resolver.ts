@@ -14,6 +14,7 @@ import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { RolesGuard } from 'src/auth/gql-signup.guard';
 import { Role } from '@prisma/client';
+import { VendorFilterInput } from './dto/get-vendor-filter.input';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -23,8 +24,10 @@ export class VendorsResolver {
   ) {}
 
   @Query(() => [Vendor])
-  async getVendors(): Promise<Vendor[]> {
-    return this.vendorsService.getVendors();
+  async getVendors(
+    @Args('filter', { nullable: true }) filter: VendorFilterInput
+  ): Promise<Vendor[]> {
+    return this.vendorsService.getVendors(filter);
   }
 
   @Query(() => Vendor)
@@ -53,7 +56,7 @@ export class VendorsResolver {
     const { skip, take } = getPaginationArgs(pg);
     const vendors = await this.prismaService.vendor.findMany({
       skip,
-      take,
+      take: take || undefined,
     });
     const list = vendors.map(async (vendor: Vendor) => {
       const vendorView = await this.vendorsService.getVendorView(vendor.id);

@@ -1,17 +1,18 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
-import { CartItemInput } from './dto/cart.input';
+import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 import {
+  BookingStatus,
+  DeliveryMethods,
+  Order,
   OrderStatus,
   PaymentMethods,
   Prisma,
   ProductType,
+  Vendor,
+  WayBill,
 } from '@prisma/client';
 import { CartItemService } from './services/cart-item.service';
 import { find, omit } from 'lodash';
@@ -22,6 +23,12 @@ import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { PaymentService } from 'src/payment/payment.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
+import { ShippingService } from 'src/shipping/shipping.service';
+import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
+import { SignupInput } from 'src/auth/dto/signup.input';
+import { PrismaClientValidationError } from '@prisma/client/runtime';
+import { WorkshopService } from 'src/workshops/workshops.service';
+import { getReadableDate } from 'src/utils/general';
 
 @Injectable()
 export class CartService {
@@ -30,6 +37,8 @@ export class CartService {
     private readonly cartItemService: CartItemService,
     private readonly vendorService: VendorsService,
     private readonly emailService: SendgridService,
+    private readonly workshopService: WorkshopService,
+    private readonly shippingService: ShippingService,
     private readonly paymentService: PaymentService,
     private readonly productService: ProductsService
   ) {}
@@ -65,25 +74,88 @@ export class CartService {
 
       const cartItems = [...res.items];
 
+      let shouldUpdateCart = false;
+      let haveProductType = false;
+
       // logic to check if all the products in the cartItems are valid and existing
       for (const [i, item] of cartItems.entries()) {
         const product = await this.prisma.product.findUnique({
           where: { id: item.productId },
         });
-        if (!product) {
+
+        if (!product || !product.active) {
           await this.removeItemFromCart(res.id, item.productId, item.sku);
           cartItems.splice(i, 1);
+        } else {
+          if (product.type === ProductType.PRODUCT) {
+            haveProductType = true;
+          }
+
+          if (product.type === ProductType.SERVICE) {
+            const bookings = await this.prisma.booking.findMany({
+              where: { cartId: res.id, productId: product.id },
+            });
+
+            if (!bookings.length) {
+              cartItems.splice(i, 1);
+            }
+          }
+
+          const updatedPrice =
+            product?.variants?.find((variant) => variant.sku === item.sku)
+              ?.price || item.price;
+
+          if (updatedPrice !== item.price) {
+            shouldUpdateCart = true;
+            cartItems[i] = {
+              ...item,
+              price: updatedPrice,
+            };
+          }
+        }
+        if (product.type === ProductType.WORKSHOP) {
+          const isWorkShopExists = await this.prisma.workshop.findFirst({
+            where: { productId: product.id, cartId: res.id },
+          });
+          if (!isWorkShopExists) {
+            cartItems.splice(i, 1);
+            shouldUpdateCart = true;
+          }
         }
       }
+      //this brings the deliveryCharges
+      const deliveryCharges = res.totalPrice - res.subTotal;
 
-      const totalPrice = cartItems.reduce(
+      //this is to make sure subTotal is correct
+      const subTotal = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0
       );
 
+      const updatedCartObject = {
+        items: cartItems,
+        subTotal: subTotal,
+        totalPrice: subTotal + deliveryCharges,
+      };
+
+      if (!haveProductType) {
+        updatedCartObject['totalPrice'] = subTotal;
+        if (updatedCartObject['deliveryMethod']) {
+          updatedCartObject['deliveryMethod'] = null;
+        }
+        if (updatedCartObject['deliveryArea']) {
+          updatedCartObject['deliveryArea'] = null;
+        }
+      }
+
+      if (shouldUpdateCart || !haveProductType)
+        await this.updateCart(res.id, updatedCartObject);
+
       return {
         ...res,
-        totalPrice,
+        //returning newly calculated subTotal + deliveryCharges as new total
+        totalPrice: updatedCartObject.totalPrice,
+        subTotal: updatedCartObject.subTotal,
         items: cartItems,
       };
     } catch (e) {
@@ -112,11 +184,11 @@ export class CartService {
       where: { id: data.productId },
     });
 
-    let cartData: Prisma.CartUpdateArgs['data'] = {};
+    let cartData = {};
 
     switch (product.type) {
       case ProductType.PRODUCT:
-        cartData = this.cartItemService.addProduct(product, cart, data);
+        cartData = await this.cartItemService.addProduct(product, cart, data);
         break;
 
       case ProductType.WORKSHOP:
@@ -144,16 +216,48 @@ export class CartService {
     });
   }
 
-  async removeItemFromCart(cartId: string, productId: string, sku: string) {
+  async removeItemFromCart(
+    cartId: string,
+    productId: string,
+    sku: string,
+    date = ''
+  ) {
     const cart = await this.getCart(cartId);
-
     throwNotFoundException(cart, 'Cart');
 
-    const items = cart.items.filter(
-      (item) => item.productId !== productId || item.sku !== sku
-    );
+    await this.prisma.workshop.deleteMany({ where: { productId, cartId } });
 
-    const totalPrice = items.reduce(
+    const product = await this.productService.getProduct(productId);
+    let items = [];
+
+    if (product.type === ProductType.SERVICE) {
+      if (!date)
+        throw new BadRequestException(
+          'Date is required to remove Item of type Service'
+        );
+      const sameServiceItems = cart.items.filter(
+        (item) => item.productId === productId && item.sku === sku
+      );
+      const remainingServiceItem = sameServiceItems.filter((serviceItem) => {
+        return serviceItem.slots.every(
+          (slot) =>
+            getReadableDate(slot.from.toString()) !==
+            getReadableDate(date || '')
+        );
+      });
+      items = cart.items.filter(
+        (item) => item.productId !== productId || item.sku !== sku
+      );
+      items = [...items, ...remainingServiceItem];
+    } else {
+      items = cart.items.filter(
+        (item) => item.productId !== productId || item.sku !== sku
+      );
+    }
+
+    const deliveryCharges = cart.totalPrice - cart.subTotal;
+
+    const subTotal = items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
@@ -162,7 +266,8 @@ export class CartService {
       where: { id: cartId },
       data: {
         items,
-        totalPrice,
+        subTotal,
+        totalPrice: subTotal + deliveryCharges,
       },
     });
   }
@@ -186,24 +291,50 @@ export class CartService {
         : item
     );
 
-    const totalPrice = items.reduce(
+    const deliveryCharges = cart.totalPrice - cart.subTotal;
+
+    const subTotal = items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
+    );
+    const updatedCartItem: any = await Promise.all(
+      items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        if (product.type === ProductType.WORKSHOP) {
+          if (product.noOfSeats < data.quantity) {
+            throw new BadRequestException('Not enough seats available');
+          } else {
+            const workshop = await this.prisma.workshop.findFirst({
+              where: { productId: product.id, cartId: cartId },
+            });
+
+            if (workshop) {
+              await this.workshopService.updateWorkshop(workshop.id, {
+                quantity: data.quantity,
+              });
+            } else {
+              await this.workshopService.createWorkshop({
+                productId: product.id,
+                cartId,
+                quantity: item.quantity,
+              });
+            }
+          }
+        }
+
+        return { ...product, ...item };
+      })
     );
 
     const updatedCart = this.prisma.cart.update({
       where: { id: cartId },
       data: {
         items,
-        totalPrice,
+        subTotal,
+        totalPrice: subTotal + deliveryCharges,
       },
     });
-    const updatedCartItem: any = await Promise.all(
-      cart.items.map(async (item) => {
-        const product = await this.productService.getProduct(item.productId);
-        return { ...product, ...item };
-      })
-    );
+
     updatedCart.items = updatedCartItem;
 
     return updatedCart;
@@ -213,12 +344,7 @@ export class CartService {
     const cart = await this.prisma.cart.findUnique({
       where: { id: cartId },
     });
-    if (!cart) throw new BadRequestException('Cart doesnt exists');
-
-    if (!cart?.consigneeAddress)
-      throw new BadRequestException(
-        'Consignee Address doenst exist for the cart'
-      );
+    if (!cart) throw new BadRequestException('Cart does not exists');
 
     // cart deletion
     await this.prisma.cart.delete({
@@ -237,13 +363,27 @@ export class CartService {
   }
 
   async checkoutCartAndCreateOrder(cartId: string, paymentSession?: string) {
-    const cart = await this.getCart(cartId);
+    let payment = undefined;
+    let errors = undefined;
 
+    const cart = await this.getCart(cartId);
     throwNotFoundException(cart, 'Cart');
+
+    // if product's quantity, workshop's noOdSeats, or service's booking are not available, throw error
+    const cartErrors = await this.checkItemsAvailability(cart);
+    if (cartErrors.length) {
+      return {
+        ...cart,
+        errors: cartErrors,
+      };
+    }
 
     const isOnlinePayment = cart.paymentMethod === PaymentMethods.ONLINE;
 
-    if (!cart.deliveryMethod) {
+    if (
+      !cart.deliveryMethod &&
+      cart?.items?.some((item) => item?.product?.type === ProductType.PRODUCT)
+    ) {
       throw new BadRequestException('delivery method is required');
     } else if (!cart.paymentMethod) {
       throw new BadRequestException('Payment method is required');
@@ -252,13 +392,12 @@ export class CartService {
     }
 
     const { vendorId } = cart;
-
     const vendorPrefix = await this.vendorService.getVendorOrderPrefix(
       vendorId
     );
-    const vendor = await this.vendorService.getVendor(vendorId);
-
     const orderId = `${vendorPrefix}-${nanoid(8)}`.toUpperCase();
+
+    const vendor = await this.vendorService.getVendor(vendorId);
 
     let order = await this.prisma.order.findFirst({
       where: {
@@ -275,6 +414,10 @@ export class CartService {
           customerInfo: cart.customerInfo,
           paymentMethod: cart.paymentMethod,
           appliedCoupon: cart.appliedCoupon,
+          subTotal: cart.subTotal,
+          finalPrice: cart.finalPrice || cart.subTotal,
+          totalPrice: cart.totalPrice,
+          status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],
           ...(cart.deliveryMethod && {
             deliveryMethod: cart.deliveryMethod,
           }),
@@ -284,9 +427,6 @@ export class CartService {
           ...(cart.shipperAddress && {
             shipperAddress: cart.shipperAddress,
           }),
-          finalPrice: cart.totalPrice,
-          totalPrice: cart.totalPrice,
-          status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],
           vendor: {
             connect: {
               id: vendorId,
@@ -301,9 +441,6 @@ export class CartService {
       });
     }
 
-    let payment = undefined;
-    let errors = undefined;
-
     if (isOnlinePayment) {
       try {
         payment = await this.paymentService.executePayment(
@@ -312,33 +449,79 @@ export class CartService {
           vendor.slug
         );
 
-        await this.prisma.order.update({
-          where: { id: order.id },
-          data: {
-            invoiceId: payment.InvoiceId.toString(),
-          },
-        });
+        if (payment?.InvoiceId) {
+          await this.prisma.order.update({
+            where: { id: order.id },
+            data: {
+              invoiceId: payment.InvoiceId.toString(),
+            },
+          });
+        }
       } catch (error) {
         errors = error.response.data.ValidationErrors;
       }
     }
 
+    if (
+      order.status === OrderStatus.PENDING &&
+      order.deliveryMethod === DeliveryMethods.SMSA
+    ) {
+      const wayBillData = await this.createWayBillData(order, vendor);
+
+      if (wayBillData) {
+        order = await this.prisma.order.update({
+          where: { id: order.id },
+          data: {
+            wayBill: wayBillData,
+          },
+        });
+      }
+    }
+
     // Payment method is not ONLINE or online payment is successfully done
-    if (errors === undefined) {
+    if (order.id && errors === undefined) {
+      // update bookings in the cart to add order id, status for pending and remove holdTimeStamp
+      await this.prisma.booking.updateMany({
+        where: { cartId },
+        data: {
+          orderId: order.id,
+          status: BookingStatus.PENDING,
+          holdTimestamp: { unset: true },
+          updatedAt: new Date(),
+        },
+      });
+
+      // remove cart: all details are now in order
       await this.prisma.cart.delete({
         where: { id: cartId },
       });
-    }
 
-    // Email notification to vendor and customer when order is created
-    if (order.id && errors === undefined) {
+      // decrement product's variant's quantity as order is now created
+      await this.productService.decrementProductVariantQuantities(
+        cart?.items || []
+      );
+
+      // Email notification to customer when order is created
       this.emailService.send(
         SendEmails(ORDER_OPTIONS.PURCHASED, order?.customerInfo?.email)
       );
-      if (vendor?.info?.email)
+
+      // Email notification to vendor when order is created
+      if (vendor?.info?.email) {
         this.emailService.send(
           SendEmails(ORDER_OPTIONS.RECEIVED, vendor?.info?.email)
         );
+      } else {
+        // if vendor info doesn't have email, fetch is from user
+        const user = await this.prisma.user.findUnique({
+          where: { id: vendor.ownerId },
+        });
+
+        if (user)
+          this.emailService.send(
+            SendEmails(ORDER_OPTIONS.RECEIVED, user.email)
+          );
+      }
     }
 
     return {
@@ -347,4 +530,106 @@ export class CartService {
       errors,
     };
   }
+
+  checkItemsAvailability = async (cart: Cart) => {
+    const cartErrors = [];
+    for (const item of cart.items) {
+      const product = await this.productService.getProduct(item.productId);
+      if (product.type === ProductType.PRODUCT) {
+        const productVariant = product.variants.find(
+          (variant) => variant.sku === item.sku
+        );
+        if (
+          !productVariant?.quantity ||
+          productVariant.quantity < item.quantity
+        ) {
+          cartErrors.push({
+            Name: 'ProductIssue',
+            Error: 'ProductHaveLessQuantityAsCart',
+            Variables: {
+              title: product.title,
+              quantity: productVariant.quantity,
+              itemQuantity: item.quantity,
+            },
+          });
+          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        }
+      }
+      if (
+        product.type === ProductType.WORKSHOP &&
+        (product.noOfSeats || 0 - product.bookedSeats || 0) < item.quantity
+      ) {
+        cartErrors.push({
+          Name: 'WorkshopIssue',
+          Error: 'WorkshopHaveLessSeatAsCart',
+          Variables: {
+            title: product.title,
+            quantity: product.noOfSeats - product.bookedSeats,
+            itemQuantity: item.quantity,
+          },
+        });
+        await this.removeItemFromCart(cart.id, item.productId, item.sku);
+      }
+      if (product.type === ProductType.SERVICE) {
+        const booking = await this.prisma.booking.findFirst({
+          where: {
+            cartId: cart.id,
+          },
+        });
+        if (!booking) {
+          cartErrors.push({
+            Name: 'ServiceIssue',
+            Error: 'ServiceIsNotAvailable',
+            Variables: {
+              title: product.title,
+            },
+          });
+          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        }
+      }
+    }
+
+    return cartErrors;
+  };
+
+  createWayBillData = async (order: Order, vendor: Vendor) => {
+    let wayBillData: WayBill = null;
+    if (order.consigneeAddress) {
+      const WayBillRequestObject: CreateShipmentInput = {
+        ConsigneeAddress: {
+          ContactName: order.consigneeAddress?.contactName,
+          ContactPhoneNumber: order.consigneeAddress?.contactPhoneNumber,
+          //this is hardcoded for now
+          Country: 'SA',
+          City: order.consigneeAddress?.city,
+          AddressLine1: order.consigneeAddress?.addressLine1,
+        },
+        ShipperAddress: {
+          ContactName: vendor.name || 'Company Name',
+          ContactPhoneNumber: vendor?.info?.phone || '06012312312',
+          Country: 'SA',
+          City: vendor?.info?.city || 'Riyadh',
+          AddressLine1: vendor?.info?.address || 'Ar Rawdah, Jeddah 23434',
+        },
+        OrderNumber: order?.orderId,
+        DeclaredValue: order?.subTotal,
+        CODAmount: 30,
+        Parcels: 1,
+        ShipDate: new Date().toISOString(),
+        ShipmentCurrency: 'SAR',
+        Weight: 15,
+        WaybillType: 'PDF',
+        WeightUnit: 'KG',
+        ContentDescription: 'Shipment contents description',
+      };
+      await this.shippingService
+        .createShipment(WayBillRequestObject)
+        .then((data) => {
+          wayBillData = data;
+        })
+        .catch((err) => console.log(err));
+    }
+
+    return wayBillData;
+  };
 }

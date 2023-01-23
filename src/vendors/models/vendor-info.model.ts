@@ -20,6 +20,9 @@ export class VendorInfo implements PrismaVendorInfo {
   email: string;
 
   @Field({ nullable: true })
+  city: string;
+
+  @Field({ nullable: true })
   addressUrl: string;
 
   @Field({ nullable: true })
@@ -60,4 +63,10 @@ export class VendorInfo implements PrismaVendorInfo {
 
   @Field({ nullable: true })
   crNum: string;
+
+  @Field({ nullable: true })
+  maroofNum: string;
+
+  @Field({ nullable: true })
+  freelanceNum: string;
 }

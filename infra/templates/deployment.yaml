@@ -45,6 +45,10 @@ spec:
                   key: app-id
             - name: MYFATOORAH_API_URL
               value: {{ .Values.myfatoorah.endpoint }}
+            - name: MYFATOORAH_CLIENT_URL
+              value: {{ .Values.myfatoorah.clienturl }}
+            - name: MYFATOORAH_CURRENCY
+              value: {{ .Values.myfatoorah.currency }}
             - name: MYFATOORAH_API_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -80,11 +84,15 @@ spec:
                   name: sendgrid
                   key: api-key
           resources: {{ toYaml .Values.resources | nindent 12 }}
-          livenessProbe:
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 20
             httpGet:
               path: /health
               port: {{ .Values.containerPort }}
-          readinessProbe:
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 20
             httpGet:
               path: /health
               port: {{ .Values.containerPort }}

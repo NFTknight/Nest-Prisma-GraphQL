@@ -27,6 +27,7 @@ import { StorageModule } from './storage/storage.module';
 import { FormsModule } from './forms/forms.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { VendorSubscriptionService } from './common/cron/vendor-subscription-cron.service';
+import { WorkshopModule } from './workshops/workshops.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { VendorSubscriptionService } from './common/cron/vendor-subscription-cro
     StorageModule,
     FormsModule,
     ReviewsModule,
+    WorkshopModule,
   ],
   controllers: [HealthController],
   providers: [SendgridService, VendorSubscriptionService],

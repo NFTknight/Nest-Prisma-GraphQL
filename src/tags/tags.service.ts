@@ -48,14 +48,14 @@ export class TagsService {
     };
     const res = await this.prisma.$transaction([
       this.prisma.tag.count({ where }),
-      this.prisma.tag.findMany({ where, skip, take }),
+      this.prisma.tag.findMany({ where, skip, take: take || undefined }),
     ]);
     return { totalCount: res[0], list: res[1] };
   }
 
   async getTagsByProduct(productId: string): Promise<Tag[]> {
     return this.prisma.tag.findMany({
-      where: { productIds: { has: productId } },
+      where: { productIds: { has: productId }, active: true },
     });
   }
 
@@ -63,7 +63,21 @@ export class TagsService {
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(data.vendorId);
     // if vendor exists we can successfully create the category.
-    return this.prisma.tag.create({ data });
+
+    const tag = await this.prisma.tag.create({ data });
+
+    if (data?.productIds?.length)
+      for (const id of data.productIds) {
+        await this.prisma.product.update({
+          where: { id },
+          data: {
+            tagIds: {
+              push: [tag.id],
+            },
+          },
+        });
+      }
+    return tag;
   }
 
   async updateTag(id: string, data: UpdateTagInput): Promise<Tag> {
@@ -192,8 +206,8 @@ export class TagsService {
       // Check if the time is available.
       const isAvailable = !slots.some((s) => {
         return (
-          startFrom.isBetween(s.from, s.to, 'minute', '()') ||
-          startFrom.add(duration).isBetween(s.from, s.to, 'minute', '()')
+          startFrom.isBetween(s.from, s.to, 'minute', '[)') ||
+          startFrom.add(duration).isBetween(s.from, s.to, 'minute', '(]')
         );
       });
 
