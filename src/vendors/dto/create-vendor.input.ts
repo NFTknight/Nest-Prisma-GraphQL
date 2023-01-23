@@ -1,5 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
+import { AddSubscriptionInput } from './add-subscription-input';
 
 @InputType()
 export class CreateVendorInput {
@@ -13,4 +14,7 @@ export class CreateVendorInput {
   @Field()
   @IsNotEmpty()
   slug: string;
+
+  @Field(() => AddSubscriptionInput, { nullable: true })
+  subscription?: AddSubscriptionInput;
 }
