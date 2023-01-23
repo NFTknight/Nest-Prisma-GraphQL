@@ -117,6 +117,7 @@ input CartAddressInput {
 }
 
 type CartItem {
+  Tag: Tag
   answers: String
   price: Float!
   product: Product
@@ -125,6 +126,8 @@ type CartItem {
   sku: String!
   slots: [BookingTime!]
   tagId: String
+  title: String
+  title_ar: String
 }
 
 input CartItemInput {
@@ -939,8 +942,7 @@ type VariableType {
 type Variant {
   default: Boolean
   image: String
-  images: [String!]
-  price: Int!
+  price: Float!
   quantity: Int!
   sku: String!
   title: String!
@@ -950,7 +952,6 @@ type Variant {
 input VariantInput {
   default: Boolean
   image: String
-  images: [String!]
   price: Float!
   sku: String!
   title: String!
