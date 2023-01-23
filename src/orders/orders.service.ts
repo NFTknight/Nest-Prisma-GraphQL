@@ -34,15 +34,41 @@ export class OrdersService {
     private readonly productsService: ProductsService
   ) {}
 
-  async getOrder(id: string): Promise<Order> {
+  async getOrder(id: string) {
     if (!id) return null;
     const order = await this.prisma.order.findUnique({
       where: { id },
     });
-
     throwNotFoundException(order, 'Order');
 
-    return order;
+    const updatedItems = [];
+
+    for (const item of order.items) {
+      let Tag = null;
+
+      if (item?.tagId) {
+        Tag = await this.prisma.tag.findUnique({
+          where: { id: item.tagId },
+        });
+      }
+
+      const product = await this.prisma.product.findUnique({
+        where: { id: item.productId },
+      });
+
+      const variant = product.variants.find(
+        (variant) => variant.sku === item.sku
+      );
+
+      updatedItems.push({
+        ...item,
+        Tag,
+        title: variant?.title || '',
+        title_ar: variant?.title_ar || '',
+      });
+    }
+
+    return { ...order, items: updatedItems };
   }
 
   async getOrders(
