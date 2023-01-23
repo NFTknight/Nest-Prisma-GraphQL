@@ -1,4 +1,5 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { Product } from 'src/products/models/product.model';
 import { DeliveryMethodAnalytics } from './analytics.deliveryMethods.model';
 import { PaymentMethodAnalytics } from './analytics.paymentMethods';
 
@@ -12,4 +13,12 @@ export class Analytics {
 
   @Field(() => Int)
   numberOfOrders: number;
+}
+@ObjectType()
+export class RevenueProductAnalytics {
+  @Field(() => Product)
+  product: Product;
+
+  @Field(() => Float)
+  revenue: number;
 }
