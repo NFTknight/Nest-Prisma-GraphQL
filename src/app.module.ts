@@ -26,6 +26,7 @@ import { SendgridModule } from './sendgrid/sendgrid.module';
 import { StorageModule } from './storage/storage.module';
 import { FormsModule } from './forms/forms.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { AnalyticsModule } from './analytics/anyaltics.module';
 import { VendorSubscriptionService } from './common/cron/vendor-subscription-cron.service';
 import { WorkshopModule } from './workshops/workshops.module';
 
@@ -62,6 +63,7 @@ import { WorkshopModule } from './workshops/workshops.module';
     StorageModule,
     FormsModule,
     ReviewsModule,
+    AnalyticsModule,
     WorkshopModule,
   ],
   controllers: [HealthController],
