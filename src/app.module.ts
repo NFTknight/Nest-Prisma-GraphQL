@@ -25,6 +25,7 @@ import { SendgridModule } from './sendgrid/sendgrid.module';
 import { StorageModule } from './storage/storage.module';
 import { FormsModule } from './forms/forms.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { WorkshopModule } from './workshops/workshops.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     StorageModule,
     FormsModule,
     ReviewsModule,
+    WorkshopModule,
   ],
   controllers: [HealthController],
   providers: [SendgridService],

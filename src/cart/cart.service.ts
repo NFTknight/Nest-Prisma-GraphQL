@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
+import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
-import { CartItemInput } from './dto/cart.input';
+import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 import {
   BookingStatus,
   DeliveryMethods,
@@ -25,6 +25,9 @@ import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
 import { ShippingService } from 'src/shipping/shipping.service';
 import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
+import { SignupInput } from 'src/auth/dto/signup.input';
+import { PrismaClientValidationError } from '@prisma/client/runtime';
+import { WorkshopService } from 'src/workshops/workshops.service';
 import { getReadableDate } from 'src/utils/general';
 
 @Injectable()
@@ -34,6 +37,7 @@ export class CartService {
     private readonly cartItemService: CartItemService,
     private readonly vendorService: VendorsService,
     private readonly emailService: SendgridService,
+    private readonly workshopService: WorkshopService,
     private readonly shippingService: ShippingService,
     private readonly paymentService: PaymentService,
     private readonly productService: ProductsService
@@ -109,6 +113,15 @@ export class CartService {
             };
           }
         }
+        if (product.type === ProductType.WORKSHOP) {
+          const isWorkShopExists = await this.prisma.workshop.findFirst({
+            where: { productId: product.id, cartId: res.id },
+          });
+          if (!isWorkShopExists) {
+            cartItems.splice(i, 1);
+            shouldUpdateCart = true;
+          }
+        }
       }
       //this brings the deliveryCharges
       const deliveryCharges = res.totalPrice - res.subTotal;
@@ -124,10 +137,15 @@ export class CartService {
         subTotal: subTotal,
         totalPrice: subTotal + deliveryCharges,
       };
+
       if (!haveProductType) {
         updatedCartObject['totalPrice'] = subTotal;
-        updatedCartObject['deliveryMethod'] = null;
-        updatedCartObject['deliveryArea'] = null;
+        if (updatedCartObject['deliveryMethod']) {
+          updatedCartObject['deliveryMethod'] = null;
+        }
+        if (updatedCartObject['deliveryArea']) {
+          updatedCartObject['deliveryArea'] = null;
+        }
       }
 
       if (shouldUpdateCart || !haveProductType)
@@ -166,11 +184,11 @@ export class CartService {
       where: { id: data.productId },
     });
 
-    let cartData: Prisma.CartUpdateArgs['data'] = {};
+    let cartData = {};
 
     switch (product.type) {
       case ProductType.PRODUCT:
-        cartData = this.cartItemService.addProduct(product, cart, data);
+        cartData = await this.cartItemService.addProduct(product, cart, data);
         break;
 
       case ProductType.WORKSHOP:
@@ -206,6 +224,8 @@ export class CartService {
   ) {
     const cart = await this.getCart(cartId);
     throwNotFoundException(cart, 'Cart');
+
+    await this.prisma.workshop.deleteMany({ where: { productId, cartId } });
 
     const product = await this.productService.getProduct(productId);
     let items = [];
@@ -272,6 +292,34 @@ export class CartService {
       (acc, item) => acc + item.price * item.quantity,
       0
     );
+    const updatedCartItem: any = await Promise.all(
+      items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        if (product.type === ProductType.WORKSHOP) {
+          if (product.noOfSeats < data.quantity) {
+            throw new BadRequestException('Not enough seats available');
+          } else {
+            const workshop = await this.prisma.workshop.findFirst({
+              where: { productId: product.id, cartId: cartId },
+            });
+
+            if (workshop) {
+              await this.workshopService.updateWorkshop(workshop.id, {
+                quantity: data.quantity,
+              });
+            } else {
+              await this.workshopService.createWorkshop({
+                productId: product.id,
+                cartId,
+                quantity: item.quantity,
+              });
+            }
+          }
+        }
+
+        return { ...product, ...item };
+      })
+    );
 
     const updatedCart = this.prisma.cart.update({
       where: { id: cartId },
@@ -280,12 +328,7 @@ export class CartService {
         totalPrice,
       },
     });
-    const updatedCartItem: any = await Promise.all(
-      cart.items.map(async (item) => {
-        const product = await this.productService.getProduct(item.productId);
-        return { ...product, ...item };
-      })
-    );
+
     updatedCart.items = updatedCartItem;
 
     return updatedCart;

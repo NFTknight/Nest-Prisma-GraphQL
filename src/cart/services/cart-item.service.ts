@@ -6,6 +6,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
 import { getReadableDate } from 'src/utils/general';
 import { throwNotFoundException } from 'src/utils/validation';
+import { WorkshopService } from 'src/workshops/workshops.service';
 import { ProductsService } from '../../products/services/products.service';
 import { CartItemInput } from '../dto/cart.input';
 import { CartItem } from '../models/cart-item.model';
@@ -15,10 +16,11 @@ import { Cart } from '../models/cart.model';
 export class CartItemService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly workshopService: WorkshopService,
     private readonly productService: ProductsService
   ) {}
 
-  addProduct(product: Product, cart: Cart, item: CartItemInput) {
+  async addProduct(product: Product, cart: Cart, item: CartItemInput) {
     const { sku, quantity } = item;
 
     throwNotFoundException(cart, 'Cart');
@@ -51,9 +53,32 @@ export class CartItemService {
         throw new BadRequestException(
           `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
         );
+      } else {
+        if (product.type === ProductType.PRODUCT)
+          newCart.items[existingProductIndex].quantity += quantity;
       }
 
-      newCart.items[existingProductIndex].quantity += quantity;
+      if (product.type === ProductType.WORKSHOP) {
+        const workshopBooking = await this.prisma.workshop.findFirst({
+          where: {
+            productId: product.id,
+            cartId: cart.id,
+          },
+        });
+        if (!!workshopBooking) {
+          this.workshopService.updateWorkshop(workshopBooking.id, {
+            quantity: newCart.items[existingProductIndex].quantity + quantity,
+          });
+          newCart.items[existingProductIndex].quantity += quantity;
+        } else {
+          await this.workshopService.createWorkshop({
+            productId: product.id,
+            cartId: cart.id,
+            quantity: quantity,
+          });
+          newCart.items[existingProductIndex].quantity = quantity;
+        }
+      }
     } else {
       if (
         product.type === ProductType.PRODUCT &&
@@ -67,6 +92,11 @@ export class CartItemService {
       newCart.items.push({
         ...item,
         price: productVariant.price,
+      });
+      await this.workshopService.createWorkshop({
+        productId: product.id,
+        cartId: cart.id,
+        quantity: quantity,
       });
     }
 
