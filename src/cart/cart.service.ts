@@ -255,7 +255,9 @@ export class CartService {
       );
     }
 
-    const totalPrice = items.reduce(
+    const deliveryCharges = cart.totalPrice - cart.subTotal;
+
+    const subTotal = items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
@@ -264,7 +266,8 @@ export class CartService {
       where: { id: cartId },
       data: {
         items,
-        totalPrice,
+        subTotal,
+        totalPrice: subTotal + deliveryCharges,
       },
     });
   }
@@ -288,7 +291,9 @@ export class CartService {
         : item
     );
 
-    const totalPrice = items.reduce(
+    const deliveryCharges = cart.totalPrice - cart.subTotal;
+
+    const subTotal = items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
@@ -325,7 +330,8 @@ export class CartService {
       where: { id: cartId },
       data: {
         items,
-        totalPrice,
+        subTotal,
+        totalPrice: subTotal + deliveryCharges,
       },
     });
 
