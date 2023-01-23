@@ -31,6 +31,8 @@ const config: Config = {
     token: process.env.SMSA_API_KEY as string,
   },
   payment: {
+    clientUrl: process.env.MYFATOORAH_CLIENT_URL as string,
+    currency: process.env.MYFATOORAH_CURRENCY as string,
     url: process.env.MYFATOORAH_API_URL as string,
     token: process.env.MYFATOORAH_API_TOKEN as string,
   },

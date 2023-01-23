@@ -45,6 +45,8 @@ export interface ShippingConfig {
 }
 
 export interface PaymentConfig {
+  currency: string;
+  clientUrl: string;
   url: string;
   token: string;
 }

@@ -70,6 +70,7 @@ type VendorInfo {
   address        String?
   phone          String?
   email          String?
+  city           String?
   addressUrl     String?
   description    String?
   description_ar String?
@@ -204,9 +205,10 @@ type VariantOption {
   default  Boolean?
   sku      String
   price    Float
-  quantity Float?   @default(1)
+  quantity Int?     @default(1)
   image    String?
-  images   String[]
+  // removing temporarily
+  // images   String[]
   title    String
   title_ar String
 }
@@ -250,7 +252,6 @@ model Product {
   minPreorderDays  Int?
   noOfSeats        Int?
   bookedSeats      Int?            @default(0)
-  itemsInStock     Int?
   variants         VariantOption[]
   sortOrder        Int             @default(0)
   attendanceType   AttendanceType?
@@ -341,7 +342,7 @@ model Order {
   cart   Cart?   @relation(fields: [cartId], references: [id])
 
   totalPrice    Float
-  subTotal      Float?
+  subTotal      Float?      @default(0)
   finalPrice    Float
   appliedCoupon String?
   items         CartItem[]
@@ -355,7 +356,7 @@ model Order {
   vendorId String? @db.ObjectId
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
-  wayBill  WayBill?
+  wayBill WayBill?
 
   invoiceId String?
 
@@ -414,17 +415,26 @@ model Booking {
   cartId        String?       @db.ObjectId
   cart          Cart?         @relation(fields: [cartId], references: [id], onDelete: SetNull)
   orderId       String?       @db.ObjectId
-  productId     String?        @db.ObjectId
-  product       Product?       @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId     String?       @db.ObjectId
+  product       Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   vendorId      String        @db.ObjectId
   vendor        Vendor        @relation(fields: vendorId, references: id)
   tagId         String        @db.ObjectId
   tag           Tag           @relation(fields: [tagId], references: [id])
   status        BookingStatus
   slots         BookingTime[]
-  holdTimestamp DateTime?     
+  holdTimestamp DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+}
+
+model Workshop {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  cartId    String?  @db.ObjectId
+  productId String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  quantity  Int?     @default(1)
 }
 
 model Form {

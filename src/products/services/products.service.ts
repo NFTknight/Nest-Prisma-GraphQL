@@ -1,10 +1,12 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Product, Prisma, AttendanceType, CartItem } from '@prisma/client';
+import {
+  Product,
+  Prisma,
+  AttendanceType,
+  CartItem,
+  ProductType,
+} from '@prisma/client';
 import {
   CreateProductValidator,
   throwNotFoundException,
@@ -77,6 +79,21 @@ export class ProductsService {
         return product;
       });
 
+      for (const [i, item] of list.entries()) {
+        const quantity = await this.prisma.workshop.aggregate({
+          where: {
+            productId: item.id,
+          },
+          _sum: {
+            quantity: true,
+          },
+        });
+
+        if (quantity?._sum?.quantity) {
+          list[i].bookedSeats += quantity?._sum?.quantity;
+        }
+      }
+
       const totalCount = await this.prisma.product.count({ where });
 
       return {
@@ -110,6 +127,20 @@ export class ProductsService {
         orderBy,
       });
 
+      for (const [i, item] of list.entries()) {
+        const quantity = await this.prisma.workshop.aggregate({
+          _sum: {
+            quantity: true,
+          },
+          where: {
+            productId: item.id,
+          },
+        });
+
+        if (quantity?._sum?.quantity) {
+          list[i].bookedSeats += quantity?._sum?.quantity;
+        }
+      }
       const totalCount = await this.prisma.product.count();
 
       return {
@@ -134,6 +165,19 @@ export class ProductsService {
       if (product.badge)
         product.badge = { ...product.badge, label: AttendanceType.PHYSICAL };
       else product.badge = { label: AttendanceType.PHYSICAL };
+    }
+
+    const quantity = await this.prisma.workshop.aggregate({
+      _sum: {
+        quantity: true,
+      },
+      where: {
+        productId: product.id,
+      },
+    });
+
+    if (quantity?._sum?.quantity) {
+      product.bookedSeats += quantity?._sum?.quantity;
     }
 
     return product;
@@ -242,26 +286,28 @@ export class ProductsService {
     return await this.prisma.product.delete({ where: { id } });
   }
 
-  async updateProductVariantQuantities(data: CartItem[]): Promise<boolean> {
+  async decrementProductVariantQuantities(data: CartItem[]): Promise<boolean> {
     return Promise.all(
       data.map(async ({ productId, sku, quantity }): Promise<boolean> => {
         const product = await this.getProduct(productId);
-        const variants = product.variants.map((item) => {
-          if (item.sku === sku) {
-            if (item.quantity < quantity) {
-              throw new BadRequestException(
-                'Product Order quantity cannot be more than Product available quantity'
-              );
+        if (product.type === ProductType.PRODUCT) {
+          const variants = product.variants.map((item) => {
+            if (item.sku === sku) {
+              if (item.quantity < quantity) {
+                throw new BadRequestException(
+                  'Product Order quantity cannot be more than Product available quantity'
+                );
+              }
+              return { ...item, quantity: item.quantity - quantity };
             }
-            return { ...item, quantity: item.quantity - quantity };
-          }
 
-          return item;
-        });
-        return !!(await this.prisma.product.update({
-          where: { id: productId },
-          data: { variants },
-        }));
+            return item;
+          });
+          return !!(await this.prisma.product.update({
+            where: { id: productId },
+            data: { variants },
+          }));
+        }
       })
     ).then((data) => {
       return data.every((item) => item === true);

@@ -34,4 +34,6 @@ storage:
 
 myfatoorah:
   endpoint: https://apitest.myfatoorah.com
+  clienturl: https://anyaa.store
+  currency: KWD
   
