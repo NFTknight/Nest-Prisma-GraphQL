@@ -122,6 +122,7 @@ input CartAddressInput {
 }
 
 type CartItem {
+  Tag: Tag
   answers: String
   price: Float!
   product: Product
@@ -130,6 +131,8 @@ type CartItem {
   sku: String!
   slots: [BookingTime!]
   tagId: String
+  title: String
+  title_ar: String
 }
 
 input CartItemInput {
@@ -261,7 +264,6 @@ input CreateProductInput {
   formId: String
   image: String!
   images: [String!]
-  itemsInStock: Int
   location: LocationInput
   meetingLink: String
   minPreorderDays: Int
@@ -436,7 +438,7 @@ type Mutation {
   login(data: LoginInput!): Auth!
   phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
-  removeCartItem(cartId: String!, productId: String!, sku: String!): Cart!
+  removeCartItem(cartId: String!, date: String, productId: String!, sku: String!): Cart!
   resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
@@ -645,7 +647,6 @@ type Product {
   id: ID!
   image: String!
   images: [String!]
-  itemsInStock: Int
   location: Location
   meetingLink: String
   minPreorderDays: Int
@@ -845,7 +846,6 @@ input UpdateProductInput {
   formId: String
   image: String
   images: [String!]
-  itemsInStock: Int
   location: LocationInput
   meetingLink: String
   minPreorderDays: Int
@@ -958,8 +958,7 @@ type VariableType {
 type Variant {
   default: Boolean
   image: String
-  images: [String!]
-  price: Int!
+  price: Float!
   quantity: Int!
   sku: String!
   title: String!
@@ -969,7 +968,6 @@ type Variant {
 input VariantInput {
   default: Boolean
   image: String
-  images: [String!]
   price: Float!
   sku: String!
   title: String!
