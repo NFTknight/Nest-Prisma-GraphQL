@@ -5,6 +5,7 @@ import { VendorInfo } from './vendor-info.model';
 import { VendorSettings } from './vendor-settings.model';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Vendor as PrismaVendor } from '@prisma/client';
+import { VendorSubscription } from './vendor-subscription.model';
 
 @ObjectType()
 export class Vendor extends BaseModel implements PrismaVendor {
@@ -43,6 +44,9 @@ export class Vendor extends BaseModel implements PrismaVendor {
 
   @Field(() => User)
   owner?: User;
+
+  @Field(() => VendorSubscription, { nullable: true })
+  subscription: VendorSubscription;
 }
 
 @ObjectType()

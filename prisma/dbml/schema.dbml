@@ -39,6 +39,7 @@ Table Vendor {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   cart Cart [not null]
+  subscription VendorSubscription
 }
 
 Table Tag {
@@ -199,6 +200,15 @@ Table Booking {
   updatedAt DateTime [not null]
 }
 
+Table Workshop {
+  id String [pk]
+  cartId String
+  productId String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  quantity Int [default: 1]
+}
+
 Table Form {
   id String [pk]
   content String [not null]
@@ -265,6 +275,17 @@ Enum BookingStatus {
   PENDING
   CONFIRMED
   REJECTED
+}
+
+Enum SubscriptionPlan {
+  BASIC
+  BASIC_LITE
+  FREE_LIFE
+}
+
+Enum SubscriptionType {
+  MONTHLY
+  YEARLY
 }
 
 Ref: Vendor.ownerId - User.id
