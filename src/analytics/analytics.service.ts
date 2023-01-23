@@ -78,4 +78,31 @@ export class AnalyticsService {
     });
     return numberOfDroppedBaskets;
   }
+  async getRevenueAndTopProduct(vendorId: string) {
+    const revenue = await this.prisma.order.aggregate({
+      _sum: {
+        totalPrice: true,
+      },
+      where: { vendorId },
+    });
+    try {
+      const mostSellingProduct = await this.prisma.order.aggregateRaw({
+        pipeline: [
+          { $unwind: '$items' },
+          { $match: { vendorId: { $eq: { $oid: vendorId } } } },
+          { $sortByCount: '$items.productId' },
+          { $limit: 1 },
+        ],
+      });
+      const id = mostSellingProduct[0]?.['_id']?.['$oid'];
+      const product = await this.prisma.product.findUnique({ where: { id } });
+
+      return {
+        revenue: revenue._sum.totalPrice,
+        product,
+      };
+    } catch (err) {
+      throw new Error(`Error: ${err?.message || ''}`);
+    }
+  }
 }

@@ -802,6 +802,14 @@ type Query {
     sortOrder: SortOrder
     vendorId: String!
   ): PaginatedProducts!
+  getRevenueAndTopProduct(vendorId: String!): RevenueProductAnalytics!
+  getProducts(
+    categoryId: String
+    filter: ProductFilterInput
+    pagination: PaginationArgs
+    sortOrder: SortOrder
+    vendorId: String!
+  ): PaginatedProducts!
   getRefundPaymentStatus(invoiceId: String!): RefundPaymentAPIResponse!
   getReviews: [Review!]!
   getReviewsByProductId(id: String!): [Review!]!
@@ -857,6 +865,11 @@ type RefundPaymentStatusRes {
 input ResetPwtInput {
   password: String!
   token: JWT!
+}
+
+type RevenueProductAnalytics {
+  product: Product!
+  revenue: Float!
 }
 
 type Review {
