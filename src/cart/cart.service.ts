@@ -132,14 +132,18 @@ export class CartService {
         (acc, item) => acc + item.price * item.quantity,
         0
       );
-      let finalPrice = subTotal;
+      let finalPrice = 0;
       if (res.appliedCoupon) {
         const coupon = await this.prisma.coupon.findFirst({
-          where: { id: res.appliedCoupon },
+          where: { code: res.appliedCoupon },
         });
         if (coupon) {
           finalPrice = subTotal - (subTotal * coupon.discount) / 100;
+        } else {
+          finalPrice = subTotal;
         }
+      } else {
+        finalPrice = subTotal;
       }
 
       const updatedCartObject = {
@@ -158,11 +162,15 @@ export class CartService {
       }
 
       if (shouldUpdateCart || !haveProductType)
-        await this.updateCart(res.id, updatedCartObject);
+        await this.prisma.cart.update({
+          where: { id: res.id },
+          data: updatedCartObject,
+        });
 
       return {
         ...res,
         totalPrice: updatedCartObject.totalPrice,
+        finalPrice: updatedCartObject.finalPrice,
         subTotal: updatedCartObject.subTotal,
         items: cartItems,
       };
@@ -269,8 +277,8 @@ export class CartService {
 
     let finalPrice = subTotal;
     if (cart.appliedCoupon) {
-      const coupon = await this.prisma.coupon.findUnique({
-        where: { id: cart.appliedCoupon },
+      const coupon = await this.prisma.coupon.findFirst({
+        where: { code: cart.appliedCoupon },
       });
       if (coupon) {
         finalPrice = subTotal - (subTotal * coupon.discount) / 100;
@@ -313,8 +321,8 @@ export class CartService {
     );
     let finalPrice = subTotal;
     if (cart.appliedCoupon) {
-      const coupon = await this.prisma.coupon.findUnique({
-        where: { id: cart.appliedCoupon },
+      const coupon = await this.prisma.coupon.findFirst({
+        where: { code: cart.appliedCoupon },
       });
       if (coupon) {
         finalPrice = subTotal - (subTotal * coupon.discount) / 100;
@@ -420,6 +428,7 @@ export class CartService {
           subTotal: cart.subTotal,
           finalPrice: cart.finalPrice || cart.subTotal,
           totalPrice: cart.totalPrice,
+          deliveryCharges: cart?.deliveryCharges || 0,
           status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],
           ...(cart.deliveryMethod && {
             deliveryMethod: cart.deliveryMethod,

@@ -121,8 +121,8 @@ export class CartItemService {
     if (!newCart.appliedCoupon) {
       newCart.finalPrice = newCart.subTotal;
     } else {
-      const coupon = await this.prisma.coupon.findUnique({
-        where: { id: newCart.appliedCoupon },
+      const coupon = await this.prisma.coupon.findFirst({
+        where: { code: newCart.appliedCoupon },
       });
 
       if (coupon) {

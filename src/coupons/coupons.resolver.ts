@@ -69,8 +69,8 @@ export class CouponsResolver {
       where: { id: cartId },
     });
 
-    const coupon = await this.prismaService.coupon.findUnique({
-      where: { id: id },
+    const coupon = await this.prismaService.coupon.findFirst({
+      where: { code: id },
     });
 
     const vendor = await this.prismaService.vendor.findUnique({
@@ -108,8 +108,8 @@ export class CouponsResolver {
       where: { id: cartId },
     });
 
-    const coupon = await this.prismaService.coupon.findUnique({
-      where: { id: id },
+    const coupon = await this.prismaService.coupon.findFirst({
+      where: { code: id },
     });
 
     throwNotFoundException(cart, 'Cart');

@@ -463,6 +463,7 @@ type Order {
   createdAt: DateTime!
   customerId: String
   customerInfo: CustomerInfo
+  deliveryCharges: Float!
   deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
@@ -500,6 +501,7 @@ type OrderPayment {
   createdAt: DateTime!
   customerId: String
   customerInfo: CustomerInfo
+  deliveryCharges: Float!
   deliveryMethod: DeliveryMethods
   errors: [ExecutePaymentError!]
   finalPrice: Float!

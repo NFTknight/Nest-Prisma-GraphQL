@@ -152,6 +152,7 @@ Table Order {
   cartId String
   cart Cart
   totalPrice Float [not null]
+  deliveryCharges Float [default: 0]
   subTotal Float [default: 0]
   finalPrice Float [not null]
   appliedCoupon String
