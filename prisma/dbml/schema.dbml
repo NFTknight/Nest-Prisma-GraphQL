@@ -278,12 +278,14 @@ Enum BookingStatus {
 }
 
 Enum SubscriptionPlan {
+  FREE_TRIAL
   BASIC
   BASIC_LITE
   FREE_LIFE
 }
 
 Enum SubscriptionType {
+  WEEKLY
   MONTHLY
   YEARLY
 }

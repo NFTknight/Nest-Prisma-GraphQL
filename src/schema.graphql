@@ -828,11 +828,13 @@ enum SubscriptionPlan {
   BASIC
   BASIC_LITE
   FREE_LIFE
+  FREE_TRIAL
 }
 
 """Subscription Type"""
 enum SubscriptionType {
   MONTHLY
+  WEEKLY
   YEARLY
 }
 
