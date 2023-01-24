@@ -293,12 +293,16 @@ export class ProductsService {
         if (product.type === ProductType.PRODUCT) {
           const variants = product.variants.map((item) => {
             if (item.sku === sku) {
-              if (item.quantity < quantity) {
+              if (item.quantity !== null && item.quantity < quantity) {
                 throw new BadRequestException(
                   'Product Order quantity cannot be more than Product available quantity'
                 );
               }
-              return { ...item, quantity: item.quantity - quantity };
+              return {
+                ...item,
+                quantity:
+                  item.quantity === null ? null : item.quantity - quantity,
+              };
             }
 
             return item;

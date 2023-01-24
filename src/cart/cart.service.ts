@@ -540,7 +540,7 @@ export class CartService {
           (variant) => variant.sku === item.sku
         );
         if (
-          !productVariant?.quantity ||
+          productVariant.quantity !== null &&
           productVariant.quantity < item.quantity
         ) {
           cartErrors.push({

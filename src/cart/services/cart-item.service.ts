@@ -82,6 +82,7 @@ export class CartItemService {
     } else {
       if (
         product.type === ProductType.PRODUCT &&
+        productVariant.quantity !== null &&
         productVariant.quantity < quantity
       ) {
         throw new BadRequestException(
