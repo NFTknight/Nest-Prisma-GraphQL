@@ -449,12 +449,14 @@ model Form {
 }
 
 enum SubscriptionPlan {
+  FREE_TRIAL
   BASIC
   BASIC_LITE
   FREE_LIFE
 }
 
 enum SubscriptionType {
+  WEEKLY
   MONTHLY
   YEARLY
 }
