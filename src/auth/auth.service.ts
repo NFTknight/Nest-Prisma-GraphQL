@@ -18,6 +18,7 @@ import { SecurityConfig } from 'src/common/configs/config.interface';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
 import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { ResetPwtInput } from './dto/reset-pwd.input';
+import { throwNotFoundException } from 'src/utils/validation';
 
 @Injectable()
 export class AuthService {
@@ -69,7 +70,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException(`No user found for email: ${email}`);
+      throwNotFoundException(user, '', `No user found for email: ${email}`);
     }
 
     const passwordValid = await this.passwordService.validatePassword(

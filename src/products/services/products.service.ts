@@ -294,11 +294,7 @@ export class ProductsService {
         if (product.type === ProductType.PRODUCT) {
           const variants = product.variants.map((item) => {
             if (item.sku === sku) {
-              const isQuantityGood = checkIfQuantityIsGood(
-                quantity,
-                item.quantity
-              );
-              if (!isQuantityGood) {
+              if (!checkIfQuantityIsGood(quantity, item.quantity)) {
                 throw new BadRequestException(
                   'Product Order quantity cannot be more than Product available quantity'
                 );

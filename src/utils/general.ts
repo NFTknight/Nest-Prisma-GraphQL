@@ -38,11 +38,8 @@ export const checkIfQuantityIsGood = (
   requiredQuantity: number,
   availableQuantity?: number | null
 ) => {
-  if (
-    typeof availableQuantity === 'number' &&
-    availableQuantity < requiredQuantity
-  ) {
-    return false;
-  }
-  return true;
+  return (
+    typeof availableQuantity !== 'number' ||
+    availableQuantity >= requiredQuantity
+  );
 };
