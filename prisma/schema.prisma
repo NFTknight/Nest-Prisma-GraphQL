@@ -56,9 +56,9 @@ model Vendor {
   ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  cart      Cart[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  cart         Cart[]
   subscription VendorSubscription?
 }
 
@@ -206,7 +206,7 @@ type VariantOption {
   default  Boolean?
   sku      String
   price    Float
-  quantity Int?     @default(1)
+  quantity Int?
   image    String?
   // removing temporarily
   // images   String[]
@@ -462,21 +462,21 @@ enum SubscriptionType {
 }
 
 type VendorSubscription {
-  createdAt DateTime  @default(now())
-  type SubscriptionType
-  plan SubscriptionPlan
-  price Float
-  freeTimeLeft Int @default(7)
-  addOns AddOnsList?
+  createdAt    DateTime         @default(now())
+  type         SubscriptionType
+  plan         SubscriptionPlan
+  price        Float
+  freeTimeLeft Int              @default(7)
+  addOns       AddOnsList?
 }
 
 type AddOn {
   feature String
-  price Float
+  price   Float
 }
 
 type AddOnsList {
-  list          AddOn[]
-  totalMonthly  Float
-  totalYearly   Float
+  list         AddOn[]
+  totalMonthly Float
+  totalYearly  Float
 }

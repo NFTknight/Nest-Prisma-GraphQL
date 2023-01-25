@@ -33,3 +33,13 @@ export const getReadableDate = (dateString: string) => {
 
   return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 };
+
+export const checkIfQuantityIsGood = (
+  requiredQuantity: number,
+  availableQuantity?: number | null
+) => {
+  return (
+    typeof availableQuantity !== 'number' ||
+    availableQuantity >= requiredQuantity
+  );
+};

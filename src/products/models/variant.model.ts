@@ -1,4 +1,4 @@
-import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { VariantOption } from '@prisma/client';
 
 @ObjectType()
@@ -18,7 +18,7 @@ export class Variant implements VariantOption {
   @Field(() => Float)
   price: number;
 
-  @Field({ defaultValue: 1 })
+  @Field(() => Int, { nullable: true })
   quantity: number;
 
   @Field(() => String, { nullable: true })
