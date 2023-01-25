@@ -1,8 +1,4 @@
-import {
-  applyDecorators,
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
@@ -141,7 +137,6 @@ export class CartService {
         deliveryCharges = 30;
       }
 
-      //this is to make sure subTotal is correct
       const subTotal = cartItems.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0
