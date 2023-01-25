@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  applyDecorators,
+  BadRequestException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
@@ -143,13 +147,15 @@ export class CartService {
         0
       );
       let finalPrice = 0;
+      let appliedCoupon = res.appliedCoupon;
       if (res.appliedCoupon) {
         const coupon = await this.prisma.coupon.findFirst({
-          where: { code: res.appliedCoupon },
+          where: { code: res.appliedCoupon, active: true },
         });
         if (coupon) {
           finalPrice = subTotal - (subTotal * coupon.discount) / 100;
         } else {
+          appliedCoupon = '';
           finalPrice = subTotal;
         }
       } else {
@@ -159,6 +165,7 @@ export class CartService {
       const updatedCartObject = {
         items: cartItems,
         subTotal,
+        appliedCoupon,
         finalPrice,
         totalPrice: finalPrice + deliveryCharges,
         deliveryCharges,
@@ -175,7 +182,11 @@ export class CartService {
         }
       }
 
-      if (shouldUpdateCart || !haveProductType)
+      if (
+        appliedCoupon !== res.appliedCoupon ||
+        shouldUpdateCart ||
+        !haveProductType
+      )
         await this.prisma.cart.update({
           where: { id: res.id },
           data: updatedCartObject,
@@ -183,6 +194,7 @@ export class CartService {
 
       return {
         ...res,
+        appliedCoupon,
         totalPrice: updatedCartObject.totalPrice,
         finalPrice: updatedCartObject.finalPrice,
         subTotal: updatedCartObject.subTotal,

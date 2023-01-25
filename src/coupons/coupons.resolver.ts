@@ -70,7 +70,7 @@ export class CouponsResolver {
     });
 
     const coupon = await this.prismaService.coupon.findFirst({
-      where: { code: id },
+      where: { code: id, active: true },
     });
 
     const vendor = await this.prismaService.vendor.findUnique({
