@@ -19,6 +19,7 @@ import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { ProductFilterInput } from 'src/common/filter/filter.input';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
+import { checkIfQuantityIsGood } from 'src/utils/general';
 
 @Injectable()
 export class ProductsService {
@@ -293,7 +294,11 @@ export class ProductsService {
         if (product.type === ProductType.PRODUCT) {
           const variants = product.variants.map((item) => {
             if (item.sku === sku) {
-              if (item.quantity !== null && item.quantity < quantity) {
+              const isQuantityGood = checkIfQuantityIsGood(
+                quantity,
+                item.quantity
+              );
+              if (!isQuantityGood) {
                 throw new BadRequestException(
                   'Product Order quantity cannot be more than Product available quantity'
                 );

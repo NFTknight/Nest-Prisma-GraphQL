@@ -1,15 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaClientExceptionFilter, PrismaService } from 'nestjs-prisma';
+import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
-import { CartItemInput, CartUpdateInput } from './dto/cart.input';
+import { CartItemInput } from './dto/cart.input';
 import {
   BookingStatus,
   DeliveryMethods,
   Order,
   OrderStatus,
   PaymentMethods,
-  Prisma,
   ProductType,
   Vendor,
   WayBill,
@@ -25,10 +24,8 @@ import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
 import { ShippingService } from 'src/shipping/shipping.service';
 import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
-import { SignupInput } from 'src/auth/dto/signup.input';
-import { PrismaClientValidationError } from '@prisma/client/runtime';
 import { WorkshopService } from 'src/workshops/workshops.service';
-import { getReadableDate } from 'src/utils/general';
+import { checkIfQuantityIsGood, getReadableDate } from 'src/utils/general';
 
 @Injectable()
 export class CartService {
@@ -539,10 +536,7 @@ export class CartService {
         const productVariant = product.variants.find(
           (variant) => variant.sku === item.sku
         );
-        if (
-          productVariant.quantity !== null &&
-          productVariant.quantity < item.quantity
-        ) {
+        if (!checkIfQuantityIsGood(item.quantity, productVariant.quantity)) {
           cartErrors.push({
             Name: 'ProductIssue',
             Error: 'ProductHaveLessQuantityAsCart',

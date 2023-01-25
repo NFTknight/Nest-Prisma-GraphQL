@@ -1,10 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BookingStatus, ProductType } from '@prisma/client';
-import * as dayjs from 'dayjs';
 import { findIndex } from 'lodash';
 import { PrismaService } from 'nestjs-prisma';
 import { Product } from 'src/products/models/product.model';
-import { getReadableDate } from 'src/utils/general';
+import { checkIfQuantityIsGood, getReadableDate } from 'src/utils/general';
 import { throwNotFoundException } from 'src/utils/validation';
 import { WorkshopService } from 'src/workshops/workshops.service';
 import { ProductsService } from '../../products/services/products.service';
@@ -47,8 +46,10 @@ export class CartItemService {
       if (
         //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
         product.type === ProductType.PRODUCT &&
-        productVariant.quantity !== null &&
-        productVariant.quantity < newCart.items[existingProductIndex].quantity
+        !checkIfQuantityIsGood(
+          newCart.items[existingProductIndex].quantity,
+          productVariant.quantity
+        )
       ) {
         throw new BadRequestException(
           `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
@@ -82,8 +83,7 @@ export class CartItemService {
     } else {
       if (
         product.type === ProductType.PRODUCT &&
-        productVariant.quantity !== null &&
-        productVariant.quantity < quantity
+        !checkIfQuantityIsGood(quantity, productVariant.quantity)
       ) {
         throw new BadRequestException(
           `You can't add more than ${productVariant.quantity} no of products in your cart.`

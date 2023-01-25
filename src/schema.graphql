@@ -1031,7 +1031,7 @@ type Variant {
   default: Boolean
   image: String
   price: Float!
-  quantity: Int!
+  quantity: Int
   sku: String!
   title: String!
   title_ar: String!
