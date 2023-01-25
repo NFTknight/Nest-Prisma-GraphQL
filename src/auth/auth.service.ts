@@ -69,9 +69,7 @@ export class AuthService {
       },
     });
 
-    if (!user) {
-      throwNotFoundException(user, '', `No user found for email: ${email}`);
-    }
+    throwNotFoundException(user, '', `No user found for email: ${email}`);
 
     const passwordValid = await this.passwordService.validatePassword(
       password,
