@@ -110,7 +110,10 @@ export class CartUpdateInput {
   @Field(() => String, { nullable: true })
   deliveryArea?: string;
 
+  @Field(() => Float, { nullable: true })
   subTotal?: number;
+
+  @Field(() => Float, { nullable: true })
   totalPrice?: number;
   finalPrice?: number;
   deliveryCharges?: number;

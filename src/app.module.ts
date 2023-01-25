@@ -2,6 +2,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'nestjs-prisma';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import config from 'src/common/configs/config';
@@ -25,9 +26,13 @@ import { SendgridModule } from './sendgrid/sendgrid.module';
 import { StorageModule } from './storage/storage.module';
 import { FormsModule } from './forms/forms.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { AnalyticsModule } from './analytics/anyaltics.module';
+import { VendorSubscriptionService } from './common/cron/vendor-subscription-cron.service';
+import { WorkshopModule } from './workshops/workshops.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true, load: [config] }),
     PrismaModule.forRoot({
       isGlobal: true,
@@ -58,8 +63,10 @@ import { ReviewsModule } from './reviews/reviews.module';
     StorageModule,
     FormsModule,
     ReviewsModule,
+    AnalyticsModule,
+    WorkshopModule,
   ],
   controllers: [HealthController],
-  providers: [SendgridService],
+  providers: [SendgridService, VendorSubscriptionService],
 })
 export class AppModule {}

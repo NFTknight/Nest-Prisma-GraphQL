@@ -5,9 +5,14 @@ import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { firstValueFrom, map } from 'rxjs';
 import { PaymentConfig } from 'src/common/configs/config.interface';
+import { VendorsService } from 'src/vendors/vendors.service';
 import { throwNotFoundException } from 'src/utils/validation';
 import { ExecutePaymentApiRequest } from './dto/execute-payment.dto';
 import { PaymentStatusApiRequest } from './dto/payment-status.dto';
+import {
+  RefundPaymentApiRequest,
+  SupplierRefundPaymentApiRequest,
+} from './dto/refund-payment.dto';
 import { PaymentSession } from './models/payment-session.model';
 
 const OrderInvoiceStatus = {
@@ -23,7 +28,8 @@ export class PaymentService {
   constructor(
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly vendorService: VendorsService
   ) {
     this.paymentConfig = this.config.get<PaymentConfig>('payment');
   }
@@ -56,8 +62,6 @@ export class PaymentService {
     });
 
     throwNotFoundException(order, 'Order');
-    // TODO callback url should be dynamic
-    // TODO DisplayCurrencyIso should be dynamic
     const data: ExecutePaymentApiRequest = {
       SessionId: sessionId,
       InvoiceValue: order.finalPrice || order.subTotal,
@@ -101,24 +105,20 @@ export class PaymentService {
       KeyType: 'invoiceid',
     };
 
-    const res = await firstValueFrom(
+    const response = await firstValueFrom(
       this.httpService
         .post(url, data, {
           headers: {
             Authorization: `Bearer ${this.paymentConfig.token}`,
           },
         })
-        .pipe(
-          map((res) => {
-            return res.data.Data;
-          })
-        )
+        .pipe(map((res) => res.data.Data))
     );
     let orderStatus = order.status;
-    if (res?.InvoiceStatus !== OrderInvoiceStatus.PENDING) {
+    if (response?.InvoiceStatus !== OrderInvoiceStatus.PENDING) {
       try {
         orderStatus =
-          res?.InvoiceStatus === OrderInvoiceStatus.PAID
+          response?.InvoiceStatus === OrderInvoiceStatus.PAID
             ? OrderStatus.PENDING
             : OrderStatus.FAILED;
 
@@ -133,7 +133,128 @@ export class PaymentService {
 
     return {
       orderStatus,
-      paymentStatus: res?.InvoiceStatus,
+      paymentStatus: response?.InvoiceStatus,
+    };
+  }
+
+  async refundPayment(orderId: string) {
+    const url = `${this.paymentConfig.url}/v2/MakeRefund`;
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order Not Found.');
+
+    const data: RefundPaymentApiRequest = {
+      Key: order.invoiceId,
+      KeyType: 'invoiceid',
+      RefundChargeOnCustomer: true,
+      ServiceChargeOnCustomer: true,
+      Amount: order.finalPrice,
+      Comment: `${order.invoiceId}`, // For reference, this key will return with response.
+      AmountDeductedFromSupplier: 0,
+    };
+
+    let responseData = {};
+    let errors = undefined;
+    try {
+      responseData = await firstValueFrom(
+        this.httpService
+          .post(url, data, {
+            headers: {
+              Authorization: `Bearer ${this.paymentConfig.token}`,
+            },
+          })
+          .pipe(map((res) => res.data?.Data))
+      );
+    } catch (error) {
+      errors = error.response.data.ValidationErrors;
+    }
+    return {
+      responseData,
+      errors,
+    };
+  }
+
+  async supplierRefundPayment(orderId: string) {
+    const url = `${this.paymentConfig.url}/v2/MakeSupplierRefund`;
+
+    // Todo [QASIM]: Need to use orderService but for now skipping because of circular dependencies issue
+    // [NOTE]: forwardRef is not working in this case
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order Not Found.');
+
+    const vendor = await this.vendorService.getVendor(order.vendorId);
+
+    const data: SupplierRefundPaymentApiRequest = {
+      Key: order.invoiceId,
+      KeyType: 'invoiceid',
+      VendorDeductAmount: order.finalPrice,
+      Comment: `${order.invoiceId}`, // For reference, this key will return with response.
+      Suppliers: [
+        {
+          SupplierCode: vendor?.MF_vendorCode,
+          SupplierDeductedAmount: 0,
+        },
+      ],
+    };
+
+    let responseData = {};
+    let errors = undefined;
+    try {
+      responseData = await firstValueFrom(
+        this.httpService
+          .post(url, data, {
+            headers: {
+              Authorization: `Bearer ${this.paymentConfig.token}`,
+            },
+          })
+          .pipe(map((res) => res.data?.Data))
+      );
+    } catch (error) {
+      errors = error.response.data.ValidationErrors;
+    }
+    return {
+      responseData,
+      errors,
+    };
+  }
+
+  async checkRefundPaymentStatus(invoiceId: string) {
+    const url = `${this.paymentConfig.url}/v2/GetRefundStatus`;
+
+    const data: PaymentStatusApiRequest = {
+      Key: invoiceId,
+      KeyType: 'invoiceid',
+    };
+
+    let response = {};
+    let errors = undefined;
+    try {
+      response = await firstValueFrom(
+        this.httpService
+          .post(url, data, {
+            headers: {
+              Authorization: `Bearer ${this.paymentConfig.token}`,
+            },
+          })
+          .pipe(map((res) => res.data.Data))
+      );
+    } catch (error) {
+      errors = error.response.data.ValidationErrors;
+    }
+
+    return {
+      ...response,
+      errors,
     };
   }
 }

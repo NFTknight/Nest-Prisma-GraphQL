@@ -9,6 +9,28 @@ input AddDeliveryAreasInput {
   label_ar: String!
 }
 
+type AddOn {
+  feature: String!
+  price: Float!
+}
+
+type AddOnsList {
+  list: [AddOn!]!
+  totalMonthly: Float!
+  totalYearly: Float!
+}
+
+input AddSubscriptionInput {
+  plan: SubscriptionPlan!
+  type: SubscriptionType!
+}
+
+type Analytics {
+  deliveryMethods: DeliveryMethodAnalytics!
+  numberOfOrders: Int!
+  paymentMethods: PaymentMethodAnalytics!
+}
+
 """Attendance Type"""
 enum AttendanceType {
   ONLINE
@@ -150,8 +172,8 @@ input CartUpdateInput {
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
   shippingAddress: CartAddressInput
-  subTotal: Int
-  totalPrice: Int
+  subTotal: Float
+  totalPrice: Float
 }
 
 type Category {
@@ -297,6 +319,7 @@ input CreateVendorInput {
   name: String!
   name_ar: String
   slug: String!
+  subscription: AddSubscriptionInput
 }
 
 type CustomerInfo {
@@ -332,6 +355,12 @@ type DeliveryAreas {
   charge: Int!
   label: String!
   label_ar: String!
+}
+
+type DeliveryMethodAnalytics {
+  MANDOOB: Int!
+  PICKUP: Int!
+  SMSA: Int!
 }
 
 """Delivery Methods"""
@@ -430,11 +459,13 @@ type Mutation {
   login(data: LoginInput!): Auth!
   phoneLogin(data: PhoneLoginInput!): OtpResponse!
   refreshToken(token: JWT!): Token!
+  refundPayment(orderId: String!): RefundPaymentAPIResponse!
   removeCartItem(cartId: String!, date: String, productId: String!, sku: String!): Cart!
   removeCouponFromCart(cartId: String!, id: String!): Cart!
   resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
+  supplierRefundPayment(orderId: String!): RefundPaymentAPIResponse!
   updateBooking(data: UpdateBookingInput!, id: String!): Booking!
   updateCart(cartId: String!, data: CartUpdateInput!): Cart!
   updateCartItem(cartId: String!, data: CartItemInput!): Cart!
@@ -592,6 +623,13 @@ input PaginationArgs {
   pageSize: Int
 }
 
+type PaymentMethodAnalytics {
+  BANK_TRANSFER: Int!
+  CASH: Int!
+  ONLINE: Int!
+  STORE: Int!
+}
+
 """Payment Methods"""
 enum PaymentMethods {
   BANK_TRANSFER
@@ -669,9 +707,11 @@ enum ProductType {
 }
 
 type Query {
+  createWorkshop(cartId: String!, productId: String!, quantity: Int!): Workshop!
   getAllBookings(pagination: PaginationArgs, sortBooking: SortOrder): PaginatedBookings!
   getAllOrders(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getAllProducts(pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
+  getAnalytics(vendorId: String!): Analytics!
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
@@ -686,6 +726,8 @@ type Query {
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
+  getRefundPaymentStatus(invoiceId: String!): RefundPaymentAPIResponse!
+  getRevenueAndTopProduct(vendorId: String!): RevenueProductAnalytics!
   getReviews: [Review!]!
   getReviewsByProductId(id: String!): [Review!]!
   getTag(id: String!): Tag!
@@ -697,15 +739,46 @@ type Query {
   getVendorView(vendorId: String!): VendorView!
   getVendors(filter: VendorFilterInput): [Vendor!]!
   getVendorsView(pagination: PaginationArgs): VendorsView!
+  getWorkshop(id: String!): Workshop!
   isVendorSlugAvailable(slug: String!): Boolean!
   me: User!
+  numberOfDroppedBaskets(vendorId: String!): Int!
   shippingOffices(city: String): [ShippingOffice!]!
   trackShipment(trackingNumber: String!): WayBill!
+  updateWorkshop(data: UpdateWorkshopInput!, id: String!): Workshop!
+}
+
+type RefundPaymentAPIResponse {
+  errors: [ExecutePaymentError!]
+  responseData: RefundPaymentAPIResponseSuccess
+}
+
+type RefundPaymentAPIResponseSuccess {
+  Amount: String
+  Comment: String
+  Key: String
+  RefundId: Int
+  RefundReference: String
+  RefundStatusResult: [RefundPaymentStatusRes!]
+}
+
+type RefundPaymentStatusRes {
+  Amount: Int
+  InvoiceId: Int
+  RefundAmount: Int
+  RefundId: Int
+  RefundReference: String
+  RefundStatus: String
 }
 
 input ResetPwtInput {
   password: String!
   token: JWT!
+}
+
+type RevenueProductAnalytics {
+  product: Product!
+  revenue: Float!
 }
 
 type Review {
@@ -755,6 +828,21 @@ input SignupInput {
 input SortOrder {
   direction: OrderDirection!
   field: String!
+}
+
+"""Subscription Plan"""
+enum SubscriptionPlan {
+  BASIC
+  BASIC_LITE
+  FREE_LIFE
+  FREE_TRIAL
+}
+
+"""Subscription Type"""
+enum SubscriptionType {
+  MONTHLY
+  WEEKLY
+  YEARLY
 }
 
 type Tag {
@@ -905,12 +993,17 @@ input UpdateVendorInput {
   name: String
   name_ar: String
   settings: UpdateVendorSettingsInput
+  subscription: AddSubscriptionInput
 }
 
 input UpdateVendorSettingsInput {
   deliveryAreas: [AddDeliveryAreasInput!]
   deliveryMethods: [DeliveryMethods!]
   paymentMethods: [PaymentMethods!]
+}
+
+input UpdateWorkshopInput {
+  quantity: Int!
 }
 
 type User {
@@ -945,7 +1038,7 @@ type Variant {
   default: Boolean
   image: String
   price: Float!
-  quantity: Int!
+  quantity: Int
   sku: String!
   title: String!
   title_ar: String!
@@ -955,6 +1048,7 @@ input VariantInput {
   default: Boolean
   image: String
   price: Float!
+  quantity: Int
   sku: String!
   title: String!
   title_ar: String!
@@ -975,6 +1069,7 @@ type Vendor {
   ownerId: String!
   settings: VendorSettings
   slug: String!
+  subscription: VendorSubscription
 
   """Identifies the date and time when the object was last updated."""
   updatedAt: DateTime!
@@ -1020,6 +1115,15 @@ type VendorSettings {
   deliveryAreas: [DeliveryAreas!]!
   deliveryMethods: [DeliveryMethods!]!
   paymentMethods: [PaymentMethods!]!
+}
+
+type VendorSubscription {
+  addOns: AddOnsList
+  createdAt: DateTime!
+  freeTimeLeft: Int!
+  plan: SubscriptionPlan!
+  price: Float!
+  type: SubscriptionType!
 }
 
 type VendorView {
@@ -1071,4 +1175,17 @@ input WorkDayInput {
   day: Weekday!
   from: String!
   to: String!
+}
+
+type Workshop {
+  cartId: String
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  productId: String
+  quantity: Int!
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
 }

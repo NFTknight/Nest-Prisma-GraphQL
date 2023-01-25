@@ -9,7 +9,6 @@ import {
   Order,
   OrderStatus,
   PaymentMethods,
-  Prisma,
   ProductType,
   Vendor,
   WayBill,
@@ -25,7 +24,8 @@ import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
 import { ShippingService } from 'src/shipping/shipping.service';
 import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
-import { getReadableDate } from 'src/utils/general';
+import { WorkshopService } from 'src/workshops/workshops.service';
+import { checkIfQuantityIsGood, getReadableDate } from 'src/utils/general';
 
 @Injectable()
 export class CartService {
@@ -34,6 +34,7 @@ export class CartService {
     private readonly cartItemService: CartItemService,
     private readonly vendorService: VendorsService,
     private readonly emailService: SendgridService,
+    private readonly workshopService: WorkshopService,
     private readonly shippingService: ShippingService,
     private readonly paymentService: PaymentService,
     private readonly productService: ProductsService
@@ -109,6 +110,15 @@ export class CartService {
             };
           }
         }
+        if (product.type === ProductType.WORKSHOP) {
+          const isWorkShopExists = await this.prisma.workshop.findFirst({
+            where: { productId: product.id, cartId: res.id },
+          });
+          if (!isWorkShopExists) {
+            cartItems.splice(i, 1);
+            shouldUpdateCart = true;
+          }
+        }
       }
       //this brings the deliveryCharges
       // const deliveryCharges = res.totalPrice - res.subTotal;
@@ -157,8 +167,12 @@ export class CartService {
       if (!haveProductType) {
         updatedCartObject['deliveryCharges'] = 0;
         updatedCartObject['totalPrice'] = subTotal;
-        updatedCartObject['deliveryMethod'] = null;
-        updatedCartObject['deliveryArea'] = null;
+        if (updatedCartObject['deliveryMethod']) {
+          updatedCartObject['deliveryMethod'] = null;
+        }
+        if (updatedCartObject['deliveryArea']) {
+          updatedCartObject['deliveryArea'] = null;
+        }
       }
 
       if (shouldUpdateCart || !haveProductType)
@@ -201,7 +215,7 @@ export class CartService {
       where: { id: data.productId },
     });
 
-    let cartData: any = {};
+    let cartData = {};
 
     switch (product.type) {
       case ProductType.PRODUCT:
@@ -241,6 +255,8 @@ export class CartService {
   ) {
     const cart = await this.getCart(cartId);
     throwNotFoundException(cart, 'Cart');
+
+    await this.prisma.workshop.deleteMany({ where: { productId, cartId } });
 
     const product = await this.productService.getProduct(productId);
     let items = [];
@@ -551,10 +567,7 @@ export class CartService {
         const productVariant = product.variants.find(
           (variant) => variant.sku === item.sku
         );
-        if (
-          !productVariant?.quantity ||
-          productVariant.quantity < item.quantity
-        ) {
+        if (!checkIfQuantityIsGood(item.quantity, productVariant.quantity)) {
           cartErrors.push({
             Name: 'ProductIssue',
             Error: 'ProductHaveLessQuantityAsCart',

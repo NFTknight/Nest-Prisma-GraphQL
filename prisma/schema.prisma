@@ -56,9 +56,10 @@ model Vendor {
   ownerId String @unique @db.ObjectId
   owner   User?  @relation(fields: [ownerId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  cart      Cart[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  cart         Cart[]
+  subscription VendorSubscription?
 }
 
 type Certificate {
@@ -205,7 +206,7 @@ type VariantOption {
   default  Boolean?
   sku      String
   price    Float
-  quantity Int?     @default(1)
+  quantity Int?
   image    String?
   // removing temporarily
   // images   String[]
@@ -430,6 +431,15 @@ model Booking {
   updatedAt     DateTime      @updatedAt
 }
 
+model Workshop {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  cartId    String?  @db.ObjectId
+  productId String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  quantity  Int?     @default(1)
+}
+
 model Form {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String
@@ -438,4 +448,37 @@ model Form {
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+enum SubscriptionPlan {
+  FREE_TRIAL
+  BASIC
+  BASIC_LITE
+  FREE_LIFE
+}
+
+enum SubscriptionType {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+type VendorSubscription {
+  createdAt    DateTime         @default(now())
+  type         SubscriptionType
+  plan         SubscriptionPlan
+  price        Float
+  freeTimeLeft Int              @default(7)
+  addOns       AddOnsList?
+}
+
+type AddOn {
+  feature String
+  price   Float
+}
+
+type AddOnsList {
+  list         AddOn[]
+  totalMonthly Float
+  totalYearly  Float
 }
