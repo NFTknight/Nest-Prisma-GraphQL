@@ -215,6 +215,7 @@ export class CartItemService {
           await this.prisma.booking.update({
             where: { id: booking.id },
             data: {
+              holdTimestamp: new Date(),
               slots: {
                 push: item.slots,
               },
