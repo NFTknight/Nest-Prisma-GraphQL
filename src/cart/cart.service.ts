@@ -2,9 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
-import { CartItemInput } from './dto/cart.input';
+import { CartItemInput, CartUpdateInput } from './dto/cart.input';
 import {
   BookingStatus,
+  CartItem,
   DeliveryMethods,
   Order,
   OrderStatus,
@@ -69,7 +70,7 @@ export class CartService {
       });
       if (!res) return null;
 
-      const cartItems = [...res.items];
+      const cartItems: CartItem[] = [...res.items];
 
       let shouldUpdateCart = false;
       let haveProductType = false;
@@ -135,18 +136,17 @@ export class CartService {
         totalPrice: subTotal + deliveryCharges,
       };
 
-      if (!haveProductType) {
-        updatedCartObject['totalPrice'] = subTotal;
-        if (updatedCartObject['deliveryMethod']) {
-          updatedCartObject['deliveryMethod'] = null;
-        }
-        if (updatedCartObject['deliveryArea']) {
-          updatedCartObject['deliveryArea'] = null;
-        }
+      if (!haveProductType) updatedCartObject['totalPrice'] = subTotal;
+
+      // this is an extra check to ensure there is no deliveryArea or deliveryMethod selected if no cartItem is of type PRODUCT present
+      if (!haveProductType && (res.deliveryArea || res.deliveryMethod)) {
+        await this.prisma.cart.update({
+          where: { id: res.id },
+          data: { deliveryArea: null, deliveryMethod: null },
+        });
       }
 
-      if (shouldUpdateCart || !haveProductType)
-        await this.updateCart(res.id, updatedCartObject);
+      if (shouldUpdateCart) await this.updateCart(res.id, updatedCartObject);
 
       return {
         ...res,
