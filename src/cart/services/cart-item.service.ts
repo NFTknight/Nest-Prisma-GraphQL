@@ -181,18 +181,65 @@ export class CartItemService {
   ): Promise<Cart> {
     const newCart = this.addProduct(product, cart, item);
 
+    // this should not be required if already a booking is present  // needs to revisit this...
     // create booking
-    await this.prisma.booking.create({
-      data: {
+
+    const allExistingBookings = await this.prisma.booking.findMany({
+      where: {
         status: BookingStatus.HOLD,
-        slots: item.slots,
-        tag: { connect: { id: item.tagId } },
-        vendor: { connect: { id: product.vendorId } },
-        cart: { connect: { id: cart.id } },
-        product: { connect: { id: product.id } },
-        holdTimestamp: new Date(),
+        productId: product.id,
+        cartId: cart.id,
       },
     });
+    if (!allExistingBookings.length)
+      await this.prisma.booking.create({
+        data: {
+          status: BookingStatus.HOLD,
+          slots: item.slots,
+          tag: { connect: { id: item.tagId } },
+          vendor: { connect: { id: product.vendorId } },
+          cart: { connect: { id: cart.id } },
+          product: { connect: { id: product.id } },
+          holdTimestamp: new Date(),
+        },
+      });
+    else {
+      let slotFound = false;
+      // allExistingBookings.map(async (eachBooking) => {
+      for (const booking of allExistingBookings) {
+        if (
+          getReadableDate(booking.slots[0].from.toString()) ===
+          getReadableDate(item.slots[0].from.toString())
+        ) {
+          slotFound = true;
+          await this.prisma.booking.update({
+            where: { id: booking.id },
+            data: {
+              slots: {
+                push: item.slots,
+              },
+            },
+          });
+        }
+      }
+
+      if (!slotFound) {
+        await this.prisma.booking.create({
+          data: {
+            status: BookingStatus.HOLD,
+            slots: item.slots,
+            tag: { connect: { id: item.tagId } },
+            vendor: { connect: { id: product.vendorId } },
+            cart: { connect: { id: cart.id } },
+            product: { connect: { id: product.id } },
+            holdTimestamp: new Date(),
+          },
+        });
+      }
+    }
+
+    //   // });
+    // }
 
     return newCart;
   }
