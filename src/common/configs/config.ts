@@ -1,3 +1,4 @@
+import { env } from 'process';
 import type { Config } from './config.interface';
 
 const config: Config = {
@@ -8,7 +9,7 @@ const config: Config = {
     enabled: true,
   },
   graphql: {
-    playgroundEnabled: true,
+    playgroundEnabled: env.NODE_ENV !== 'production',
     debug: true,
     schemaDestination: './src/schema.graphql',
     sortSchema: true,
