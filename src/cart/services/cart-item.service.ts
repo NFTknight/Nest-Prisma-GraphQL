@@ -205,11 +205,11 @@ export class CartItemService {
       });
     else {
       let slotFound = false;
-      // allExistingBookings.map(async (eachBooking) => {
+
       for (const booking of allExistingBookings) {
         if (
-          getReadableDate(booking.slots[0].from.toString()) ===
-          getReadableDate(item.slots[0].from.toString())
+          getReadableDate(booking?.slots?.[0]?.from?.toString()) ===
+          getReadableDate(item?.slots?.[0]?.from?.toString())
         ) {
           slotFound = true;
           await this.prisma.booking.update({
