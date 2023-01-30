@@ -611,6 +611,11 @@ type PaginatedTags {
   totalCount: Int!
 }
 
+type PaginatedVendors {
+  list: [Vendor!]
+  totalCount: Int!
+}
+
 input PaginationArgs {
   page: Int
   pageSize: Int
@@ -732,6 +737,7 @@ type Query {
   getVendorBySlug(slug: String!): Vendor!
   getVendorView(vendorId: String!): VendorView!
   getVendors(filter: VendorFilterInput): [Vendor!]!
+  getVendorsForHub(filter: VendorFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedVendors!
   getVendorsView(pagination: PaginationArgs): VendorsView!
   getWorkshop(id: String!): Workshop!
   isVendorSlugAvailable(slug: String!): Boolean!
@@ -1080,6 +1086,15 @@ input VendorFilterInput {
   active: Boolean
   name: [String!]
   name_ar: [String!]
+}
+
+input VendorFilterInputForHub {
+  active: Boolean
+  email: String
+  name: [String!]
+  name_ar: [String!]
+  slug: [String!]
+  vendorId: [String!]
 }
 
 type VendorInfo {
