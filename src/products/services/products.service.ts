@@ -138,9 +138,9 @@ export class ProductsService {
           },
         });
 
-        if (quantity?._sum?.quantity) {
-          list[i].bookedSeats += quantity?._sum?.quantity;
-        }
+        // if (quantity?._sum?.quantity) {
+        // list[i].bookedSeats += quantity?._sum?.quantity;
+        // }
       }
       const totalCount = await this.prisma.product.count();
 
@@ -177,9 +177,9 @@ export class ProductsService {
       },
     });
 
-    if (quantity?._sum?.quantity) {
-      product.bookedSeats += quantity?._sum?.quantity;
-    }
+    // if (quantity?._sum?.quantity) {
+    // product.bookedSeats += quantity?._sum?.quantity;
+    // }
 
     return product;
   }
@@ -311,6 +311,14 @@ export class ProductsService {
           return !!(await this.prisma.product.update({
             where: { id: productId },
             data: { variants },
+          }));
+        }
+        if (product.type === ProductType.WORKSHOP) {
+          return !!(await this.prisma.product.update({
+            where: { id: productId },
+            data: {
+              bookedSeats: product.bookedSeats + quantity,
+            },
           }));
         }
       })

@@ -60,25 +60,25 @@ export class CartItemService {
       }
 
       if (product.type === ProductType.WORKSHOP) {
-        const workshopBooking = await this.prisma.workshop.findFirst({
-          where: {
-            productId: product.id,
-            cartId: cart.id,
-          },
-        });
-        if (!!workshopBooking) {
-          this.workshopService.updateWorkshop(workshopBooking.id, {
-            quantity: newCart.items[existingProductIndex].quantity + quantity,
-          });
-          newCart.items[existingProductIndex].quantity += quantity;
-        } else {
-          await this.workshopService.createWorkshop({
-            productId: product.id,
-            cartId: cart.id,
-            quantity: quantity,
-          });
-          newCart.items[existingProductIndex].quantity = quantity;
-        }
+        //   const workshopBooking = await this.prisma.workshop.findFirst({
+        //     where: {
+        //       productId: product.id,
+        //       cartId: cart.id,
+        //     },
+        //   });
+        //   if (!!workshopBooking) {
+        //     this.workshopService.updateWorkshop(workshopBooking.id, {
+        //       quantity: newCart.items[existingProductIndex].quantity + quantity,
+        //     });
+        newCart.items[existingProductIndex].quantity += quantity;
+        //   } else {
+        //     await this.workshopService.createWorkshop({
+        //       productId: product.id,
+        //       cartId: cart.id,
+        //       quantity: quantity,
+        //     });
+        //     newCart.items[existingProductIndex].quantity = quantity;
+        //   }
       }
     } else {
       if (
