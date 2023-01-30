@@ -11,9 +11,10 @@ import { GetProductArgs } from './dto/product';
 import { PaginatedProducts } from 'src/products/models/paginated-products.model';
 import { GetVendorsArgs, VendorFilterInputForHub } from './dto/vendor';
 import { PaginatedVendors } from './models/vendor';
-import { Auth } from 'src/auth/models/auth.model';
 import { SignupInput } from 'src/auth/dto/signup.input';
 import { User } from 'src/users/models/user.model';
+import { GetUsersArgs, UserFilterInputForHub } from './dto/user';
+import { PaginatedUsers } from './models/user';
 
 @Resolver('hub')
 export class HubResolver {
@@ -61,5 +62,21 @@ export class HubResolver {
   createAgentForHub(@Args('data') data: SignupInput): Promise<User> {
     data.email = data.email.toLowerCase();
     return this.hubService.createAgent(data);
+  }
+
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.AGENT)
+  @Query(() => PaginatedUsers)
+  getUsersForHub(
+    @Args('pagination', { nullable: true }) pg: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder: SortOrder,
+    @Args('filter', { nullable: true }) filter: UserFilterInputForHub
+  ): Promise<PaginatedUsers> {
+    const data: GetUsersArgs = {
+      pg,
+      sortOrder,
+      filter,
+    };
+    return this.hubService.getUsers(data);
   }
 }

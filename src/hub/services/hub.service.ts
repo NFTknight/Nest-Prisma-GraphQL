@@ -10,6 +10,8 @@ import { GetVendorsArgs } from '../dto/vendor';
 import { PaginatedVendors } from '../models/vendor';
 import { SignupInput } from 'src/auth/dto/signup.input';
 import { PasswordService } from 'src/auth/password.service';
+import { PaginatedUsers } from '../models/user';
+import { GetUsersArgs } from '../dto/user';
 
 @Injectable()
 export class HubService {
@@ -124,6 +126,50 @@ export class HubService {
 
       return {
         list: vendors,
+        totalCount: totalCount || 0,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  };
+
+  getUsers = async ({
+    pg,
+    sortOrder,
+    filter,
+  }: GetUsersArgs): Promise<PaginatedUsers> => {
+    try {
+      const { skip, take } = getPaginationArgs(pg);
+      let where: Prisma.UserWhereInput = {};
+      const orderBy = { createdAt: Prisma.SortOrder.asc };
+
+      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
+
+      if (typeof filter.verified === 'boolean')
+        where = { ...where, verified: filter.verified };
+
+      if (filter?.userId?.length)
+        where = { ...where, id: { in: filter?.userId } };
+
+      if (filter?.email?.length)
+        where = { ...where, email: { in: filter?.email } };
+
+      if (filter?.role?.length)
+        where = { ...where, role: { in: filter?.role } };
+
+      const users = await this.prisma.user.findMany({
+        where,
+        skip,
+        take: take || undefined,
+        orderBy,
+      });
+
+      throwNotFoundException(users?.length, '', 'No user available');
+
+      const totalCount = await this.prisma.user.count({ where });
+
+      return {
+        list: users,
         totalCount: totalCount || 0,
       };
     } catch (err) {

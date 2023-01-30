@@ -612,6 +612,11 @@ type PaginatedTags {
   totalCount: Int!
 }
 
+type PaginatedUsers {
+  list: [User!]
+  totalCount: Int!
+}
+
 type PaginatedVendors {
   list: [Vendor!]
   totalCount: Int!
@@ -734,6 +739,7 @@ type Query {
   getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [BookingTime!]!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
   getTagsByProduct(productId: String!): [Tag!]!
+  getUsersForHub(filter: UserFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedUsers!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendorView(vendorId: String!): VendorView!
@@ -1023,6 +1029,13 @@ type User {
   vendor: Vendor
   vendorId: String
   verified: Boolean!
+}
+
+input UserFilterInputForHub {
+  email: [String!]
+  role: [Role!]
+  userId: [String!]
+  verified: Boolean
 }
 
 type UserRole {
