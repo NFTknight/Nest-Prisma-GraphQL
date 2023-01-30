@@ -173,6 +173,20 @@ export class CartItemService {
     return newCart;
   }
 
+  createBooking = async (slots, tagId, vendorId, cartId, productId) => {
+    await this.prisma.booking.create({
+      data: {
+        status: BookingStatus.HOLD,
+        slots: slots,
+        tag: { connect: { id: tagId } },
+        vendor: { connect: { id: vendorId } },
+        cart: { connect: { id: cartId } },
+        product: { connect: { id: productId } },
+        holdTimestamp: new Date(),
+      },
+    });
+  };
+
   // TODO revisit HOLD booking logic
   async addServiceToCart(
     product: Product,
@@ -181,9 +195,6 @@ export class CartItemService {
   ): Promise<Cart> {
     const newCart = this.addProduct(product, cart, item);
 
-    // this should not be required if already a booking is present  // needs to revisit this...
-    // create booking
-
     const allExistingBookings = await this.prisma.booking.findMany({
       where: {
         status: BookingStatus.HOLD,
@@ -191,56 +202,36 @@ export class CartItemService {
         cartId: cart.id,
       },
     });
-    if (!allExistingBookings.length)
-      await this.prisma.booking.create({
-        data: {
-          status: BookingStatus.HOLD,
-          slots: item.slots,
-          tag: { connect: { id: item.tagId } },
-          vendor: { connect: { id: product.vendorId } },
-          cart: { connect: { id: cart.id } },
-          product: { connect: { id: product.id } },
-          holdTimestamp: new Date(),
-        },
-      });
-    else {
-      let slotFound = false;
 
-      for (const booking of allExistingBookings) {
-        if (
-          getReadableDate(booking?.slots?.[0]?.from?.toString()) ===
-          getReadableDate(item?.slots?.[0]?.from?.toString())
-        ) {
-          slotFound = true;
-          await this.prisma.booking.update({
-            where: { id: booking.id },
-            data: {
-              holdTimestamp: new Date(),
-              slots: {
-                push: item.slots,
-              },
-            },
-          });
-        }
-      }
+    let slotFound = false;
 
-      if (!slotFound) {
-        await this.prisma.booking.create({
+    for (const booking of allExistingBookings) {
+      if (
+        getReadableDate(booking?.slots?.[0]?.from?.toString()) ===
+        getReadableDate(item?.slots?.[0]?.from?.toString())
+      ) {
+        slotFound = true;
+        await this.prisma.booking.update({
+          where: { id: booking.id },
           data: {
-            status: BookingStatus.HOLD,
-            slots: item.slots,
-            tag: { connect: { id: item.tagId } },
-            vendor: { connect: { id: product.vendorId } },
-            cart: { connect: { id: cart.id } },
-            product: { connect: { id: product.id } },
             holdTimestamp: new Date(),
+            slots: {
+              push: item.slots,
+            },
           },
         });
       }
     }
 
-    //   // });
-    // }
+    if (!slotFound) {
+      await this.createBooking(
+        item.slots,
+        item.tagId,
+        product.vendorId,
+        cart.id,
+        product.id
+      );
+    }
 
     return newCart;
   }
