@@ -236,6 +236,20 @@ export class CartService {
         throw new BadRequestException(
           'Date is required to remove Item of type Service'
         );
+
+      const allExistingBookings = await this.prisma.booking.findMany({
+        where: { status: BookingStatus.HOLD, productId, cartId },
+      });
+      for (const booking of allExistingBookings) {
+        if (
+          getReadableDate(booking?.slots[0]?.from?.toString()) ===
+          getReadableDate(date.toString())
+        ) {
+          await this.prisma.booking.delete({
+            where: { id: booking.id },
+          });
+        }
+      }
       const sameServiceItems = cart.items.filter(
         (item) => item.productId === productId && item.sku === sku
       );

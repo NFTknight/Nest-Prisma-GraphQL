@@ -173,6 +173,20 @@ export class CartItemService {
     return newCart;
   }
 
+  createBooking = async (slots, tagId, vendorId, cartId, productId) => {
+    await this.prisma.booking.create({
+      data: {
+        status: BookingStatus.HOLD,
+        slots: slots,
+        tag: { connect: { id: tagId } },
+        vendor: { connect: { id: vendorId } },
+        cart: { connect: { id: cartId } },
+        product: { connect: { id: productId } },
+        holdTimestamp: new Date(),
+      },
+    });
+  };
+
   // TODO revisit HOLD booking logic
   async addServiceToCart(
     product: Product,
@@ -181,18 +195,43 @@ export class CartItemService {
   ): Promise<Cart> {
     const newCart = this.addProduct(product, cart, item);
 
-    // create booking
-    await this.prisma.booking.create({
-      data: {
+    const allExistingBookings = await this.prisma.booking.findMany({
+      where: {
         status: BookingStatus.HOLD,
-        slots: item.slots,
-        tag: { connect: { id: item.tagId } },
-        vendor: { connect: { id: product.vendorId } },
-        cart: { connect: { id: cart.id } },
-        product: { connect: { id: product.id } },
-        holdTimestamp: new Date(),
+        productId: product.id,
+        cartId: cart.id,
       },
     });
+
+    let slotFound = false;
+
+    for (const booking of allExistingBookings) {
+      if (
+        getReadableDate(booking?.slots?.[0]?.from?.toString()) ===
+        getReadableDate(item?.slots?.[0]?.from?.toString())
+      ) {
+        slotFound = true;
+        await this.prisma.booking.update({
+          where: { id: booking.id },
+          data: {
+            holdTimestamp: new Date(),
+            slots: {
+              push: item.slots,
+            },
+          },
+        });
+      }
+    }
+
+    if (!slotFound) {
+      await this.createBooking(
+        item.slots,
+        item.tagId,
+        product.vendorId,
+        cart.id,
+        product.id
+      );
+    }
 
     return newCart;
   }
