@@ -111,15 +111,15 @@ export class CartService {
             };
           }
         }
-        if (product.type === ProductType.WORKSHOP) {
-          const isWorkShopExists = await this.prisma.workshop.findFirst({
-            where: { productId: product.id, cartId: res.id },
-          });
-          if (!isWorkShopExists) {
-            cartItems.splice(i, 1);
-            shouldUpdateCart = true;
-          }
-        }
+        // if (product.type === ProductType.WORKSHOP) {
+        //   const isWorkShopExists = await this.prisma.workshop.findFirst({
+        //     where: { productId: product.id, cartId: res.id },
+        //   });
+        //   if (!isWorkShopExists) {
+        //     cartItems.splice(i, 1);
+        //     shouldUpdateCart = true;
+        //   }
+        // }
       }
       //this brings the deliveryCharges
       const deliveryCharges = res.totalPrice - res.subTotal;
@@ -301,21 +301,20 @@ export class CartService {
           if (product.noOfSeats < data.quantity) {
             throw new BadRequestException('Not enough seats available');
           } else {
-            const workshop = await this.prisma.workshop.findFirst({
-              where: { productId: product.id, cartId: cartId },
-            });
-
-            if (workshop) {
-              await this.workshopService.updateWorkshop(workshop.id, {
-                quantity: data.quantity,
-              });
-            } else {
-              await this.workshopService.createWorkshop({
-                productId: product.id,
-                cartId,
-                quantity: item.quantity,
-              });
-            }
+            // const workshop = await this.prisma.workshop.findFirst({
+            //   where: { productId: product.id, cartId: cartId },
+            // });
+            // if (workshop) {
+            //   await this.workshopService.updateWorkshop(workshop.id, {
+            //     quantity: data.quantity,
+            //   });
+            // } else {
+            //   await this.workshopService.createWorkshop({
+            //     productId: product.id,
+            //     cartId,
+            //     quantity: item.quantity,
+            //   });
+            // }
           }
         }
 
