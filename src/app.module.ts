@@ -29,6 +29,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { AnalyticsModule } from './analytics/anyaltics.module';
 import { VendorSubscriptionService } from './common/cron/vendor-subscription-cron.service';
 import { WorkshopModule } from './workshops/workshops.module';
+import { HubModule } from './hub/hub.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { WorkshopModule } from './workshops/workshops.module';
     ReviewsModule,
     AnalyticsModule,
     WorkshopModule,
+    HubModule,
   ],
   controllers: [HealthController],
   providers: [SendgridService, VendorSubscriptionService],
