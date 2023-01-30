@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client';
 import { SetMetadata, UseGuards } from '@nestjs/common';
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { RolesGuard } from 'src/auth/gql-signup.guard';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -11,6 +11,9 @@ import { GetProductArgs } from './dto/product';
 import { PaginatedProducts } from 'src/products/models/paginated-products.model';
 import { GetVendorsArgs, VendorFilterInputForHub } from './dto/vendor';
 import { PaginatedVendors } from './models/vendor';
+import { Auth } from 'src/auth/models/auth.model';
+import { SignupInput } from 'src/auth/dto/signup.input';
+import { User } from 'src/users/models/user.model';
 
 @Resolver('hub')
 export class HubResolver {
@@ -50,5 +53,13 @@ export class HubResolver {
       filter,
     };
     return this.hubService.getVendors(data);
+  }
+
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
+  @Mutation(() => User)
+  createAgentForHub(@Args('data') data: SignupInput): Promise<User> {
+    data.email = data.email.toLowerCase();
+    return this.hubService.createAgent(data);
   }
 }

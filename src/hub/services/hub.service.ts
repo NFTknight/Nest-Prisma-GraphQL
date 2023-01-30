@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma, AttendanceType } from '@prisma/client';
+import { Prisma, AttendanceType, User, Role } from '@prisma/client';
 
 import { throwNotFoundException } from 'src/utils/validation';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
@@ -8,10 +8,15 @@ import { GetProductArgs } from '../dto/product';
 import { PaginatedProducts } from 'src/products/models/paginated-products.model';
 import { GetVendorsArgs } from '../dto/vendor';
 import { PaginatedVendors } from '../models/vendor';
+import { SignupInput } from 'src/auth/dto/signup.input';
+import { PasswordService } from 'src/auth/password.service';
 
 @Injectable()
 export class HubService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly passwordService: PasswordService
+  ) {}
 
   getProducts = async ({
     vendorId,
@@ -123,6 +128,30 @@ export class HubService {
       };
     } catch (err) {
       throw new Error(err);
+    }
+  };
+
+  createAgent = async (payload: SignupInput): Promise<User> => {
+    const hashedPassword = await this.passwordService.hashPassword(
+      payload.password
+    );
+
+    try {
+      return await this.prisma.user.create({
+        data: {
+          ...payload,
+          password: hashedPassword,
+          role: payload.role || Role.VENDOR,
+        },
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException(`Email ${payload.email} already used.`);
+      }
+      throw new Error(e);
     }
   };
 }

@@ -433,6 +433,7 @@ type Mutation {
   addWorkshopToCart(cartId: String!, data: CartItemInput!): Cart!
   changePassword(data: ChangePasswordInput!): User!
   checkoutCart(cartId: String!, paymentSession: String): OrderPayment!
+  createAgentForHub(data: SignupInput!): User!
   createBooking(data: CreateBookingInput!): Booking!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
@@ -823,6 +824,7 @@ input SignupInput {
   firstName: String
   lastName: String
   password: String!
+  role: Role
 }
 
 input SortOrder {
