@@ -91,10 +91,14 @@ export class CartService {
 
           if (product.type === ProductType.SERVICE) {
             const bookings = await this.prisma.booking.findMany({
-              where: { cartId: res.id, productId: product.id },
+              where: {
+                cartId: res.id,
+                productId: product.id,
+              },
             });
 
             if (!bookings.length) {
+              shouldUpdateCart = true;
               cartItems.splice(i, 1);
             }
           }
