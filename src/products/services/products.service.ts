@@ -138,9 +138,9 @@ export class ProductsService {
           },
         });
 
-        if (quantity?._sum?.quantity) {
-          // list[i].bookedSeats += quantity?._sum?.quantity;
-        }
+        // if (quantity?._sum?.quantity) {
+        // list[i].bookedSeats += quantity?._sum?.quantity;
+        // }
       }
       const totalCount = await this.prisma.product.count();
 
@@ -177,9 +177,9 @@ export class ProductsService {
       },
     });
 
-    if (quantity?._sum?.quantity) {
-      // product.bookedSeats += quantity?._sum?.quantity;
-    }
+    // if (quantity?._sum?.quantity) {
+    // product.bookedSeats += quantity?._sum?.quantity;
+    // }
 
     return product;
   }
@@ -290,7 +290,6 @@ export class ProductsService {
   async decrementProductVariantQuantities(data: CartItem[]): Promise<boolean> {
     return Promise.all(
       data.map(async ({ productId, sku, quantity }): Promise<boolean> => {
-        console.log({ productId, quantity });
         const product = await this.getProduct(productId);
         if (product.type === ProductType.PRODUCT) {
           const variants = product.variants.map((item) => {
