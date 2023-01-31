@@ -70,7 +70,24 @@ export class CartItemService {
         //     this.workshopService.updateWorkshop(workshopBooking.id, {
         //       quantity: newCart.items[existingProductIndex].quantity + quantity,
         //     });
-        newCart.items[existingProductIndex].quantity += quantity;
+
+        if (
+          //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+          !checkIfQuantityIsGood(
+            newCart.items[existingProductIndex].quantity + quantity,
+            product.noOfSeats
+          )
+        ) {
+          throw new BadRequestException(
+            `You can't add more than ${
+              product.noOfSeats - product.bookedSeats
+            } no of products in your cart. You already have ${
+              newCart.items[existingProductIndex].quantity
+            } item(s)`
+          );
+        } else {
+          newCart.items[existingProductIndex].quantity += quantity;
+        }
         //   } else {
         //     await this.workshopService.createWorkshop({
         //       productId: product.id,
