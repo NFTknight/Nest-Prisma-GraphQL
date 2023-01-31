@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { Cart } from './models/cart.model';
 
-import { CartItemInput, CartUpdateInput } from './dto/cart.input';
+import { CartItemInput } from './dto/cart.input';
 import {
   BookingStatus,
   CartItem,
@@ -27,6 +27,10 @@ import { ShippingService } from 'src/shipping/shipping.service';
 import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
 import { WorkshopService } from 'src/workshops/workshops.service';
 import { checkIfQuantityIsGood, getReadableDate } from 'src/utils/general';
+import {
+  ProductQuantityException,
+  WorkshopQuantityException,
+} from 'src/utils/errors';
 
 @Injectable()
 export class CartService {
@@ -319,35 +323,36 @@ export class CartService {
       items.map(async (item) => {
         const product = await this.productService.getProduct(item.productId);
         if (product.type === ProductType.WORKSHOP) {
-          if (product.noOfSeats < data.quantity) {
-            throw new BadRequestException('Not enough seats available');
-          } else {
-            // const workshop = await this.prisma.workshop.findFirst({
-            //   where: { productId: product.id, cartId: cartId },
-            // });
-            // if (workshop) {
-            //   await this.workshopService.updateWorkshop(workshop.id, {
-            //     quantity: data.quantity,
-            //   });
-            // } else {
-            //   await this.workshopService.createWorkshop({
-            //     productId: product.id,
-            //     cartId,
-            //     quantity: item.quantity,
-            //   });
-            // }
+          if (product.noOfSeats - product.bookedSeats < data.quantity) {
+            throw new WorkshopQuantityException(
+              data.quantity,
+              product.noOfSeats - product.bookedSeats
+            );
           }
+          // else {
+          // const workshop = await this.prisma.workshop.findFirst({
+          //   where: { productId: product.id, cartId: cartId },
+          // });
+          // if (workshop) {
+          //   await this.workshopService.updateWorkshop(workshop.id, {
+          //     quantity: data.quantity,
+          //   });
+          // } else {
+          //   await this.workshopService.createWorkshop({
+          //     productId: product.id,
+          //     cartId,
+          //     quantity: item.quantity,
+          //   });
+          // }
+          // }
         }
         if (product.type === ProductType.PRODUCT) {
           const variant = product.variants.find(
             (item) => item.sku === data.sku
           );
           throwNotFoundException(variant, '', 'Variant is not available');
-          if (data.quantity > variant.quantity) {
-            throw new BadRequestException(
-              `You can't add more than ${variant.quantity} no of products in your cart.`
-            );
-          }
+          if (data.quantity > variant.quantity)
+            throw new ProductQuantityException(data.quantity, variant.quantity);
         }
 
         return { ...product, ...item };
@@ -373,7 +378,6 @@ export class CartService {
       where: { id: cartId },
     });
     if (!cart) throw new BadRequestException('Cart does not exists');
-
     // cart deletion
     await this.prisma.cart.delete({
       where: { id: cartId },
