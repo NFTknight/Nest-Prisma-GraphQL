@@ -69,7 +69,7 @@ export class CartItemService {
         //     this.workshopService.updateWorkshop(workshopBooking.id, {
         //       quantity: newCart.items[existingProductIndex].quantity + quantity,
         //     });
-        newCart.items[existingProductIndex].quantity += quantity;
+        newCart.items[existingProductIndex].quantity = newQuantity;
         //   } else {
         //     await this.workshopService.createWorkshop({
         //       productId: product.id,
