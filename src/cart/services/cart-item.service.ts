@@ -54,7 +54,8 @@ export class CartItemService {
           `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
         );
       } else {
-        if (product.type === ProductType.PRODUCT) newQuantity;
+        if (product.type === ProductType.PRODUCT)
+          newCart.items[existingProductIndex].quantity = newQuantity;
       }
 
       if (product.type === ProductType.WORKSHOP) {
