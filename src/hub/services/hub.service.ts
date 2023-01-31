@@ -12,6 +12,8 @@ import { SignupInput } from 'src/auth/dto/signup.input';
 import { PasswordService } from 'src/auth/password.service';
 import { PaginatedUsers } from '../models/user';
 import { GetUsersArgs } from '../dto/user';
+import { PaginatedOrders } from 'src/orders/models/paginated-orders.model';
+import { GetOrderArgs } from '../dto/order';
 
 @Injectable()
 export class HubService {
@@ -43,8 +45,6 @@ export class HubService {
 
       if (filter.attendanceType?.length)
         where['attendanceType'] = { in: filter.attendanceType };
-
-      console.log(where);
 
       const products = await this.prisma.product.findMany({
         where,
@@ -174,6 +174,55 @@ export class HubService {
 
       return {
         list: users,
+        totalCount: totalCount || 0,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  };
+
+  getOrders = async ({
+    pg,
+    sortOrder,
+    filter,
+  }: GetOrderArgs): Promise<PaginatedOrders> => {
+    try {
+      const { skip, take } = getPaginationArgs(pg);
+      const where: Prisma.OrderWhereInput = {};
+      const orderBy = {};
+
+      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
+      else orderBy['createdAt'] = Prisma.SortOrder.asc;
+
+      if (filter.orderId?.length) where['orderId'] = { in: filter.orderId };
+
+      if (filter.vendorId?.length) where['vendorId'] = { in: filter.vendorId };
+
+      if (filter.productId?.length)
+        where['items.productId'] = { in: filter.productId };
+
+      if (filter.email?.length)
+        where['customerInfo'] = {
+          is: {
+            email: { in: filter.email },
+          },
+        };
+
+      if (filter.status?.length) where['status'] = { in: filter.status };
+
+      const orders = await this.prisma.order.findMany({
+        where,
+        skip,
+        take: take || undefined,
+        orderBy,
+      });
+
+      throwNotFoundException(orders?.length, '', 'No order available');
+
+      const totalCount = await this.prisma.order.count({ where });
+
+      return {
+        list: orders,
         totalCount: totalCount || 0,
       };
     } catch (err) {

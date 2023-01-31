@@ -517,6 +517,14 @@ enum OrderDirection {
   desc
 }
 
+input OrderFilterInputForHub {
+  email: [String!]
+  orderId: [String!]
+  productId: [String!]
+  status: [OrderStatus!]
+  vendorId: [String!]
+}
+
 type OrderPayment {
   appliedCoupon: String
   cart: Cart
@@ -736,6 +744,7 @@ type Query {
   getOrder(id: String!): Order!
   getOrderPaymentStatus(orderId: String!): GetPaymentStatusResponse!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
+  getOrdersForHub(filter: OrderFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
   getProductsForHub(filter: ProductFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
