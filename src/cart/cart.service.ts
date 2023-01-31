@@ -338,6 +338,17 @@ export class CartService {
             // }
           }
         }
+        if (product.type === ProductType.PRODUCT) {
+          const variant = product.variants.find(
+            (item) => item.sku === data.sku
+          );
+          throwNotFoundException(variant, '', 'Variant is not available');
+          if (data.quantity > variant.quantity) {
+            throw new BadRequestException(
+              `You can't add more than ${variant.quantity} no of products in your cart.`
+            );
+          }
+        }
 
         return { ...product, ...item };
       })
@@ -566,7 +577,7 @@ export class CartService {
               itemQuantity: item.quantity,
             },
           });
-          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+          // await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
       }
       if (
@@ -582,7 +593,7 @@ export class CartService {
             itemQuantity: item.quantity,
           },
         });
-        await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        // await this.removeItemFromCart(cart.id, item.productId, item.sku);
       }
       if (product.type === ProductType.SERVICE) {
         const booking = await this.prisma.booking.findFirst({
@@ -598,7 +609,7 @@ export class CartService {
               title: product.title,
             },
           });
-          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+          // await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
       }
     }
