@@ -43,20 +43,19 @@ export class CartItemService {
     const deliveryCharges = newCart.totalPrice - newCart.subTotal;
 
     if (existingProductIndex !== -1) {
+      const newQuantity =
+        newCart.items[existingProductIndex].quantity + quantity;
       if (
         //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
         product.type === ProductType.PRODUCT &&
-        !checkIfQuantityIsGood(
-          newCart.items[existingProductIndex].quantity,
-          productVariant.quantity
-        )
+        !checkIfQuantityIsGood(newQuantity, productVariant.quantity)
       ) {
         throw new BadRequestException(
           `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
         );
       } else {
         if (product.type === ProductType.PRODUCT)
-          newCart.items[existingProductIndex].quantity += quantity;
+          newCart.items[existingProductIndex].quantity = newQuantity;
       }
 
       if (product.type === ProductType.WORKSHOP) {
@@ -70,7 +69,7 @@ export class CartItemService {
         //     this.workshopService.updateWorkshop(workshopBooking.id, {
         //       quantity: newCart.items[existingProductIndex].quantity + quantity,
         //     });
-        newCart.items[existingProductIndex].quantity += quantity;
+        newCart.items[existingProductIndex].quantity = newQuantity;
         //   } else {
         //     await this.workshopService.createWorkshop({
         //       productId: product.id,
