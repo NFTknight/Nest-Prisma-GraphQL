@@ -30,9 +30,10 @@ export class HubService {
     try {
       const { skip, take } = getPaginationArgs(pg);
       const where: Prisma.ProductWhereInput = {};
-      const orderBy = { createdAt: Prisma.SortOrder.asc };
+      const orderBy = {};
 
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
+      else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
       if (typeof filter.active === 'boolean') where['active'] = filter.active;
 
@@ -95,9 +96,10 @@ export class HubService {
     try {
       const { skip, take } = getPaginationArgs(pg);
       let where: Prisma.VendorWhereInput = {};
-      const orderBy = { createdAt: Prisma.SortOrder.asc };
+      const orderBy = {};
 
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
+      else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
       if (typeof filter.active === 'boolean')
         where = { ...where, active: filter.active };
@@ -145,9 +147,10 @@ export class HubService {
     try {
       const { skip, take } = getPaginationArgs(pg);
       let where: Prisma.UserWhereInput = {};
-      const orderBy = { createdAt: Prisma.SortOrder.asc };
+      const orderBy = {};
 
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
+      else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
       if (typeof filter.verified === 'boolean')
         where = { ...where, verified: filter.verified };
