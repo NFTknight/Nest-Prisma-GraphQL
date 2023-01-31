@@ -191,6 +191,13 @@ type Category {
   vendorId: String!
 }
 
+input CategoryFilterInputForHub {
+  active: Boolean
+  slug: [String!]
+  title: [String!]
+  vendorId: [String!]
+}
+
 input Certificate {
   image: String!
   title: String!
@@ -735,6 +742,7 @@ type Query {
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
+  getCategoriesForHub(filter: CategoryFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedCoupons!

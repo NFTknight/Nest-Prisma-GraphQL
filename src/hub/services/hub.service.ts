@@ -14,6 +14,8 @@ import { PaginatedUsers } from '../models/user';
 import { GetUsersArgs } from '../dto/user';
 import { PaginatedOrders } from 'src/orders/models/paginated-orders.model';
 import { GetOrderArgs } from '../dto/order';
+import { GetCategoryArgs } from '../dto/category';
+import { PaginatedCategories } from 'src/categories/models/paginated-categories.model';
 
 @Injectable()
 export class HubService {
@@ -204,6 +206,13 @@ export class HubService {
       if (filter.productId?.length)
         where['items.productId'] = { in: filter.productId };
 
+      if (filter.productId?.length)
+        where['items'] = {
+          some: {
+            productId: { in: filter.productId },
+          },
+        };
+
       if (filter.email?.length)
         where['customerInfo'] = {
           is: {
@@ -226,6 +235,47 @@ export class HubService {
 
       return {
         list: orders,
+        totalCount: totalCount || 0,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  };
+
+  getCategories = async ({
+    pg,
+    sortOrder,
+    filter,
+  }: GetCategoryArgs): Promise<PaginatedCategories> => {
+    try {
+      const { skip, take } = getPaginationArgs(pg);
+      const where: Prisma.OrderWhereInput = {};
+      const orderBy = {};
+
+      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
+      else orderBy['createdAt'] = Prisma.SortOrder.asc;
+
+      if (typeof filter.active === 'boolean') where['active'] = filter.active;
+
+      if (filter.vendorId?.length) where['vendorId'] = { in: filter.vendorId };
+
+      if (filter.title?.length) where['title'] = { in: filter.title };
+
+      if (filter.slug?.length) where['slug'] = { in: filter.slug };
+
+      const categories = await this.prisma.category.findMany({
+        where,
+        skip,
+        take: take || undefined,
+        orderBy,
+      });
+
+      throwNotFoundException(categories?.length, '', 'No category available');
+
+      const totalCount = await this.prisma.category.count({ where });
+
+      return {
+        list: categories,
         totalCount: totalCount || 0,
       };
     } catch (err) {

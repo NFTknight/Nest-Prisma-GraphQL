@@ -16,6 +16,8 @@ import { GetUsersArgs, UserFilterInputForHub } from './dto/user';
 import { PaginatedUsers } from './models/user';
 import { PaginatedOrders } from 'src/orders/models/paginated-orders.model';
 import { GetOrderArgs, OrderFilterInputForHub } from './dto/order';
+import { PaginatedCategories } from 'src/categories/models/paginated-categories.model';
+import { CategoryFilterInputForHub, GetCategoryArgs } from './dto/category';
 
 @Resolver('hub')
 export class HubResolver {
@@ -85,6 +87,22 @@ export class HubResolver {
       filter,
     };
     return this.hubService.getOrders(data);
+  }
+
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.AGENT)
+  @Query(() => PaginatedCategories)
+  getCategoriesForHub(
+    @Args('pagination', { nullable: true }) pg: PaginationArgs,
+    @Args('sortOrder', { nullable: true }) sortOrder: SortOrder,
+    @Args('filter', { nullable: true }) filter: CategoryFilterInputForHub
+  ): Promise<PaginatedCategories> {
+    const data: GetCategoryArgs = {
+      pg,
+      sortOrder,
+      filter,
+    };
+    return this.hubService.getCategories(data);
   }
 
   // Mutations
