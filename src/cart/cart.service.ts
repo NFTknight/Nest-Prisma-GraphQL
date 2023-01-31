@@ -582,7 +582,9 @@ export class CartService {
       }
       if (
         product.type === ProductType.WORKSHOP &&
-        (product.noOfSeats || 0 - product.bookedSeats || 0) < item.quantity
+        !!product?.noOfSeats &&
+        !!product.bookedSeats &&
+        product.noOfSeats - product.bookedSeats < item.quantity
       ) {
         cartErrors.push({
           Name: 'WorkshopIssue',
