@@ -21,26 +21,30 @@ export class HubService {
   ) {}
 
   getProducts = async ({
-    vendorId,
-    categoryId,
     pg,
     sortOrder,
     filter,
   }: GetProductArgs): Promise<PaginatedProducts> => {
     try {
       const { skip, take } = getPaginationArgs(pg);
-      const where: Prisma.ProductWhereInput = { ...filter };
+      const where: Prisma.ProductWhereInput = {};
       const orderBy = { createdAt: Prisma.SortOrder.asc };
 
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
 
-      if (vendorId) {
-        where['vendorId'] = { in: vendorId.split(',') };
-      }
+      if (typeof filter.active === 'boolean') where['active'] = filter.active;
 
-      if (categoryId) {
-        where['categoryId'] = { in: categoryId.split(',') };
-      }
+      if (filter.vendorId?.length) where['vendorId'] = { in: filter.vendorId };
+
+      if (filter.categoryId?.length)
+        where['categoryId'] = { in: filter.categoryId };
+
+      if (filter.type?.length) where['type'] = { in: filter.type };
+
+      if (filter.attendanceType?.length)
+        where['attendanceType'] = { in: filter.attendanceType };
+
+      console.log(where);
 
       const products = await this.prisma.product.findMany({
         where,
