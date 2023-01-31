@@ -47,7 +47,7 @@ export class CartItemService {
         //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
         product.type === ProductType.PRODUCT &&
         !checkIfQuantityIsGood(
-          newCart.items[existingProductIndex].quantity,
+          newCart.items[existingProductIndex].quantity + 1,
           productVariant.quantity
         )
       ) {

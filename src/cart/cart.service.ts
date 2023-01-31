@@ -141,19 +141,22 @@ export class CartService {
       };
 
       if (!haveProductType) updatedCartObject['totalPrice'] = subTotal;
+      let cart: Cart = res;
 
       // this is an extra check to ensure there is no deliveryArea or deliveryMethod selected if no cartItem is of type PRODUCT present
       if (!haveProductType && (res.deliveryArea || res.deliveryMethod)) {
-        await this.prisma.cart.update({
+        cart = await this.prisma.cart.update({
           where: { id: res.id },
           data: { deliveryArea: null, deliveryMethod: null },
         });
       }
 
-      if (shouldUpdateCart) await this.updateCart(res.id, updatedCartObject);
+      if (shouldUpdateCart)
+        cart = await this.updateCart(res.id, updatedCartObject);
 
       return {
-        ...res,
+        ...cart,
+
         //returning newly calculated subTotal + deliveryCharges as new total
         totalPrice: updatedCartObject.totalPrice,
         subTotal: updatedCartObject.subTotal,
