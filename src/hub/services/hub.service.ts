@@ -249,7 +249,7 @@ export class HubService {
   }: GetCategoryArgs): Promise<PaginatedCategories> => {
     try {
       const { skip, take } = getPaginationArgs(pg);
-      const where: Prisma.OrderWhereInput = {};
+      const where: Prisma.CategoryWhereInput = {};
       const orderBy = {};
 
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
