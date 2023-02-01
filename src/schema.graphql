@@ -193,7 +193,6 @@ type Category {
 
 input CategoryFilterInputForHub {
   active: Boolean
-  slug: [String!]
   title: [String!]
   vendorId: [String!]
 }
@@ -1130,7 +1129,7 @@ input VendorFilterInput {
 
 input VendorFilterInputForHub {
   active: Boolean
-  email: String
+  email: [String!]
   name: [String!]
   name_ar: [String!]
   slug: [String!]

@@ -3,18 +3,19 @@ import { PrismaService } from 'nestjs-prisma';
 import { Prisma, AttendanceType, User, Role } from '@prisma/client';
 
 import { throwNotFoundException } from 'src/utils/validation';
+import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
-import { GetProductArgs } from '../dto/product';
+import { GetProductArgs, ProductFilterInputForHub } from '../dto/product';
 import { PaginatedProducts } from 'src/products/models/paginated-products.model';
-import { GetVendorsArgs } from '../dto/vendor';
+import { GetVendorsArgs, VendorFilterInputForHub } from '../dto/vendor';
 import { PaginatedVendors } from '../models/vendor';
 import { SignupInput } from 'src/auth/dto/signup.input';
 import { PasswordService } from 'src/auth/password.service';
 import { PaginatedUsers } from '../models/user';
-import { GetUsersArgs } from '../dto/user';
+import { GetUsersArgs, UserFilterInputForHub } from '../dto/user';
 import { PaginatedOrders } from 'src/orders/models/paginated-orders.model';
-import { GetOrderArgs } from '../dto/order';
-import { GetCategoryArgs } from '../dto/category';
+import { GetOrderArgs, OrderFilterInputForHub } from '../dto/order';
+import { CategoryFilterInputForHub, GetCategoryArgs } from '../dto/category';
 import { PaginatedCategories } from 'src/categories/models/paginated-categories.model';
 
 @Injectable()
@@ -24,6 +25,34 @@ export class HubService {
     private readonly passwordService: PasswordService
   ) {}
 
+  getOrderByValue = (sortOrder: SortOrder) => {
+    if (sortOrder) return { [sortOrder.field]: sortOrder.direction };
+    else return { createdAt: Prisma.SortOrder.asc };
+  };
+
+  getWhereClauseValue = (
+    filter:
+      | ProductFilterInputForHub
+      | VendorFilterInputForHub
+      | UserFilterInputForHub
+      | OrderFilterInputForHub
+      | CategoryFilterInputForHub,
+    ignoreKeyList: string[],
+    booleanKey?: string
+  ) => {
+    const where = {};
+
+    for (const filterKey of Object.keys(filter)) {
+      if (filterKey === booleanKey && typeof filter?.[booleanKey] === 'boolean')
+        where[filterKey] = filter[filterKey];
+
+      if (!ignoreKeyList?.includes(filterKey) && filter[filterKey]?.length)
+        where[filterKey] = { in: filter[filterKey] };
+    }
+
+    return where;
+  };
+
   getProducts = async ({
     pg,
     sortOrder,
@@ -31,24 +60,12 @@ export class HubService {
   }: GetProductArgs): Promise<PaginatedProducts> => {
     try {
       const { skip, take } = getPaginationArgs(pg);
-      const where: Prisma.ProductWhereInput = {};
-      const orderBy = {};
-
-      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
-      else orderBy['createdAt'] = Prisma.SortOrder.asc;
-
-      if (typeof filter?.active === 'boolean') where['active'] = filter?.active;
-
-      if (filter?.vendorId?.length)
-        where['vendorId'] = { in: filter?.vendorId };
-
-      if (filter?.categoryId?.length)
-        where['categoryId'] = { in: filter?.categoryId };
-
-      if (filter?.type?.length) where['type'] = { in: filter?.type };
-
-      if (filter?.attendanceType?.length)
-        where['attendanceType'] = { in: filter?.attendanceType };
+      const orderBy = this.getOrderByValue(sortOrder);
+      const where: Prisma.ProductWhereInput = this.getWhereClauseValue(
+        filter,
+        [],
+        'active'
+      );
 
       const products = await this.prisma.product.findMany({
         where,
@@ -98,29 +115,17 @@ export class HubService {
   }: GetVendorsArgs): Promise<PaginatedVendors> => {
     try {
       const { skip, take } = getPaginationArgs(pg);
-      let where: Prisma.VendorWhereInput = {};
-      const orderBy = {};
+      const orderBy = this.getOrderByValue(sortOrder);
+      const where: Prisma.VendorWhereInput = this.getWhereClauseValue(
+        filter,
+        ['vendorId', 'email'],
+        'active'
+      );
 
-      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
-      else orderBy['createdAt'] = Prisma.SortOrder.asc;
-
-      if (typeof filter?.active === 'boolean')
-        where = { ...where, active: filter?.active };
-
-      if (filter?.vendorId?.length)
-        where = { ...where, id: { in: filter?.vendorId } };
-
-      if (filter?.name?.length)
-        where = { ...where, name: { in: filter?.name } };
-
-      if (filter?.name_ar?.length)
-        where = { ...where, name_ar: { in: filter?.name_ar } };
-
-      if (filter?.slug?.length)
-        where = { ...where, slug: { in: filter?.slug } };
+      if (filter?.vendorId?.length) where['id'] = { in: filter?.vendorId };
 
       if (filter?.email?.length)
-        where = { ...where, info: { email: filter?.email } };
+        where['info'] = { is: { email: { in: filter?.email } } };
 
       const vendors = await this.prisma.vendor.findMany({
         where,
@@ -149,23 +154,14 @@ export class HubService {
   }: GetUsersArgs): Promise<PaginatedUsers> => {
     try {
       const { skip, take } = getPaginationArgs(pg);
-      let where: Prisma.UserWhereInput = {};
-      const orderBy = {};
+      const orderBy = this.getOrderByValue(sortOrder);
+      const where: Prisma.UserWhereInput = this.getWhereClauseValue(
+        filter,
+        ['userId'],
+        'verified'
+      );
 
-      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
-      else orderBy['createdAt'] = Prisma.SortOrder.asc;
-
-      if (typeof filter?.verified === 'boolean')
-        where = { ...where, verified: filter?.verified };
-
-      if (filter?.userId?.length)
-        where = { ...where, id: { in: filter?.userId } };
-
-      if (filter?.email?.length)
-        where = { ...where, email: { in: filter?.email } };
-
-      if (filter?.role?.length)
-        where = { ...where, role: { in: filter?.role } };
+      if (filter?.userId?.length) where['id'] = { in: filter?.userId };
 
       const users = await this.prisma.user.findMany({
         where,
@@ -194,35 +190,17 @@ export class HubService {
   }: GetOrderArgs): Promise<PaginatedOrders> => {
     try {
       const { skip, take } = getPaginationArgs(pg);
-      const where: Prisma.OrderWhereInput = {};
-      const orderBy = {};
-
-      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
-      else orderBy['createdAt'] = Prisma.SortOrder.asc;
-
-      if (filter?.orderId?.length) where['orderId'] = { in: filter?.orderId };
-
-      if (filter?.vendorId?.length)
-        where['vendorId'] = { in: filter?.vendorId };
+      const orderBy = this.getOrderByValue(sortOrder);
+      const where: Prisma.OrderWhereInput = this.getWhereClauseValue(filter, [
+        'productId',
+        'email',
+      ]);
 
       if (filter?.productId?.length)
-        where['items.productId'] = { in: filter?.productId };
-
-      if (filter?.productId?.length)
-        where['items'] = {
-          some: {
-            productId: { in: filter?.productId },
-          },
-        };
+        where['items'] = { some: { productId: { in: filter?.productId } } };
 
       if (filter?.email?.length)
-        where['customerInfo'] = {
-          is: {
-            email: { in: filter?.email },
-          },
-        };
-
-      if (filter?.status?.length) where['status'] = { in: filter?.status };
+        where['customerInfo'] = { is: { email: { in: filter?.email } } };
 
       const orders = await this.prisma.order.findMany({
         where,
@@ -251,20 +229,12 @@ export class HubService {
   }: GetCategoryArgs): Promise<PaginatedCategories> => {
     try {
       const { skip, take } = getPaginationArgs(pg);
-      const where: Prisma.CategoryWhereInput = {};
-      const orderBy = {};
-
-      if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
-      else orderBy['createdAt'] = Prisma.SortOrder.asc;
-
-      if (typeof filter?.active === 'boolean') where['active'] = filter?.active;
-
-      if (filter?.vendorId?.length)
-        where['vendorId'] = { in: filter?.vendorId };
-
-      if (filter?.title?.length) where['title'] = { in: filter?.title };
-
-      if (filter?.slug?.length) where['slug'] = { in: filter?.slug };
+      const orderBy = this.getOrderByValue(sortOrder);
+      const where: Prisma.CategoryWhereInput = this.getWhereClauseValue(
+        filter,
+        [],
+        'active'
+      );
 
       const categories = await this.prisma.category.findMany({
         where,

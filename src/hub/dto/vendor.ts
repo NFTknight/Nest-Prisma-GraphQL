@@ -22,8 +22,8 @@ export class VendorFilterInputForHub {
   @Field(() => [String], { nullable: true })
   slug?: [string];
 
-  @Field(() => String, { nullable: true })
-  email?: string;
+  @Field(() => [String], { nullable: true })
+  email?: [string];
 
   @Field(() => Boolean, { nullable: true })
   active?: boolean;
