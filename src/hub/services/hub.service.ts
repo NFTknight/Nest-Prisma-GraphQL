@@ -37,17 +37,18 @@ export class HubService {
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
       else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
-      if (typeof filter.active === 'boolean') where['active'] = filter.active;
+      if (typeof filter?.active === 'boolean') where['active'] = filter?.active;
 
-      if (filter.vendorId?.length) where['vendorId'] = { in: filter.vendorId };
+      if (filter?.vendorId?.length)
+        where['vendorId'] = { in: filter?.vendorId };
 
-      if (filter.categoryId?.length)
-        where['categoryId'] = { in: filter.categoryId };
+      if (filter?.categoryId?.length)
+        where['categoryId'] = { in: filter?.categoryId };
 
-      if (filter.type?.length) where['type'] = { in: filter.type };
+      if (filter?.type?.length) where['type'] = { in: filter?.type };
 
-      if (filter.attendanceType?.length)
-        where['attendanceType'] = { in: filter.attendanceType };
+      if (filter?.attendanceType?.length)
+        where['attendanceType'] = { in: filter?.attendanceType };
 
       const products = await this.prisma.product.findMany({
         where,
@@ -103,8 +104,8 @@ export class HubService {
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
       else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
-      if (typeof filter.active === 'boolean')
-        where = { ...where, active: filter.active };
+      if (typeof filter?.active === 'boolean')
+        where = { ...where, active: filter?.active };
 
       if (filter?.vendorId?.length)
         where = { ...where, id: { in: filter?.vendorId } };
@@ -154,8 +155,8 @@ export class HubService {
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
       else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
-      if (typeof filter.verified === 'boolean')
-        where = { ...where, verified: filter.verified };
+      if (typeof filter?.verified === 'boolean')
+        where = { ...where, verified: filter?.verified };
 
       if (filter?.userId?.length)
         where = { ...where, id: { in: filter?.userId } };
@@ -199,28 +200,29 @@ export class HubService {
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
       else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
-      if (filter.orderId?.length) where['orderId'] = { in: filter.orderId };
+      if (filter?.orderId?.length) where['orderId'] = { in: filter?.orderId };
 
-      if (filter.vendorId?.length) where['vendorId'] = { in: filter.vendorId };
+      if (filter?.vendorId?.length)
+        where['vendorId'] = { in: filter?.vendorId };
 
-      if (filter.productId?.length)
-        where['items.productId'] = { in: filter.productId };
+      if (filter?.productId?.length)
+        where['items.productId'] = { in: filter?.productId };
 
-      if (filter.productId?.length)
+      if (filter?.productId?.length)
         where['items'] = {
           some: {
-            productId: { in: filter.productId },
+            productId: { in: filter?.productId },
           },
         };
 
-      if (filter.email?.length)
+      if (filter?.email?.length)
         where['customerInfo'] = {
           is: {
-            email: { in: filter.email },
+            email: { in: filter?.email },
           },
         };
 
-      if (filter.status?.length) where['status'] = { in: filter.status };
+      if (filter?.status?.length) where['status'] = { in: filter?.status };
 
       const orders = await this.prisma.order.findMany({
         where,
@@ -255,13 +257,14 @@ export class HubService {
       if (sortOrder) orderBy[sortOrder.field] = sortOrder.direction;
       else orderBy['createdAt'] = Prisma.SortOrder.asc;
 
-      if (typeof filter.active === 'boolean') where['active'] = filter.active;
+      if (typeof filter?.active === 'boolean') where['active'] = filter?.active;
 
-      if (filter.vendorId?.length) where['vendorId'] = { in: filter.vendorId };
+      if (filter?.vendorId?.length)
+        where['vendorId'] = { in: filter?.vendorId };
 
-      if (filter.title?.length) where['title'] = { in: filter.title };
+      if (filter?.title?.length) where['title'] = { in: filter?.title };
 
-      if (filter.slug?.length) where['slug'] = { in: filter.slug };
+      if (filter?.slug?.length) where['slug'] = { in: filter?.slug };
 
       const categories = await this.prisma.category.findMany({
         where,
