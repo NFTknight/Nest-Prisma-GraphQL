@@ -148,6 +148,7 @@ export class CartItemService {
       if (!isAdded) {
         newCart.items = [
           ...newCart.items,
+
           {
             ...item,
             price:
@@ -157,10 +158,14 @@ export class CartItemService {
         ];
       }
     }
-    newCart.subTotal = newCart.items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    newCart.subTotal = newCart.items.reduce((acc, item) => {
+      if (item?.slots?.length) {
+        return acc + item.price * item.slots.length;
+      }
+
+      return acc + item.price * item.quantity;
+    }, 0);
+
     newCart.totalPrice = newCart.subTotal + deliveryCharges;
 
     newCart.updatedAt = new Date();

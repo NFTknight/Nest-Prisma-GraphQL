@@ -119,6 +119,7 @@ export class CartService {
             };
           }
         }
+
         // if (product.type === ProductType.WORKSHOP) {
         //   const isWorkShopExists = await this.prisma.workshop.findFirst({
         //     where: { productId: product.id, cartId: res.id },
@@ -133,10 +134,12 @@ export class CartService {
       const deliveryCharges = res.totalPrice - res.subTotal;
 
       //this is to make sure subTotal is correct
-      const subTotal = cartItems.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-      );
+      const subTotal = cartItems.reduce((acc, item) => {
+        if (item?.slots?.length) {
+          return acc + item.price * item.slots.length;
+        }
+        return acc + item.price * item.quantity;
+      }, 0);
 
       const updatedCartObject = {
         items: cartItems,
@@ -279,10 +282,12 @@ export class CartService {
 
     const deliveryCharges = cart.totalPrice - cart.subTotal;
 
-    const subTotal = items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    const subTotal = items.reduce((acc, item) => {
+      if (item?.slots?.length) {
+        return acc + item.price * item.slots.length;
+      }
+      return acc + item.price * item.quantity;
+    }, 0);
 
     return this.prisma.cart.update({
       where: { id: cartId },
@@ -315,10 +320,14 @@ export class CartService {
 
     const deliveryCharges = cart.totalPrice - cart.subTotal;
 
-    const subTotal = items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    const subTotal = items.reduce((acc, item) => {
+      if (item?.slots?.length) {
+        return acc + item.price * item.slots.length;
+      } else {
+        return acc + item.price * item.quantity;
+      }
+    }, 0);
+
     const updatedCartItem: any = await Promise.all(
       items.map(async (item) => {
         const product = await this.productService.getProduct(item.productId);
@@ -347,9 +356,12 @@ export class CartService {
           // }
         }
         if (product.type === ProductType.PRODUCT) {
+          if (product.id !== data.productId) return;
+
           const variant = product.variants.find(
             (item) => item.sku === data.sku
           );
+
           throwNotFoundException(variant, '', 'Variant is not available');
           if (data.quantity > variant.quantity)
             throw new ProductQuantityException(data.quantity, variant.quantity);
