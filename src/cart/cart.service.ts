@@ -131,7 +131,7 @@ export class CartService {
 
       //this is to make sure subTotal is correct
       const subTotal = cartItems.reduce((acc, item) => {
-        if (item.slots.length) {
+        if (item?.slots?.length) {
           return acc + item.price * item.slots.length;
         }
         return acc + item.price * item.quantity;
@@ -279,7 +279,7 @@ export class CartService {
     const deliveryCharges = cart.totalPrice - cart.subTotal;
 
     const subTotal = items.reduce((acc, item) => {
-      if (item.slots.length) {
+      if (item?.slots?.length) {
         return acc + item.price * item.slots.length;
       }
       return acc + item.price * item.quantity;
@@ -317,7 +317,7 @@ export class CartService {
     const deliveryCharges = cart.totalPrice - cart.subTotal;
 
     const subTotal = items.reduce((acc, item) => {
-      if (item.slots.length) {
+      if (item?.slots?.length) {
         return acc + item.price * item.slots.length;
       } else {
         return acc + item.price * item.quantity;
