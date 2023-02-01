@@ -152,10 +152,24 @@ export class CartService {
 
       // this is an extra check to ensure there is no deliveryArea or deliveryMethod selected if no cartItem is of type PRODUCT present
       if (!haveProductType && (res.deliveryArea || res.deliveryMethod)) {
-        cart = await this.prisma.cart.update({
-          where: { id: res.id },
-          data: { deliveryArea: null, deliveryMethod: null },
-        });
+        let attempts = 0;
+        const maxAttempts = 3;
+        while (attempts < maxAttempts) {
+          try {
+            cart = await this.prisma.cart.update({
+              where: { id: res.id },
+              data: { deliveryArea: null, deliveryMethod: null },
+            });
+          } catch (error) {
+            console.error(`Query failed with error: ${error.message}`);
+
+            if (attempts === maxAttempts) {
+              throw new Error(`Query failed after ${attempts} attempts`);
+            }
+          } finally {
+            attempts++;
+          }
+        }
       }
 
       if (shouldUpdateCart)
