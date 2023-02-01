@@ -72,10 +72,7 @@ export class CartItemService {
 
         if (
           //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
-          !checkIfQuantityIsGood(
-            newQuantity,
-            product.noOfSeats
-          )
+          !checkIfQuantityIsGood(newQuantity, product.noOfSeats)
         ) {
           throw new BadRequestException(
             `You can't add more than ${
@@ -151,6 +148,7 @@ export class CartItemService {
       if (!isAdded) {
         newCart.items = [
           ...newCart.items,
+
           {
             ...item,
             price:
@@ -160,10 +158,14 @@ export class CartItemService {
         ];
       }
     }
-    newCart.subTotal = newCart.items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    newCart.subTotal = newCart.items.reduce((acc, item) => {
+      if (item.slots.length) {
+        return acc + item.price * item.slots.length;
+      }
+
+      return acc + item.price * item.quantity;
+    }, 0);
+
     newCart.totalPrice = newCart.subTotal + deliveryCharges;
 
     newCart.updatedAt = new Date();
