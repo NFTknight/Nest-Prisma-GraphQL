@@ -179,13 +179,11 @@ export class TagsService {
 
     // set start time to the given date.
     const startTime = dayjs(date)
-      .tz('Asia/Riyadh')
       .set('hour', parseInt(startHour))
       .set('minute', parseInt(startMinute));
 
     // set end time to the given date.
     const endTime = dayjs(date)
-      .tz('Asia/Riyadh')
       .set('hour', parseInt(endHour))
       .set('minute', parseInt(endMinute));
 
@@ -195,8 +193,8 @@ export class TagsService {
     const slots = bookings
       .map((b) =>
         b.slots.map((s) => ({
-          from: dayjs(s.from).tz('Asia/Riyadh'),
-          to: dayjs(s.to).tz('Asia/Riyadh'),
+          from: dayjs(s.from),
+          to: dayjs(s.to),
         }))
       )
       .flat();
@@ -205,10 +203,18 @@ export class TagsService {
     while (startFrom.isBefore(endTime)) {
       // Check if the time is available.
       const isAvailable = !slots.some((s) => {
-        return (
-          startFrom.isBetween(s.from, s.to, 'minute', '[)') ||
-          startFrom.add(duration).isBetween(s.from, s.to, 'minute', '(]')
-        );
+        console.log({
+          from: s.from.toDate(),
+          to: s.to.toDate(),
+          startFrom: startFrom.toDate(),
+          duration,
+        });
+        const abc =
+          startFrom.isBetween(s.from.toDate(), s.to, 'minute', '[)') ||
+          startFrom
+            .add(duration)
+            .isBetween(s.from.toDate(), s.to, 'minute', '(]');
+        return abc;
       });
 
       if (isAvailable) {
