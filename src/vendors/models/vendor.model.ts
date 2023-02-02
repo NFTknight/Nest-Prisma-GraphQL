@@ -47,6 +47,15 @@ export class Vendor extends BaseModel implements PrismaVendor {
 
   @Field(() => VendorSubscription, { nullable: true })
   subscription: VendorSubscription;
+
+  @Field({ nullable: true })
+  assignedTo: string;
+
+  @Field(() => User)
+  assign?: User;
+
+  @Field({ nullable: true })
+  notes: string;
 }
 
 @ObjectType()

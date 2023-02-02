@@ -23,7 +23,8 @@ model User {
   verified  Boolean  @default(false)
   role      Role
   vendorId  String?
-  vendor    Vendor?
+  vendor    Vendor?  @relation("owner")
+  assign    Vendor?  @relation("assignedTo")
 }
 
 enum Role {
@@ -53,13 +54,16 @@ model Vendor {
   booking    Booking[]
   forms      Form[]
 
+  owner   User?  @relation("owner", fields: [ownerId], references: [id])
   ownerId String @unique @db.ObjectId
-  owner   User?  @relation(fields: [ownerId], references: [id])
 
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
   cart         Cart[]
   subscription VendorSubscription?
+  assign       User?               @relation(name: "assignedTo", fields: [assignedTo], references: [id])
+  assignedTo   String?             @unique @db.ObjectId
+  notes        String?
 }
 
 type Certificate {

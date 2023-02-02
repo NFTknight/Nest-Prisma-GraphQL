@@ -481,6 +481,7 @@ type Mutation {
   updateUser(data: UpdateUserInput!): User!
   updateUserRole(role: Role!, userId: String!): UserRole!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
+  updateVendorForHub(data: UpdateVendorInputForHub!, id: String!): Vendor!
   uploadFile(file: String!, key: String!): String!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
   verifyPhone(data: PhoneVerify!): Auth!
@@ -1019,11 +1020,22 @@ input UpdateVendorInfoInput {
 }
 
 input UpdateVendorInput {
-  active: Boolean
   bank: UpdateVendorBankInput
   info: UpdateVendorInfoInput
   name: String
   name_ar: String
+  settings: UpdateVendorSettingsInput
+  subscription: AddSubscriptionInput
+}
+
+input UpdateVendorInputForHub {
+  active: Boolean
+  assignedTo: String
+  bank: UpdateVendorBankInput
+  info: UpdateVendorInfoInput
+  name: String
+  name_ar: String
+  notes: String
   settings: UpdateVendorSettingsInput
   subscription: AddSubscriptionInput
 }
@@ -1096,6 +1108,8 @@ input VariantInput {
 type Vendor {
   MF_vendorCode: Int
   active: Boolean!
+  assign: User
+  assignedTo: String
   bank: VendorBank
 
   """Identifies the date and time when the object was created."""
@@ -1104,6 +1118,7 @@ type Vendor {
   info: VendorInfo
   name: String!
   name_ar: String
+  notes: String
   owner: User
   ownerId: String!
   settings: VendorSettings

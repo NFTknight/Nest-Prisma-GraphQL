@@ -8,7 +8,11 @@ import { PaginationArgs } from 'src/common/pagination/pagination.input';
 import { HubService } from './services/hub.service';
 import { GetProductArgs, ProductFilterInputForHub } from './dto/product';
 import { PaginatedProducts } from 'src/products/models/paginated-products.model';
-import { GetVendorsArgs, VendorFilterInputForHub } from './dto/vendor';
+import {
+  GetVendorsArgs,
+  UpdateVendorInputForHub,
+  VendorFilterInputForHub,
+} from './dto/vendor';
 import { PaginatedVendors } from './models/vendor';
 import { SignupInput } from 'src/auth/dto/signup.input';
 import { User } from 'src/users/models/user.model';
@@ -18,6 +22,7 @@ import { PaginatedOrders } from 'src/orders/models/paginated-orders.model';
 import { GetOrderArgs, OrderFilterInputForHub } from './dto/order';
 import { PaginatedCategories } from 'src/categories/models/paginated-categories.model';
 import { CategoryFilterInputForHub, GetCategoryArgs } from './dto/category';
+import { Vendor } from 'src/vendors/models/vendor.model';
 
 @Resolver('hub')
 export class HubResolver {
@@ -113,5 +118,15 @@ export class HubResolver {
   createAgentForHub(@Args('data') data: SignupInput): Promise<User> {
     data.email = data.email.toLowerCase();
     return this.hubService.createAgent(data);
+  }
+
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.ADMIN)
+  @Mutation(() => Vendor)
+  updateVendorForHub(
+    @Args('id') id: string,
+    @Args('data') data: UpdateVendorInputForHub
+  ): Promise<Vendor> {
+    return this.hubService.updateVendor(id, data);
   }
 }

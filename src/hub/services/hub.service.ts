@@ -7,7 +7,11 @@ import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
 import { GetProductArgs, ProductFilterInputForHub } from '../dto/product';
 import { PaginatedProducts } from 'src/products/models/paginated-products.model';
-import { GetVendorsArgs, VendorFilterInputForHub } from '../dto/vendor';
+import {
+  GetVendorsArgs,
+  UpdateVendorInputForHub,
+  VendorFilterInputForHub,
+} from '../dto/vendor';
 import { PaginatedVendors } from '../models/vendor';
 import { SignupInput } from 'src/auth/dto/signup.input';
 import { PasswordService } from 'src/auth/password.service';
@@ -17,6 +21,8 @@ import { PaginatedOrders } from 'src/orders/models/paginated-orders.model';
 import { GetOrderArgs, OrderFilterInputForHub } from '../dto/order';
 import { CategoryFilterInputForHub, GetCategoryArgs } from '../dto/category';
 import { PaginatedCategories } from 'src/categories/models/paginated-categories.model';
+import { getSubscriptionPrice } from 'src/utils/subscription';
+import { AddSubscriptionInputWithPrice } from 'src/vendors/dto/add-subscription-input';
 
 @Injectable()
 export class HubService {
@@ -278,5 +284,26 @@ export class HubService {
       }
       throw new Error(e);
     }
+  };
+
+  updateVendor = (id: string, updateVendorInput: UpdateVendorInputForHub) => {
+    let subscriptionObj: AddSubscriptionInputWithPrice;
+    const { subscription } = updateVendorInput;
+
+    if (subscription) {
+      subscriptionObj = {
+        ...subscription,
+        price: getSubscriptionPrice(subscription.type, subscription.plan),
+      };
+    }
+
+    return this.prisma.vendor.update({
+      data: {
+        ...updateVendorInput,
+        subscription: subscriptionObj,
+        updatedAt: new Date(),
+      },
+      where: { id },
+    });
   };
 }
