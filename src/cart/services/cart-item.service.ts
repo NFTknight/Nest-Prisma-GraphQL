@@ -72,7 +72,10 @@ export class CartItemService {
 
         if (
           //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
-          !checkIfQuantityIsGood(newQuantity, product.noOfSeats)
+          !checkIfQuantityIsGood(
+            newQuantity,
+            product.noOfSeats - product.bookedSeats
+          )
         ) {
           throw new BadRequestException(
             `You can't add more than ${
@@ -107,11 +110,11 @@ export class CartItemService {
         ...item,
         price: productVariant.price,
       });
-      await this.workshopService.createWorkshop({
-        productId: product.id,
-        cartId: cart.id,
-        quantity: quantity,
-      });
+      // await this.workshopService.createWorkshop({
+      //   productId: product.id,
+      //   cartId: cart.id,
+      //   quantity: quantity,
+      // });
     }
 
     if (product.type == ProductType.SERVICE) {

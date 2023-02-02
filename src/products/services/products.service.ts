@@ -128,20 +128,20 @@ export class ProductsService {
         orderBy,
       });
 
-      for (const [i, item] of list.entries()) {
-        const quantity = await this.prisma.workshop.aggregate({
-          _sum: {
-            quantity: true,
-          },
-          where: {
-            productId: item.id,
-          },
-        });
+      // for (const [i, item] of list.entries()) {
+      //   const quantity = await this.prisma.workshop.aggregate({
+      //     _sum: {
+      //       quantity: true,
+      //     },
+      //     where: {
+      //       productId: item.id,
+      //     },
+      //   });
 
-        // if (quantity?._sum?.quantity) {
-        // list[i].bookedSeats += quantity?._sum?.quantity;
-        // }
-      }
+      //   if (quantity?._sum?.quantity) {
+      //   list[i].bookedSeats += quantity?._sum?.quantity;
+      //   }
+      // }
       const totalCount = await this.prisma.product.count();
 
       return {
@@ -168,14 +168,14 @@ export class ProductsService {
       else product.badge = { label: AttendanceType.PHYSICAL };
     }
 
-    const quantity = await this.prisma.workshop.aggregate({
-      _sum: {
-        quantity: true,
-      },
-      where: {
-        productId: product.id,
-      },
-    });
+    // const quantity = await this.prisma.workshop.aggregate({
+    //   _sum: {
+    //     quantity: true,
+    //   },
+    //   where: {
+    //     productId: product.id,
+    //   },
+    // });
 
     // if (quantity?._sum?.quantity) {
     // product.bookedSeats += quantity?._sum?.quantity;
