@@ -205,10 +205,18 @@ export class TagsService {
     while (startFrom.isBefore(endTime)) {
       // Check if the time is available.
       const isAvailable = !slots.some((s) => {
-        return (
-          startFrom.isBetween(s.from, s.to, 'minute', '[)') ||
-          startFrom.add(duration).isBetween(s.from, s.to, 'minute', '(]')
-        );
+        console.log({
+          from: s.from.toDate(),
+          to: s.to.toDate(),
+          startFrom: startFrom.toDate(),
+          duration,
+        });
+        const abc =
+          startFrom.isBetween(s.from.toDate(), s.to, 'minute', '[)') ||
+          startFrom
+            .add(duration)
+            .isBetween(s.from.toDate(), s.to, 'minute', '(]');
+        return abc;
       });
 
       if (isAvailable) {
