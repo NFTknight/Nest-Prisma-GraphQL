@@ -30,7 +30,7 @@ async function bootstrap() {
     })
   );
 
-  // enable shutdown hook
+  // Enable shutdown hook
   const prismaService: PrismaService = app.get(PrismaService);
   prismaService.enableShutdownHooks(app);
 
