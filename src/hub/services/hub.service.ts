@@ -138,6 +138,10 @@ export class HubService {
         skip,
         take: take || undefined,
         orderBy,
+        include: {
+          owner: true, // Return all fields
+          assign: true, // Return all fields
+        },
       });
 
       throwNotFoundException(vendors?.length, '', 'No vendor available');

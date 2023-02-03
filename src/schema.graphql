@@ -2,6 +2,8 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+directive @hideFields on FIELD_DEFINITION
+
 input AddDeliveryAreasInput {
   active: Boolean!
   charge: Int!
