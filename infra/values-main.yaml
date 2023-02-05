@@ -1,22 +1,13 @@
-# Default values for backend-api.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 replicaCount: 3
-
 namespace: prod
-
 image:
   repository: registry.digitalocean.com/anyaa/backend-api
-  tag: 'latest'
-
+  tag: 6dfa204
 containerPort: 3000
-
 ingress:
   tld: anyaa.io
   domain: api
   path: /
-
 resources:
   limits:
     cpu: 300m
@@ -24,14 +15,11 @@ resources:
   requests:
     cpu: 150m
     memory: 256Mi
-
 acme:
   email: thaer.abbas@anyaa.io
-
 storage:
   endpoint: https://ams3.digitaloceanspaces.com
   space: anyaa-prod
-
 myfatoorah:
   endpoint: https://api-sa.myfatoorah.com
   clienturl: https://anyaa.io
