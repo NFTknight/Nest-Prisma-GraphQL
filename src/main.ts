@@ -16,6 +16,7 @@ async function bootstrap() {
   });
   const logger = new Logger('bootstrap');
 
+  // Body Parser
   app.use(json({ limit: '8mb' }));
 
   // Validation

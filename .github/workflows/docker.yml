@@ -56,7 +56,7 @@ jobs:
 
       - name: Build image
         if: steps.changes.outputs.app == 'true'
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: docker build . --file Dockerfile.alpine --tag $IMAGE_NAME
 
       - name: Push image to digitalocean
         if: steps.changes.outputs.app == 'true'
