@@ -351,23 +351,22 @@ export class CartService {
               data.quantity,
               product.noOfSeats - product.bookedSeats
             );
+          } else {
+            const workshop = await this.prisma.workshop.findFirst({
+              where: { productId: product.id, cartId: cartId },
+            });
+            if (workshop) {
+              await this.workshopService.updateWorkshop(workshop.id, {
+                quantity: data.quantity,
+              });
+            } else {
+              await this.workshopService.createWorkshop({
+                productId: product.id,
+                cartId,
+                quantity: item.quantity,
+              });
+            }
           }
-          // else {
-          // const workshop = await this.prisma.workshop.findFirst({
-          //   where: { productId: product.id, cartId: cartId },
-          // });
-          // if (workshop) {
-          //   await this.workshopService.updateWorkshop(workshop.id, {
-          //     quantity: data.quantity,
-          //   });
-          // } else {
-          //   await this.workshopService.createWorkshop({
-          //     productId: product.id,
-          //     cartId,
-          //     quantity: item.quantity,
-          //   });
-          // }
-          // }
         }
         if (product.type === ProductType.PRODUCT) {
           if (product.id !== data.productId) return;
@@ -548,6 +547,10 @@ export class CartService {
           updatedAt: new Date(),
         },
       });
+      //delete all workshop holds
+      await this.prisma.workshop.deleteMany({
+        where: { cartId },
+      });
 
       // remove cart: all details are now in order
       await this.prisma.cart.delete({
@@ -610,22 +613,38 @@ export class CartService {
           // await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
       }
-      if (
-        product.type === ProductType.WORKSHOP &&
-        !!product?.noOfSeats &&
-        !!product.bookedSeats &&
-        product.noOfSeats - product.bookedSeats < item.quantity
-      ) {
-        cartErrors.push({
-          Name: 'WorkshopIssue',
-          Error: 'WorkshopHaveLessSeatAsCart',
-          Variables: {
-            title: product.title,
-            quantity: product.noOfSeats - product.bookedSeats,
-            itemQuantity: item.quantity,
+      if (product.type === ProductType.WORKSHOP) {
+        if (
+          !!product?.noOfSeats &&
+          !!product.bookedSeats &&
+          product.noOfSeats - product.bookedSeats < item.quantity
+        ) {
+          cartErrors.push({
+            Name: 'WorkshopIssue',
+            Error: 'WorkshopHaveLessSeatAsCart',
+            Variables: {
+              title: product.title,
+              quantity: product.noOfSeats - product.bookedSeats,
+              itemQuantity: item.quantity,
+            },
+          });
+          // await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        }
+        const workshopBooking = await this.prisma.workshop.findFirst({
+          where: {
+            productId: product.id,
+            cartId: cart.id,
           },
         });
-        // await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        if (!workshopBooking) {
+          cartErrors.push({
+            Name: 'WorkshopIssue',
+            Error: 'WorkshopBookingExpired',
+            Variables: {
+              title: product.title,
+            },
+          });
+        }
       }
       if (product.type === ProductType.SERVICE) {
         const booking = await this.prisma.booking.findFirst({
