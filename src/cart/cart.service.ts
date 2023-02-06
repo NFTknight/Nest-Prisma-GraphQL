@@ -207,7 +207,7 @@ export class CartService {
 
       if (!haveProductType) {
         updatedCartObject['deliveryCharges'] = 0;
-        updatedCartObject['totalPrice'] = subTotal;
+        updatedCartObject['totalPrice'] = finalPrice;
         if (updatedCartObject['deliveryMethod']) {
           updatedCartObject['deliveryMethod'] = null;
         }
