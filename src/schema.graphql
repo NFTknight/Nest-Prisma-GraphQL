@@ -105,6 +105,7 @@ type Cart {
   customerId: String!
   customerInfo: CustomerInfo
   deliveryArea: String
+  deliveryCharges: Float
   deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
@@ -165,7 +166,9 @@ input CartUpdateInput {
   consigneeAddress: CartAddressInput
   customerInfo: CustomerInput
   deliveryArea: String
+  deliveryCharges: Int
   deliveryMethod: DeliveryMethods
+  finalPrice: Int
   items: [CartItemInput!]
   paymentMethod: PaymentMethods
   shippingAddress: CartAddressInput
@@ -425,6 +428,7 @@ input LoginInput {
 }
 
 type Mutation {
+  addCouponToCart(cartId: String!, id: String!): Cart!
   addDeliveryAreas(areas: [AddDeliveryAreasInput!]!, id: String!): Vendor!
   addItemToCart(cartId: String!, data: CartItemInput!): Cart!
   addProductToCart(cartId: String!, data: CartItemInput!): Cart!
@@ -457,6 +461,7 @@ type Mutation {
   refreshToken(token: JWT!): Token!
   refundPayment(orderId: String!): RefundPaymentAPIResponse!
   removeCartItem(cartId: String!, date: String, productId: String!, sku: String!): Cart!
+  removeCouponFromCart(cartId: String!, id: String!): Cart!
   resetPassword(data: ResetPwtInput!): DefaultResponse!
   sendOtp(data: SendOtpInput!): OtpResponse!
   signup(data: SignupInput!): Auth!
@@ -489,6 +494,7 @@ type Order {
   createdAt: DateTime!
   customerId: String
   customerInfo: CustomerInfo
+  deliveryCharges: Float!
   deliveryMethod: DeliveryMethods
   finalPrice: Float!
   id: ID!
@@ -526,6 +532,7 @@ type OrderPayment {
   createdAt: DateTime!
   customerId: String
   customerInfo: CustomerInfo
+  deliveryCharges: Float!
   deliveryMethod: DeliveryMethods
   errors: [ExecutePaymentError!]
   finalPrice: Float!

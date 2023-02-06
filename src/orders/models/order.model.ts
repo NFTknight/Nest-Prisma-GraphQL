@@ -69,6 +69,9 @@ export class Order extends BaseModel {
   @Field(() => Float)
   finalPrice: number;
 
+  @Field(() => Float)
+  deliveryCharges: number;
+
   @Field(() => CartAddress, { nullable: true })
   consigneeAddress: Address;
 

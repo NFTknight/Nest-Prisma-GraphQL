@@ -290,13 +290,14 @@ type CartAddress {
 }
 
 model Cart {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  items         CartItem[]
-  customerId    String
-  appliedCoupon String?
-  totalPrice    Float
-  subTotal      Float?
-  finalPrice    Float
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  items           CartItem[]
+  customerId      String
+  appliedCoupon   String?
+  totalPrice      Float
+  deliveryCharges Float?     @default(0)
+  subTotal        Float?
+  finalPrice      Float
 
   vendorId String? @db.ObjectId
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
@@ -342,13 +343,14 @@ model Order {
   cartId String? @db.ObjectId
   cart   Cart?   @relation(fields: [cartId], references: [id])
 
-  totalPrice    Float
-  subTotal      Float?      @default(0)
-  finalPrice    Float
-  appliedCoupon String?
-  items         CartItem[]
-  status        OrderStatus
-  customerId    String
+  totalPrice      Float
+  deliveryCharges Float?      @default(0)
+  subTotal        Float?      @default(0)
+  finalPrice      Float
+  appliedCoupon   String?
+  items           CartItem[]
+  status          OrderStatus
+  customerId      String
 
   customerInfo   CustomerInfo
   deliveryMethod DeliveryMethods?

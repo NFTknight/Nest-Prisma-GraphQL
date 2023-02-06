@@ -1,7 +1,6 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { BaseModel } from 'src/common/models/base.model';
 import { CartItem } from './cart-item.model';
-import { Cart as PrismaCart } from '@prisma/client';
 import { CustomerInfo } from 'src/orders/models/customer-info.model';
 import {
   DeliveryMethods,
@@ -19,7 +18,7 @@ export type Address = {
   addressUrl: string;
 };
 @ObjectType()
-export class Cart extends BaseModel implements PrismaCart {
+export class Cart extends BaseModel {
   @Field(() => [CartItem])
   items: CartItem[];
 
@@ -58,4 +57,7 @@ export class Cart extends BaseModel implements PrismaCart {
 
   @Field(() => String, { nullable: true })
   deliveryArea: string;
+
+  @Field(() => Float, { nullable: true })
+  deliveryCharges?: number;
 }

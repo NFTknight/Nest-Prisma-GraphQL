@@ -40,7 +40,6 @@ export class CartItemService {
       productId: product.id,
       sku: productVariant.sku,
     });
-    const deliveryCharges = newCart.totalPrice - newCart.subTotal;
 
     if (existingProductIndex !== -1) {
       const newQuantity =
@@ -161,6 +160,7 @@ export class CartItemService {
         ];
       }
     }
+
     newCart.subTotal = newCart.items.reduce((acc, item) => {
       if (item?.slots?.length) {
         return acc + item.price * item.slots.length;
@@ -169,7 +169,22 @@ export class CartItemService {
       return acc + item.price * item.quantity;
     }, 0);
 
-    newCart.totalPrice = newCart.subTotal + deliveryCharges;
+    if (!newCart.appliedCoupon) {
+      newCart.finalPrice = newCart.subTotal;
+    } else {
+      const coupon = await this.prisma.coupon.findFirst({
+        where: { code: newCart.appliedCoupon },
+      });
+
+      if (coupon) {
+        newCart.finalPrice =
+          newCart.subTotal - (newCart.subTotal * coupon.discount) / 100;
+      } else {
+        newCart.appliedCoupon = '';
+      }
+    }
+
+    newCart.totalPrice = newCart.finalPrice + newCart?.deliveryCharges || 0;
 
     newCart.updatedAt = new Date();
 

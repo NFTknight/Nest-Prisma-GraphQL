@@ -131,9 +131,22 @@ export class CartService {
         // }
       }
       //this brings the deliveryCharges
-      const deliveryCharges = res.totalPrice - res.subTotal;
+      // const deliveryCharges = res.totalPrice - res.subTotal;
 
-      //this is to make sure subTotal is correct
+      const vendor = await this.prisma.vendor.findUnique({
+        where: { id: res.vendorId },
+      });
+      let deliveryCharges = 0;
+
+      if (res.deliveryMethod === DeliveryMethods.MANDOOB && res.deliveryArea) {
+        deliveryCharges =
+          vendor?.settings?.deliveryAreas?.find(
+            (deliveryArea) => deliveryArea.label === res.deliveryArea
+          )?.charge || 0;
+      } else if (res.deliveryMethod === DeliveryMethods.SMSA) {
+        deliveryCharges = 30;
+      }
+
       const subTotal = cartItems.reduce((acc, item) => {
         if (item?.slots?.length) {
           return acc + item.price * item.slots.length;
@@ -141,10 +154,30 @@ export class CartService {
         return acc + item.price * item.quantity;
       }, 0);
 
+      let finalPrice = 0;
+      let appliedCoupon = res.appliedCoupon;
+
+      if (res.appliedCoupon) {
+        const coupon = await this.prisma.coupon.findFirst({
+          where: { code: res.appliedCoupon, active: true },
+        });
+        if (coupon) {
+          finalPrice = subTotal - (subTotal * coupon.discount) / 100;
+        } else {
+          appliedCoupon = '';
+          finalPrice = subTotal;
+        }
+      } else {
+        finalPrice = subTotal;
+      }
+
       const updatedCartObject = {
         items: cartItems,
-        subTotal: subTotal,
-        totalPrice: subTotal + deliveryCharges,
+        subTotal,
+        appliedCoupon,
+        finalPrice,
+        totalPrice: finalPrice + deliveryCharges,
+        deliveryCharges,
       };
 
       if (!haveProductType) updatedCartObject['totalPrice'] = subTotal;
@@ -172,14 +205,25 @@ export class CartService {
         }
       }
 
-      if (shouldUpdateCart)
+      if (!haveProductType) {
+        updatedCartObject['deliveryCharges'] = 0;
+        updatedCartObject['totalPrice'] = finalPrice;
+        if (updatedCartObject['deliveryMethod']) {
+          updatedCartObject['deliveryMethod'] = null;
+        }
+        if (updatedCartObject['deliveryArea']) {
+          updatedCartObject['deliveryArea'] = null;
+        }
+      }
+
+      if (shouldUpdateCart || updatedCartObject.totalPrice !== res.totalPrice)
         cart = await this.updateCart(res.id, updatedCartObject);
 
       return {
         ...cart,
-
-        //returning newly calculated subTotal + deliveryCharges as new total
+        appliedCoupon,
         totalPrice: updatedCartObject.totalPrice,
+        finalPrice: updatedCartObject.finalPrice,
         subTotal: updatedCartObject.subTotal,
         items: cartItems,
       };
@@ -188,6 +232,7 @@ export class CartService {
     }
   }
 
+  // this should not be directly mutation things... need to look in the future
   async updateCartPrice(
     cartId: string,
     prices: { totalPrice: number }
@@ -294,8 +339,6 @@ export class CartService {
       );
     }
 
-    const deliveryCharges = cart.totalPrice - cart.subTotal;
-
     const subTotal = items.reduce((acc, item) => {
       if (item?.slots?.length) {
         return acc + item.price * item.slots.length;
@@ -303,12 +346,23 @@ export class CartService {
       return acc + item.price * item.quantity;
     }, 0);
 
+    let finalPrice = subTotal;
+    if (cart.appliedCoupon) {
+      const coupon = await this.prisma.coupon.findFirst({
+        where: { code: cart.appliedCoupon },
+      });
+      if (coupon) {
+        finalPrice = subTotal - (subTotal * coupon.discount) / 100;
+      }
+    }
+
     return this.prisma.cart.update({
       where: { id: cartId },
       data: {
         items,
         subTotal,
-        totalPrice: subTotal + deliveryCharges,
+        finalPrice,
+        totalPrice: finalPrice + cart.deliveryCharges || 0,
       },
     });
   }
@@ -332,8 +386,6 @@ export class CartService {
         : item
     );
 
-    const deliveryCharges = cart.totalPrice - cart.subTotal;
-
     const subTotal = items.reduce((acc, item) => {
       if (item?.slots?.length) {
         return acc + item.price * item.slots.length;
@@ -341,6 +393,15 @@ export class CartService {
         return acc + item.price * item.quantity;
       }
     }, 0);
+    let finalPrice = subTotal;
+    if (cart.appliedCoupon) {
+      const coupon = await this.prisma.coupon.findFirst({
+        where: { code: cart.appliedCoupon },
+      });
+      if (coupon) {
+        finalPrice = subTotal - (subTotal * coupon.discount) / 100;
+      }
+    }
 
     const updatedCartItem: any = await Promise.all(
       items.map(async (item) => {
@@ -390,9 +451,17 @@ export class CartService {
       data: {
         items,
         subTotal,
-        totalPrice: subTotal + deliveryCharges,
+        finalPrice,
+        totalPrice: finalPrice + cart.deliveryCharges || 0,
       },
     });
+
+    // const updatedCartItem: any = await Promise.all(
+    //   cart.items.map(async (item) => {
+    //     const product = await this.productService.getProduct(item.productId);
+    //     return { ...product, ...item };
+    //   })
+    // );
 
     updatedCart.items = updatedCartItem;
 
@@ -475,6 +544,7 @@ export class CartService {
           subTotal: cart.subTotal,
           finalPrice: cart.finalPrice || cart.subTotal,
           totalPrice: cart.totalPrice,
+          deliveryCharges: cart?.deliveryCharges || 0,
           status: OrderStatus[isOnlinePayment ? 'CREATED' : 'PENDING'],
           ...(cart.deliveryMethod && {
             deliveryMethod: cart.deliveryMethod,
