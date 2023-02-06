@@ -216,7 +216,7 @@ export class CartService {
         }
       }
 
-      if (shouldUpdateCart)
+      if (shouldUpdateCart || updatedCartObject.totalPrice !== res.totalPrice)
         cart = await this.updateCart(res.id, updatedCartObject);
 
       return {
