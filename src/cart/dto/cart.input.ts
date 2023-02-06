@@ -2,7 +2,6 @@ import { IsEmail, IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int, Float } from '@nestjs/graphql';
 import { BookingTime } from 'src/bookings/models/booking-time.model';
 import { DeliveryMethods, PaymentMethods } from '@prisma/client';
-import { CartAddress } from '../models/cart-address.model';
 
 @InputType()
 export class BookingTimeInput implements BookingTime {
@@ -86,7 +85,7 @@ export class CartAddressInput {
 
 @InputType()
 export class CartUpdateInput {
-  @Field(() => [CartItemInput], { nullable: true })
+  @Field(() => [CartItemInput])
   items?: CartItemInput[];
 
   @Field({ nullable: true })
@@ -102,10 +101,10 @@ export class CartUpdateInput {
   deliveryMethod?: DeliveryMethods;
 
   @Field(() => CartAddressInput, { nullable: true })
-  consigneeAddress: CartAddressInput;
+  consigneeAddress?: CartAddressInput;
 
   @Field(() => CartAddressInput, { nullable: true })
-  shippingAddress: CartAddressInput;
+  shippingAddress?: CartAddressInput;
 
   @Field(() => String, { nullable: true })
   deliveryArea?: string;

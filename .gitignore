@@ -7,3 +7,4 @@ coverage/
 
 prisma/migrations/dev/
 .env
+.idea

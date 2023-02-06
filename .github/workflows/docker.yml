@@ -5,59 +5,76 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - main
+      - develop
+      - staging
 
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
 
+  # Run tests for any PRs.
+  pull_request:
+
 env:
-  # TODO: Change variable to your image's name.
   IMAGE_NAME: backend-api
 
 jobs:
   #Push to Digital Ocean private Registry
-  CD:
+  build:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
+
       - uses: dorny/paths-filter@v2
         id: changes
         with:
+          base: ${{ github.ref }}
           filters: |
             app:
               - 'src/**'
+              - 'prisma/**'
+              - 'styles/**'
+              - 'package.json'
+              - '*config.js'
+              - '*config.json'
+              - '*config.ts'
               - 'Dockerfile*'
+              - '.dockerignore'
 
       - name: Install doctl # install the doctl on the runner
+        if: steps.changes.outputs.app == 'true'
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Set version
+        if: steps.changes.outputs.app == 'true'
+        id: set_version
+        run: |
+          echo "sha_short=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
 
       - name: Build image
         if: steps.changes.outputs.app == 'true'
         run: docker build . --file Dockerfile.alpine --tag $IMAGE_NAME
 
-      - name: Push image
+      - name: Push image to digitalocean
         if: steps.changes.outputs.app == 'true'
         run: |
           doctl registry login
-          docker tag $IMAGE_NAME registry.digitalocean.com/anyaa/$IMAGE_NAME
-          docker push registry.digitalocean.com/anyaa/$IMAGE_NAME
+          docker tag $IMAGE_NAME registry.digitalocean.com/anyaa/$IMAGE_NAME:${{ env.sha_short }}
+          docker push registry.digitalocean.com/anyaa/$IMAGE_NAME:${{ env.sha_short }}
 
-      - name: Set up kubectl
-        uses: matootie/dokube@v1.4.0
+      - name: Update values.yaml
+        if: steps.changes.outputs.app == 'true'
+        uses: fjogeleit/yaml-update-action@main
         with:
-          personalAccessToken: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          clusterName: anyaa-k8s
-          expirationTime: 300
-
-      - name: Upgrade deployment
-        run: |
-          helm upgrade --install --atomic --timeout 5m backend-api ./infra/ -f ./infra/values-dev.yaml \
-          --namespace dev --create-namespace \
-          --set-string sha=${{ github.sha }}
-
-      - name: Restart deployment
-        run: |
-          kubectl rollout restart deployment backend-api -n dev
+          valueFile: 'infra/values-${{ github.ref_name }}.yaml'
+          propertyPath: 'image.tag'
+          value: ${{ env.sha_short }}
+          masterBranchName: main
+          commitChange: true
+          createPR: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+          message: 'Update infra/values-${{ github.ref_name }}.yaml with new image tag ${{ env.sha_short }}'

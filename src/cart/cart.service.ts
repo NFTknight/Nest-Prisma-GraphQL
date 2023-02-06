@@ -5,6 +5,7 @@ import { Cart } from './models/cart.model';
 import { CartItemInput } from './dto/cart.input';
 import {
   BookingStatus,
+  CartItem,
   DeliveryMethods,
   Order,
   OrderStatus,
@@ -26,6 +27,10 @@ import { ShippingService } from 'src/shipping/shipping.service';
 import { CreateShipmentInput } from 'src/orders/dto/update-order.input';
 import { WorkshopService } from 'src/workshops/workshops.service';
 import { checkIfQuantityIsGood, getReadableDate } from 'src/utils/general';
+import {
+  ProductQuantityException,
+  WorkshopQuantityException,
+} from 'src/utils/errors';
 
 @Injectable()
 export class CartService {
@@ -69,7 +74,7 @@ export class CartService {
       });
       if (!res) return null;
 
-      const cartItems = res.items;
+      const cartItems: CartItem[] = [...res.items];
 
       let shouldUpdateCart = false;
       let haveProductType = false;
@@ -90,10 +95,14 @@ export class CartService {
 
           if (product.type === ProductType.SERVICE) {
             const bookings = await this.prisma.booking.findMany({
-              where: { cartId: res.id, productId: product.id },
+              where: {
+                cartId: res.id,
+                productId: product.id,
+              },
             });
 
             if (!bookings.length) {
+              shouldUpdateCart = true;
               cartItems.splice(i, 1);
             }
           }
@@ -110,15 +119,16 @@ export class CartService {
             };
           }
         }
-        if (product.type === ProductType.WORKSHOP) {
-          const isWorkShopExists = await this.prisma.workshop.findFirst({
-            where: { productId: product.id, cartId: res.id },
-          });
-          if (!isWorkShopExists) {
-            cartItems.splice(i, 1);
-            shouldUpdateCart = true;
-          }
-        }
+
+        // if (product.type === ProductType.WORKSHOP) {
+        //   const isWorkShopExists = await this.prisma.workshop.findFirst({
+        //     where: { productId: product.id, cartId: res.id },
+        //   });
+        //   if (!isWorkShopExists) {
+        //     cartItems.splice(i, 1);
+        //     shouldUpdateCart = true;
+        //   }
+        // }
       }
       //this brings the deliveryCharges
       // const deliveryCharges = res.totalPrice - res.subTotal;
@@ -137,12 +147,16 @@ export class CartService {
         deliveryCharges = 30;
       }
 
-      const subTotal = cartItems.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-      );
+      const subTotal = cartItems.reduce((acc, item) => {
+        if (item?.slots?.length) {
+          return acc + item.price * item.slots.length;
+        }
+        return acc + item.price * item.quantity;
+      }, 0);
+
       let finalPrice = 0;
       let appliedCoupon = res.appliedCoupon;
+
       if (res.appliedCoupon) {
         const coupon = await this.prisma.coupon.findFirst({
           where: { code: res.appliedCoupon, active: true },
@@ -166,6 +180,31 @@ export class CartService {
         deliveryCharges,
       };
 
+      if (!haveProductType) updatedCartObject['totalPrice'] = subTotal;
+      let cart: Cart = res;
+
+      // this is an extra check to ensure there is no deliveryArea or deliveryMethod selected if no cartItem is of type PRODUCT present
+      if (!haveProductType && (res.deliveryArea || res.deliveryMethod)) {
+        let attempts = 0;
+        const maxAttempts = 3;
+        while (attempts < maxAttempts) {
+          try {
+            cart = await this.prisma.cart.update({
+              where: { id: res.id },
+              data: { deliveryArea: null, deliveryMethod: null },
+            });
+          } catch (error) {
+            console.error(`Query failed with error: ${error.message}`);
+
+            if (attempts === maxAttempts) {
+              throw new Error(`Query failed after ${attempts} attempts`);
+            }
+          } finally {
+            attempts++;
+          }
+        }
+      }
+
       if (!haveProductType) {
         updatedCartObject['deliveryCharges'] = 0;
         updatedCartObject['totalPrice'] = subTotal;
@@ -177,18 +216,11 @@ export class CartService {
         }
       }
 
-      if (
-        appliedCoupon !== res.appliedCoupon ||
-        shouldUpdateCart ||
-        !haveProductType
-      )
-        await this.prisma.cart.update({
-          where: { id: res.id },
-          data: updatedCartObject,
-        });
+      if (shouldUpdateCart)
+        cart = await this.updateCart(res.id, updatedCartObject);
 
       return {
-        ...res,
+        ...cart,
         appliedCoupon,
         totalPrice: updatedCartObject.totalPrice,
         finalPrice: updatedCartObject.finalPrice,
@@ -273,6 +305,20 @@ export class CartService {
         throw new BadRequestException(
           'Date is required to remove Item of type Service'
         );
+
+      const allExistingBookings = await this.prisma.booking.findMany({
+        where: { status: BookingStatus.HOLD, productId, cartId },
+      });
+      for (const booking of allExistingBookings) {
+        if (
+          getReadableDate(booking?.slots[0]?.from?.toString()) ===
+          getReadableDate(date.toString())
+        ) {
+          await this.prisma.booking.delete({
+            where: { id: booking.id },
+          });
+        }
+      }
       const sameServiceItems = cart.items.filter(
         (item) => item.productId === productId && item.sku === sku
       );
@@ -293,10 +339,12 @@ export class CartService {
       );
     }
 
-    const subTotal = items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    const subTotal = items.reduce((acc, item) => {
+      if (item?.slots?.length) {
+        return acc + item.price * item.slots.length;
+      }
+      return acc + item.price * item.quantity;
+    }, 0);
 
     let finalPrice = subTotal;
     if (cart.appliedCoupon) {
@@ -338,10 +386,13 @@ export class CartService {
         : item
     );
 
-    const subTotal = items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    const subTotal = items.reduce((acc, item) => {
+      if (item?.slots?.length) {
+        return acc + item.price * item.slots.length;
+      } else {
+        return acc + item.price * item.quantity;
+      }
+    }, 0);
     let finalPrice = subTotal;
     if (cart.appliedCoupon) {
       const coupon = await this.prisma.coupon.findFirst({
@@ -351,6 +402,49 @@ export class CartService {
         finalPrice = subTotal - (subTotal * coupon.discount) / 100;
       }
     }
+
+    const updatedCartItem: any = await Promise.all(
+      items.map(async (item) => {
+        const product = await this.productService.getProduct(item.productId);
+        if (product.type === ProductType.WORKSHOP) {
+          if (product.noOfSeats - product.bookedSeats < data.quantity) {
+            throw new WorkshopQuantityException(
+              data.quantity,
+              product.noOfSeats - product.bookedSeats
+            );
+          }
+          // else {
+          // const workshop = await this.prisma.workshop.findFirst({
+          //   where: { productId: product.id, cartId: cartId },
+          // });
+          // if (workshop) {
+          //   await this.workshopService.updateWorkshop(workshop.id, {
+          //     quantity: data.quantity,
+          //   });
+          // } else {
+          //   await this.workshopService.createWorkshop({
+          //     productId: product.id,
+          //     cartId,
+          //     quantity: item.quantity,
+          //   });
+          // }
+          // }
+        }
+        if (product.type === ProductType.PRODUCT) {
+          if (product.id !== data.productId) return;
+
+          const variant = product.variants.find(
+            (item) => item.sku === data.sku
+          );
+
+          throwNotFoundException(variant, '', 'Variant is not available');
+          if (data.quantity > variant.quantity)
+            throw new ProductQuantityException(data.quantity, variant.quantity);
+        }
+
+        return { ...product, ...item };
+      })
+    );
 
     const updatedCart = this.prisma.cart.update({
       where: { id: cartId },
@@ -362,12 +456,12 @@ export class CartService {
       },
     });
 
-    const updatedCartItem: any = await Promise.all(
-      cart.items.map(async (item) => {
-        const product = await this.productService.getProduct(item.productId);
-        return { ...product, ...item };
-      })
-    );
+    // const updatedCartItem: any = await Promise.all(
+    //   cart.items.map(async (item) => {
+    //     const product = await this.productService.getProduct(item.productId);
+    //     return { ...product, ...item };
+    //   })
+    // );
 
     updatedCart.items = updatedCartItem;
 
@@ -379,7 +473,6 @@ export class CartService {
       where: { id: cartId },
     });
     if (!cart) throw new BadRequestException('Cart does not exists');
-
     // cart deletion
     await this.prisma.cart.delete({
       where: { id: cartId },
@@ -584,12 +677,14 @@ export class CartService {
               itemQuantity: item.quantity,
             },
           });
-          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+          // await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
       }
       if (
         product.type === ProductType.WORKSHOP &&
-        (product.noOfSeats || 0 - product.bookedSeats || 0) < item.quantity
+        !!product?.noOfSeats &&
+        !!product.bookedSeats &&
+        product.noOfSeats - product.bookedSeats < item.quantity
       ) {
         cartErrors.push({
           Name: 'WorkshopIssue',
@@ -600,7 +695,7 @@ export class CartService {
             itemQuantity: item.quantity,
           },
         });
-        await this.removeItemFromCart(cart.id, item.productId, item.sku);
+        // await this.removeItemFromCart(cart.id, item.productId, item.sku);
       }
       if (product.type === ProductType.SERVICE) {
         const booking = await this.prisma.booking.findFirst({
@@ -616,7 +711,7 @@ export class CartService {
               title: product.title,
             },
           });
-          await this.removeItemFromCart(cart.id, item.productId, item.sku);
+          // await this.removeItemFromCart(cart.id, item.productId, item.sku);
         }
       }
     }

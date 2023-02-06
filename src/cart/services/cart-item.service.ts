@@ -42,42 +42,58 @@ export class CartItemService {
     });
 
     if (existingProductIndex !== -1) {
+      const newQuantity =
+        newCart.items[existingProductIndex].quantity + quantity;
       if (
         //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
         product.type === ProductType.PRODUCT &&
-        !checkIfQuantityIsGood(
-          newCart.items[existingProductIndex].quantity,
-          productVariant.quantity
-        )
+        !checkIfQuantityIsGood(newQuantity, productVariant.quantity)
       ) {
         throw new BadRequestException(
           `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
         );
       } else {
         if (product.type === ProductType.PRODUCT)
-          newCart.items[existingProductIndex].quantity += quantity;
+          newCart.items[existingProductIndex].quantity = newQuantity;
       }
 
       if (product.type === ProductType.WORKSHOP) {
-        const workshopBooking = await this.prisma.workshop.findFirst({
-          where: {
-            productId: product.id,
-            cartId: cart.id,
-          },
-        });
-        if (!!workshopBooking) {
-          this.workshopService.updateWorkshop(workshopBooking.id, {
-            quantity: newCart.items[existingProductIndex].quantity + quantity,
-          });
-          newCart.items[existingProductIndex].quantity += quantity;
+        //   const workshopBooking = await this.prisma.workshop.findFirst({
+        //     where: {
+        //       productId: product.id,
+        //       cartId: cart.id,
+        //     },
+        //   });
+        //   if (!!workshopBooking) {
+        //     this.workshopService.updateWorkshop(workshopBooking.id, {
+        //       quantity: newCart.items[existingProductIndex].quantity + quantity,
+        //     });
+
+        if (
+          //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+          !checkIfQuantityIsGood(
+            newQuantity,
+            product.noOfSeats - product.bookedSeats
+          )
+        ) {
+          throw new BadRequestException(
+            `You can't add more than ${
+              product.noOfSeats - product.bookedSeats
+            } no of products in your cart. You already have ${
+              newCart.items[existingProductIndex].quantity
+            } item(s)`
+          );
         } else {
-          await this.workshopService.createWorkshop({
-            productId: product.id,
-            cartId: cart.id,
-            quantity: quantity,
-          });
-          newCart.items[existingProductIndex].quantity = quantity;
+          newCart.items[existingProductIndex].quantity = newQuantity;
         }
+        //   } else {
+        //     await this.workshopService.createWorkshop({
+        //       productId: product.id,
+        //       cartId: cart.id,
+        //       quantity: quantity,
+        //     });
+        //     newCart.items[existingProductIndex].quantity = quantity;
+        //   }
       }
     } else {
       if (
@@ -93,11 +109,11 @@ export class CartItemService {
         ...item,
         price: productVariant.price,
       });
-      await this.workshopService.createWorkshop({
-        productId: product.id,
-        cartId: cart.id,
-        quantity: quantity,
-      });
+      // await this.workshopService.createWorkshop({
+      //   productId: product.id,
+      //   cartId: cart.id,
+      //   quantity: quantity,
+      // });
     }
 
     if (product.type == ProductType.SERVICE) {
@@ -134,6 +150,7 @@ export class CartItemService {
       if (!isAdded) {
         newCart.items = [
           ...newCart.items,
+
           {
             ...item,
             price:
@@ -144,10 +161,13 @@ export class CartItemService {
       }
     }
 
-    newCart.subTotal = newCart.items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    newCart.subTotal = newCart.items.reduce((acc, item) => {
+      if (item?.slots?.length) {
+        return acc + item.price * item.slots.length;
+      }
+
+      return acc + item.price * item.quantity;
+    }, 0);
 
     if (!newCart.appliedCoupon) {
       newCart.finalPrice = newCart.subTotal;
@@ -189,6 +209,20 @@ export class CartItemService {
     return newCart;
   }
 
+  createBooking = async (slots, tagId, vendorId, cartId, productId) => {
+    await this.prisma.booking.create({
+      data: {
+        status: BookingStatus.HOLD,
+        slots: slots,
+        tag: { connect: { id: tagId } },
+        vendor: { connect: { id: vendorId } },
+        cart: { connect: { id: cartId } },
+        product: { connect: { id: productId } },
+        holdTimestamp: new Date(),
+      },
+    });
+  };
+
   // TODO revisit HOLD booking logic
   async addServiceToCart(
     product: Product,
@@ -197,18 +231,43 @@ export class CartItemService {
   ): Promise<Cart> {
     const newCart = this.addProduct(product, cart, item);
 
-    // create booking
-    await this.prisma.booking.create({
-      data: {
+    const allExistingBookings = await this.prisma.booking.findMany({
+      where: {
         status: BookingStatus.HOLD,
-        slots: item.slots,
-        tag: { connect: { id: item.tagId } },
-        vendor: { connect: { id: product.vendorId } },
-        cart: { connect: { id: cart.id } },
-        product: { connect: { id: product.id } },
-        holdTimestamp: new Date(),
+        productId: product.id,
+        cartId: cart.id,
       },
     });
+
+    let slotFound = false;
+
+    for (const booking of allExistingBookings) {
+      if (
+        getReadableDate(booking?.slots?.[0]?.from?.toString()) ===
+        getReadableDate(item?.slots?.[0]?.from?.toString())
+      ) {
+        slotFound = true;
+        await this.prisma.booking.update({
+          where: { id: booking.id },
+          data: {
+            holdTimestamp: new Date(),
+            slots: {
+              push: item.slots,
+            },
+          },
+        });
+      }
+    }
+
+    if (!slotFound) {
+      await this.createBooking(
+        item.slots,
+        item.tagId,
+        product.vendorId,
+        cart.id,
+        product.id
+      );
+    }
 
     return newCart;
   }

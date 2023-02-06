@@ -16,6 +16,7 @@ async function bootstrap() {
   });
   const logger = new Logger('bootstrap');
 
+  // Body Parser
   app.use(json({ limit: '8mb' }));
 
   // Validation
@@ -30,7 +31,7 @@ async function bootstrap() {
     })
   );
 
-  // enable shutdown hook
+  // Enable shutdown hook
   const prismaService: PrismaService = app.get(PrismaService);
   prismaService.enableShutdownHooks(app);
 
