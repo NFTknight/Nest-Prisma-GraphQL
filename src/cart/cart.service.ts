@@ -120,15 +120,15 @@ export class CartService {
           }
         }
 
-        // if (product.type === ProductType.WORKSHOP) {
-        //   const isWorkShopExists = await this.prisma.workshop.findFirst({
-        //     where: { productId: product.id, cartId: res.id },
-        //   });
-        //   if (!isWorkShopExists) {
-        //     cartItems.splice(i, 1);
-        //     shouldUpdateCart = true;
-        //   }
-        // }
+        if (product.type === ProductType.WORKSHOP) {
+          const isWorkShopExists = await this.prisma.workshop.findFirst({
+            where: { productId: product.id, cartId: res.id },
+          });
+          if (!isWorkShopExists) {
+            shouldUpdateCart = true;
+            cartItems[i] = { ...cartItems[i], expired: true };
+          }
+        }
       }
       //this brings the deliveryCharges
       const deliveryCharges = res.totalPrice - res.subTotal;

@@ -59,42 +59,42 @@ export class CartItemService {
       }
 
       if (product.type === ProductType.WORKSHOP) {
-        //   const workshopBooking = await this.prisma.workshop.findFirst({
-        //     where: {
-        //       productId: product.id,
-        //       cartId: cart.id,
-        //     },
-        //   });
-        //   if (!!workshopBooking) {
-        //     this.workshopService.updateWorkshop(workshopBooking.id, {
-        //       quantity: newCart.items[existingProductIndex].quantity + quantity,
-        //     });
+        const workshopBooking = await this.prisma.workshop.findFirst({
+          where: {
+            productId: product.id,
+            cartId: cart.id,
+          },
+        });
+        if (!!workshopBooking) {
+          this.workshopService.updateWorkshop(workshopBooking.id, {
+            quantity: newCart.items[existingProductIndex].quantity + quantity,
+          });
 
-        if (
-          //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
-          !checkIfQuantityIsGood(
-            newQuantity,
-            product.noOfSeats - product.bookedSeats
-          )
-        ) {
-          throw new BadRequestException(
-            `You can't add more than ${
+          if (
+            //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+            !checkIfQuantityIsGood(
+              newQuantity,
               product.noOfSeats - product.bookedSeats
-            } no of products in your cart. You already have ${
-              newCart.items[existingProductIndex].quantity
-            } item(s)`
-          );
+            )
+          ) {
+            throw new BadRequestException(
+              `You can't add more than ${
+                product.noOfSeats - product.bookedSeats
+              } no of products in your cart. You already have ${
+                newCart.items[existingProductIndex].quantity
+              } item(s)`
+            );
+          } else {
+            newCart.items[existingProductIndex].quantity = newQuantity;
+          }
         } else {
-          newCart.items[existingProductIndex].quantity = newQuantity;
+          await this.workshopService.createWorkshop({
+            productId: product.id,
+            cartId: cart.id,
+            quantity: quantity,
+          });
+          newCart.items[existingProductIndex].quantity = quantity;
         }
-        //   } else {
-        //     await this.workshopService.createWorkshop({
-        //       productId: product.id,
-        //       cartId: cart.id,
-        //       quantity: quantity,
-        //     });
-        //     newCart.items[existingProductIndex].quantity = quantity;
-        //   }
       }
     } else {
       if (
@@ -108,13 +108,14 @@ export class CartItemService {
       // if the cart item does not exist, create the item
       newCart.items.push({
         ...item,
+        expired: false,
         price: productVariant.price,
       });
-      // await this.workshopService.createWorkshop({
-      //   productId: product.id,
-      //   cartId: cart.id,
-      //   quantity: quantity,
-      // });
+      await this.workshopService.createWorkshop({
+        productId: product.id,
+        cartId: cart.id,
+        quantity: quantity,
+      });
     }
 
     if (product.type == ProductType.SERVICE) {
@@ -154,6 +155,7 @@ export class CartItemService {
 
           {
             ...item,
+            expired: false,
             price:
               product?.variants?.find((variant) => variant.sku === item.sku)
                 ?.price || 0,

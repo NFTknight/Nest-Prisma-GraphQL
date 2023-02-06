@@ -140,6 +140,7 @@ input CartAddressInput {
 type CartItem {
   Tag: Tag
   answers: String
+  expired: Boolean
   price: Float!
   product: Product
   productId: String!
