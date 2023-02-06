@@ -1,6 +1,12 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma, AttendanceType, User, Role } from '@prisma/client';
+import {
+  Prisma,
+  AttendanceType,
+  User,
+  Role,
+  ProductType,
+} from '@prisma/client';
 
 import { throwNotFoundException } from 'src/utils/validation';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -146,6 +152,52 @@ export class HubService {
 
       throwNotFoundException(vendors?.length, '', 'No vendor available');
 
+      const extendedVendors = [];
+
+      for (const vendor of vendors) {
+        const vendorId = vendor.id;
+
+        const workShopCount = await this.prisma.product.count({
+          where: { vendorId, type: ProductType.WORKSHOP },
+        });
+
+        const serviceCount = await this.prisma.product.count({
+          where: { vendorId, type: ProductType.SERVICE },
+        });
+
+        const productCount = await this.prisma.product.count({
+          where: { vendorId, type: ProductType.PRODUCT },
+        });
+
+        const orderAggregation = await this.prisma.order.aggregate({
+          _avg: { totalPrice: true },
+          _count: { vendorId: true },
+          _sum: { subTotal: true },
+          where: { vendorId },
+        });
+
+        const couponCount = await this.prisma.coupon.count({
+          where: { vendorId: vendor.id },
+        });
+
+        const categoryCount = await this.prisma.category.count({
+          where: { vendorId: vendor.id },
+        });
+
+        extendedVendors.push({
+          ...vendor,
+          totalProductCount: productCount + workShopCount + serviceCount,
+          workShopCount,
+          serviceCount,
+          productCount,
+          orderCount: orderAggregation?._count?.vendorId,
+          avgOrderSize: orderAggregation?._avg?.totalPrice,
+          revenue: orderAggregation?._sum?.subTotal,
+          couponCount,
+          categoryCount,
+        });
+      }
+
       const totalCount = await this.prisma.vendor.count({ where });
 
       return {
@@ -276,7 +328,7 @@ export class HubService {
         data: {
           ...payload,
           password: hashedPassword,
-          role: payload.role || Role.VENDOR,
+          role: payload.role || Role.AGENT,
         },
       });
     } catch (e) {
