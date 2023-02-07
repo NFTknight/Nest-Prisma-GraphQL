@@ -19,7 +19,7 @@ acme:
   email: thaer.abbas@anyaa.io
 storage:
   endpoint: https://ams3.digitaloceanspaces.com
-  space: anyaa-prod
+  space: anyaa-dev
 myfatoorah:
   endpoint: https://api-sa.myfatoorah.com
   clienturl: https://anyaa.io
