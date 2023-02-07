@@ -1,6 +1,12 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Prisma, AttendanceType, User, Role } from '@prisma/client';
+import {
+  Prisma,
+  AttendanceType,
+  User,
+  Role,
+  ProductType,
+} from '@prisma/client';
 
 import { throwNotFoundException } from 'src/utils/validation';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
@@ -141,15 +147,99 @@ export class HubService {
         include: {
           owner: true, // Return all fields
           assign: true, // Return all fields
+          _count: {
+            select: {
+              orders: true,
+              categories: true,
+              coupons: true,
+            },
+          },
         },
       });
 
       throwNotFoundException(vendors?.length, '', 'No vendor available');
 
+      const extendedVendors = [];
+
+      for (const vendor of vendors) {
+        const vendorId = vendor.id;
+
+        const workShopCountPromise = this.prisma.product.count({
+          where: { vendorId, type: ProductType.WORKSHOP },
+        });
+
+        const serviceCountPromise = this.prisma.product.count({
+          where: { vendorId, type: ProductType.SERVICE },
+        });
+
+        const productCountPromise = this.prisma.product.count({
+          where: { vendorId, type: ProductType.PRODUCT },
+        });
+
+        const orderAggregationPromise = this.prisma.order.aggregate({
+          _avg: { totalPrice: true },
+          _sum: { subTotal: true },
+          where: { vendorId },
+        });
+
+        const avgMonthlySalesPromise = this.prisma.order.aggregateRaw({
+          pipeline: [
+            {
+              $match: {
+                vendorId: { $oid: vendorId },
+              },
+            },
+            {
+              $group: {
+                _id: {
+                  month: {
+                    $dateToString: {
+                      format: '%m %Y',
+                      date: '$createdAt',
+                    },
+                  },
+                },
+                averageSale: {
+                  $avg: '$totalPrice',
+                },
+              },
+            },
+          ],
+        });
+
+        const [
+          workShopCount,
+          serviceCount,
+          productCount,
+          orderAggregation,
+          avgMonthlySales,
+        ] = await Promise.all([
+          workShopCountPromise,
+          serviceCountPromise,
+          productCountPromise,
+          orderAggregationPromise,
+          avgMonthlySalesPromise,
+        ]);
+
+        extendedVendors.push({
+          ...vendor,
+          totalProductCount: productCount + workShopCount + serviceCount,
+          workShopCount,
+          serviceCount,
+          productCount,
+          orderCount: vendor?._count?.orders,
+          avgOrderSize: orderAggregation?._avg?.totalPrice,
+          avgMonthlySales,
+          revenue: orderAggregation?._sum?.subTotal,
+          couponCount: vendor?._count?.coupons,
+          categoryCount: vendor?._count?.categories,
+        });
+      }
+
       const totalCount = await this.prisma.vendor.count({ where });
 
       return {
-        list: vendors,
+        list: extendedVendors,
         totalCount: totalCount || 0,
       };
     } catch (err) {
@@ -276,7 +366,7 @@ export class HubService {
         data: {
           ...payload,
           password: hashedPassword,
-          role: payload.role || Role.VENDOR,
+          role: payload.role || Role.AGENT,
         },
       });
     } catch (e) {
