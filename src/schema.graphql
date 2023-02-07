@@ -48,6 +48,11 @@ type Auth {
   user: User!
 }
 
+type AvgMonthlySale {
+  _id: GroupedMonth
+  averageSale: Float
+}
+
 type BadgeType {
   label: AttendanceType!
 }
@@ -408,6 +413,10 @@ type GetPaymentStatusResponse {
   paymentStatus: String!
 }
 
+type GroupedMonth {
+  month: String
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -635,7 +644,7 @@ type PaginatedUsers {
 }
 
 type PaginatedVendors {
-  list: [Vendor!]
+  list: [VendorViewForHub!]
   totalCount: Int!
 }
 
@@ -1201,6 +1210,40 @@ type VendorView {
   numberServices: Int
   vendorName: String
   vendorUrl: String
+}
+
+type VendorViewForHub {
+  MF_vendorCode: Int
+  active: Boolean!
+  assign: User
+  assignedTo: String
+  avgMonthlySales: [AvgMonthlySale!]
+  avgOrderSize: Float
+  bank: VendorBank
+  categoryCount: Int
+  couponCount: Int
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  info: VendorInfo
+  name: String!
+  name_ar: String
+  notes: String
+  orderCount: Int
+  owner: User
+  ownerId: String!
+  productCount: Int
+  revenue: Float
+  serviceCount: Int
+  settings: VendorSettings
+  slug: String!
+  subscription: VendorSubscription
+  totalProductCount: Int
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  workShopCount: Int
 }
 
 type VendorsView {

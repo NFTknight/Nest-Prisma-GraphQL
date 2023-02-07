@@ -147,6 +147,13 @@ export class HubService {
         include: {
           owner: true, // Return all fields
           assign: true, // Return all fields
+          _count: {
+            select: {
+              orders: true,
+              categories: true,
+              coupons: true,
+            },
+          },
         },
       });
 
@@ -157,32 +164,62 @@ export class HubService {
       for (const vendor of vendors) {
         const vendorId = vendor.id;
 
-        const workShopCount = await this.prisma.product.count({
+        const workShopCountPromise = this.prisma.product.count({
           where: { vendorId, type: ProductType.WORKSHOP },
         });
 
-        const serviceCount = await this.prisma.product.count({
+        const serviceCountPromise = this.prisma.product.count({
           where: { vendorId, type: ProductType.SERVICE },
         });
 
-        const productCount = await this.prisma.product.count({
+        const productCountPromise = this.prisma.product.count({
           where: { vendorId, type: ProductType.PRODUCT },
         });
 
-        const orderAggregation = await this.prisma.order.aggregate({
+        const orderAggregationPromise = this.prisma.order.aggregate({
           _avg: { totalPrice: true },
-          _count: { vendorId: true },
           _sum: { subTotal: true },
           where: { vendorId },
         });
 
-        const couponCount = await this.prisma.coupon.count({
-          where: { vendorId: vendor.id },
+        const avgMonthlySalesPromise = this.prisma.order.aggregateRaw({
+          pipeline: [
+            {
+              $match: {
+                vendorId: { $oid: vendorId },
+              },
+            },
+            {
+              $group: {
+                _id: {
+                  month: {
+                    $dateToString: {
+                      format: '%m %Y',
+                      date: '$createdAt',
+                    },
+                  },
+                },
+                averageSale: {
+                  $avg: '$totalPrice',
+                },
+              },
+            },
+          ],
         });
 
-        const categoryCount = await this.prisma.category.count({
-          where: { vendorId: vendor.id },
-        });
+        const [
+          workShopCount,
+          serviceCount,
+          productCount,
+          orderAggregation,
+          avgMonthlySales,
+        ] = await Promise.all([
+          workShopCountPromise,
+          serviceCountPromise,
+          productCountPromise,
+          orderAggregationPromise,
+          avgMonthlySalesPromise,
+        ]);
 
         extendedVendors.push({
           ...vendor,
@@ -190,18 +227,19 @@ export class HubService {
           workShopCount,
           serviceCount,
           productCount,
-          orderCount: orderAggregation?._count?.vendorId,
+          orderCount: vendor?._count?.orders,
           avgOrderSize: orderAggregation?._avg?.totalPrice,
+          avgMonthlySales,
           revenue: orderAggregation?._sum?.subTotal,
-          couponCount,
-          categoryCount,
+          couponCount: vendor?._count?.coupons,
+          categoryCount: vendor?._count?.categories,
         });
       }
 
       const totalCount = await this.prisma.vendor.count({ where });
 
       return {
-        list: vendors,
+        list: extendedVendors,
         totalCount: totalCount || 0,
       };
     } catch (err) {
