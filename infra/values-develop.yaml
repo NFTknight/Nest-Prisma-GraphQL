@@ -2,7 +2,7 @@ replicaCount: 1
 namespace: dev
 image:
   repository: registry.digitalocean.com/anyaa/backend-api
-  tag: e2362c3
+  tag: ef172d1
 containerPort: 3000
 ingress:
   tld: dev.anyaa.io
