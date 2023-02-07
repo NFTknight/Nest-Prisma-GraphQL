@@ -125,22 +125,19 @@ class UpdateVendorSettingsInput implements VendorSettings {
 
 @InputType()
 export class UpdateVendorInput {
-  @Field()
+  @Field({ nullable: true })
   name?: string;
 
   @Field({ nullable: true })
   name_ar: string;
 
-  @Field()
-  active?: boolean;
-
-  @Field()
+  @Field(() => UpdateVendorInfoInput, { nullable: true })
   info?: UpdateVendorInfoInput;
 
-  @Field()
+  @Field(() => UpdateVendorBankInput, { nullable: true })
   bank?: UpdateVendorBankInput;
 
-  @Field()
+  @Field(() => UpdateVendorSettingsInput, { nullable: true })
   settings?: UpdateVendorSettingsInput;
 
   @Field(() => AddSubscriptionInput, { nullable: true })

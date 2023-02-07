@@ -3,7 +3,7 @@ import { User } from 'src/users/models/user.model';
 import { VendorBank } from './vendor-bank.model';
 import { VendorInfo } from './vendor-info.model';
 import { VendorSettings } from './vendor-settings.model';
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Directive, Field, Int, ObjectType } from '@nestjs/graphql';
 import { Vendor as PrismaVendor } from '@prisma/client';
 import { VendorSubscription } from './vendor-subscription.model';
 
@@ -47,6 +47,18 @@ export class Vendor extends BaseModel implements PrismaVendor {
 
   @Field(() => VendorSubscription, { nullable: true })
   subscription: VendorSubscription;
+
+  @Directive('@hideFields')
+  @Field({ nullable: true })
+  assignedTo: string;
+
+  @Directive('@hideFields')
+  @Field(() => User)
+  assign?: User;
+
+  @Directive('@hideFields')
+  @Field({ nullable: true })
+  notes: string;
 }
 
 @ObjectType()

@@ -9,3 +9,9 @@ export class AddSubscriptionInput {
   @Field(() => SubscriptionType)
   type: SubscriptionType;
 }
+
+@InputType()
+export class AddSubscriptionInputWithPrice extends AddSubscriptionInput {
+  @Field()
+  price: number;
+}

@@ -2,6 +2,8 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+directive @hideFields on FIELD_DEFINITION
+
 input AddDeliveryAreasInput {
   active: Boolean!
   charge: Int!
@@ -44,6 +46,11 @@ type Auth {
   """JWT refresh token"""
   refreshToken: JWT!
   user: User!
+}
+
+type AvgMonthlySale {
+  _id: GroupedMonth
+  averageSale: Float
 }
 
 type BadgeType {
@@ -192,6 +199,12 @@ type Category {
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
+}
+
+input CategoryFilterInputForHub {
+  active: Boolean
+  title: [String!]
+  vendorId: [String!]
 }
 
 input Certificate {
@@ -403,6 +416,10 @@ type GetPaymentStatusResponse {
   paymentStatus: String!
 }
 
+type GroupedMonth {
+  month: String
+}
+
 """
 A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
 """
@@ -437,6 +454,7 @@ type Mutation {
   addWorkshopToCart(cartId: String!, data: CartItemInput!): Cart!
   changePassword(data: ChangePasswordInput!): User!
   checkoutCart(cartId: String!, paymentSession: String): OrderPayment!
+  createAgentForHub(data: SignupInput!): User!
   createBooking(data: CreateBookingInput!): Booking!
   createCategory(data: CreateCategoryInput!): Category!
   createCoupon(data: CreateCouponInput!): Coupon!
@@ -479,6 +497,7 @@ type Mutation {
   updateUser(data: UpdateUserInput!): User!
   updateUserRole(role: Role!, userId: String!): UserRole!
   updateVendor(data: UpdateVendorInput!, id: String!): Vendor!
+  updateVendorForHub(data: UpdateVendorInputForHub!, id: String!): Vendor!
   uploadFile(file: String!, key: String!): String!
   verifyOtp(data: CheckOtpInput!): CheckOtpResponse!
   verifyPhone(data: PhoneVerify!): Auth!
@@ -520,6 +539,14 @@ Possible directions in which to order a list of items when provided an `orderBy`
 enum OrderDirection {
   asc
   desc
+}
+
+input OrderFilterInputForHub {
+  email: [String!]
+  orderId: [String!]
+  productId: [String!]
+  status: [OrderStatus!]
+  vendorId: [String!]
 }
 
 type OrderPayment {
@@ -618,6 +645,16 @@ type PaginatedTags {
   totalCount: Int!
 }
 
+type PaginatedUsers {
+  list: [User!]
+  totalCount: Int!
+}
+
+type PaginatedVendors {
+  list: [VendorViewForHub!]
+  totalCount: Int!
+}
+
 input PaginationArgs {
   page: Int
   pageSize: Int
@@ -699,6 +736,14 @@ input ProductFilterInput {
   type: ProductType
 }
 
+input ProductFilterInputForHub {
+  active: Boolean
+  attendanceType: [AttendanceType!]
+  categoryId: [String!]
+  type: [ProductType!]
+  vendorId: [String!]
+}
+
 """Product Type"""
 enum ProductType {
   PRODUCT
@@ -715,6 +760,7 @@ type Query {
   getBooking(id: String!): Booking!
   getBookings(productId: String, tagId: String, vendorId: String!): [Booking!]!
   getCategories(active: Boolean, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedCategories!
+  getCategoriesForHub(filter: CategoryFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedCategories!
   getCategory(id: String!): Category!
   getCoupon(id: String!): Coupon!
   getCoupons(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedCoupons!
@@ -724,8 +770,10 @@ type Query {
   getOrder(id: String!): Order!
   getOrderPaymentStatus(orderId: String!): GetPaymentStatusResponse!
   getOrders(filter: OrdersFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedOrders!
+  getOrdersForHub(filter: OrderFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedOrders!
   getProduct(id: String!): Product!
   getProducts(categoryId: String, filter: ProductFilterInput, pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String!): PaginatedProducts!
+  getProductsForHub(filter: ProductFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedProducts!
   getRefundPaymentStatus(invoiceId: String!): RefundPaymentAPIResponse!
   getRevenueAndTopProduct(vendorId: String!): RevenueProductAnalytics!
   getReviews: [Review!]!
@@ -734,10 +782,12 @@ type Query {
   getTagAvailabilityByDate(date: String!, productId: String!, tagId: String!): [BookingTime!]!
   getTags(pagination: PaginationArgs, sortOrder: SortOrder, vendorId: String): PaginatedTags!
   getTagsByProduct(productId: String!): [Tag!]!
+  getUsersForHub(filter: UserFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedUsers!
   getVendor(id: String!): Vendor!
   getVendorBySlug(slug: String!): Vendor!
   getVendorView(vendorId: String!): VendorView!
   getVendors(filter: VendorFilterInput): [Vendor!]!
+  getVendorsForHub(filter: VendorFilterInputForHub, pagination: PaginationArgs, sortOrder: SortOrder): PaginatedVendors!
   getVendorsView(pagination: PaginationArgs): VendorsView!
   getWorkshop(id: String!): Workshop!
   isVendorSlugAvailable(slug: String!): Boolean!
@@ -823,6 +873,7 @@ input SignupInput {
   firstName: String
   lastName: String
   password: String!
+  role: Role
 }
 
 input SortOrder {
@@ -987,11 +1038,22 @@ input UpdateVendorInfoInput {
 }
 
 input UpdateVendorInput {
-  active: Boolean
   bank: UpdateVendorBankInput
   info: UpdateVendorInfoInput
   name: String
   name_ar: String
+  settings: UpdateVendorSettingsInput
+  subscription: AddSubscriptionInput
+}
+
+input UpdateVendorInputForHub {
+  active: Boolean
+  assignedTo: String
+  bank: UpdateVendorBankInput
+  info: UpdateVendorInfoInput
+  name: String
+  name_ar: String
+  notes: String
   settings: UpdateVendorSettingsInput
   subscription: AddSubscriptionInput
 }
@@ -1021,6 +1083,13 @@ type User {
   vendor: Vendor
   vendorId: String
   verified: Boolean!
+}
+
+input UserFilterInputForHub {
+  email: [String!]
+  role: [Role!]
+  userId: [String!]
+  verified: Boolean
 }
 
 type UserRole {
@@ -1057,6 +1126,8 @@ input VariantInput {
 type Vendor {
   MF_vendorCode: Int
   active: Boolean!
+  assign: User
+  assignedTo: String
   bank: VendorBank
 
   """Identifies the date and time when the object was created."""
@@ -1065,6 +1136,7 @@ type Vendor {
   info: VendorInfo
   name: String!
   name_ar: String
+  notes: String
   owner: User
   ownerId: String!
   settings: VendorSettings
@@ -1086,6 +1158,15 @@ input VendorFilterInput {
   active: Boolean
   name: [String!]
   name_ar: [String!]
+}
+
+input VendorFilterInputForHub {
+  active: Boolean
+  email: [String!]
+  name: [String!]
+  name_ar: [String!]
+  slug: [String!]
+  vendorId: [String!]
 }
 
 type VendorInfo {
@@ -1136,6 +1217,40 @@ type VendorView {
   numberServices: Int
   vendorName: String
   vendorUrl: String
+}
+
+type VendorViewForHub {
+  MF_vendorCode: Int
+  active: Boolean!
+  assign: User
+  assignedTo: String
+  avgMonthlySales: [AvgMonthlySale!]
+  avgOrderSize: Float
+  bank: VendorBank
+  categoryCount: Int
+  couponCount: Int
+
+  """Identifies the date and time when the object was created."""
+  createdAt: DateTime!
+  id: ID!
+  info: VendorInfo
+  name: String!
+  name_ar: String
+  notes: String
+  orderCount: Int
+  owner: User
+  ownerId: String!
+  productCount: Int
+  revenue: Float
+  serviceCount: Int
+  settings: VendorSettings
+  slug: String!
+  subscription: VendorSubscription
+  totalProductCount: Int
+
+  """Identifies the date and time when the object was last updated."""
+  updatedAt: DateTime!
+  workShopCount: Int
 }
 
 type VendorsView {
