@@ -2,7 +2,7 @@ replicaCount: 1
 namespace: dev
 image:
   repository: registry.digitalocean.com/anyaa/backend-api
-  tag: ef172d1
+  tag: dd5b9d5
 containerPort: 3000
 ingress:
   tld: dev.anyaa.io
@@ -10,10 +10,10 @@ ingress:
   path: /
 resources:
   limits:
-    cpu: 50m
-    memory: 256Mi
+    cpu: 100m
+    memory: 512Mi
   requests:
-    cpu: 50m
+    cpu: 100m
     memory: 256Mi
 acme:
   email: thaer.abbas@anyaa.io
