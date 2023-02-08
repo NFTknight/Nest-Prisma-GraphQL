@@ -29,6 +29,8 @@ import { CategoryFilterInputForHub, GetCategoryArgs } from '../dto/category';
 import { PaginatedCategories } from 'src/categories/models/paginated-categories.model';
 import { getSubscriptionPrice } from 'src/utils/subscription';
 import { AddSubscriptionInputWithPrice } from 'src/vendors/dto/add-subscription-input';
+import { SubscriberCountFilterInputForHub } from '../dto/subscriber';
+import { SubscriberPlan } from '../models/subscriber';
 
 @Injectable()
 export class HubService {
@@ -54,12 +56,17 @@ export class HubService {
   ) => {
     const where = {};
 
-    for (const filterKey of Object.keys(filter)) {
-      if (filterKey === booleanKey && typeof filter?.[booleanKey] === 'boolean')
-        where[filterKey] = filter[filterKey];
+    if (filter) {
+      for (const filterKey of Object.keys(filter)) {
+        if (
+          filterKey === booleanKey &&
+          typeof filter?.[booleanKey] === 'boolean'
+        )
+          where[filterKey] = filter[filterKey];
 
-      if (!ignoreKeyList?.includes(filterKey) && filter[filterKey]?.length)
-        where[filterKey] = { in: filter[filterKey] };
+        if (!ignoreKeyList?.includes(filterKey) && filter[filterKey]?.length)
+          where[filterKey] = { in: filter[filterKey] };
+      }
     }
 
     return where;
@@ -351,6 +358,36 @@ export class HubService {
         list: categories,
         totalCount: totalCount || 0,
       };
+    } catch (err) {
+      throw new Error(err);
+    }
+  };
+
+  getSubscriberCount = async (
+    filter: SubscriberCountFilterInputForHub
+  ): Promise<[SubscriberPlan]> => {
+    try {
+      const pipeline = [];
+      if (typeof filter?.active === 'boolean') {
+        pipeline.push({
+          $match: {
+            active: filter?.active,
+          },
+        });
+      }
+      const subscribers = await this.prisma.vendor.aggregateRaw({
+        pipeline: [
+          ...pipeline,
+          { $group: { _id: '$subscription.plan', vendor: { $sum: 1 } } },
+        ],
+      });
+
+      const response = Object.values(subscribers).filter(
+        (subscriber: { [Key in string]?: string | number }) => subscriber._id
+      );
+
+      throwNotFoundException(response?.length, '', 'No data available');
+      return response as any;
     } catch (err) {
       throw new Error(err);
     }

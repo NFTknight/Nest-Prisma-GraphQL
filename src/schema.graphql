@@ -794,6 +794,7 @@ type Query {
   me: User!
   numberOfDroppedBaskets(vendorId: String!): Int!
   shippingOffices(city: String): [ShippingOffice!]!
+  subscriberCount(filter: SubscriberCountFilterInputForHub): [SubscriberPlan!]!
   trackShipment(trackingNumber: String!): WayBill!
   updateWorkshop(data: UpdateWorkshopInput!, id: String!): Workshop!
 }
@@ -879,6 +880,15 @@ input SignupInput {
 input SortOrder {
   direction: OrderDirection!
   field: String!
+}
+
+input SubscriberCountFilterInputForHub {
+  active: Boolean
+}
+
+type SubscriberPlan {
+  _id: String
+  vendor: Int
 }
 
 """Subscription Plan"""

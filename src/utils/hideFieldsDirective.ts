@@ -30,14 +30,16 @@ export function hideFieldDirectiveTransformer(
             authToken?.split('Bearer ')?.[1] || ''
           )?.['userId'];
 
-          const role: Role = await prismaService.user
-            .findUnique({
-              where: { id: userId },
-            })
-            .then((e) => e?.role);
+          if (userId) {
+            const role: Role = await prismaService.user
+              .findUnique({
+                where: { id: userId },
+              })
+              .then((e) => e?.role);
 
-          if (role !== Role.AGENT && role !== Role.ADMIN) {
-            return null;
+            if (role !== Role.AGENT && role !== Role.ADMIN) {
+              return null;
+            }
           }
           return result;
         };
