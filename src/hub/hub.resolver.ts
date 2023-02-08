@@ -24,6 +24,8 @@ import { PaginatedCategories } from 'src/categories/models/paginated-categories.
 import { CategoryFilterInputForHub, GetCategoryArgs } from './dto/category';
 import { Vendor } from 'src/vendors/models/vendor.model';
 
+console.log('trigger');
+
 @Resolver('hub')
 export class HubResolver {
   constructor(private readonly hubService: HubService) {}
