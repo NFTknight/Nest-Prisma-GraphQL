@@ -26,8 +26,6 @@ import { Vendor } from 'src/vendors/models/vendor.model';
 import { SubscriberCountFilterInputForHub } from './dto/subscriber';
 import { SubscriberPlan } from './models/subscriber';
 
-console.log('trigger');
-
 @Resolver('hub')
 export class HubResolver {
   constructor(private readonly hubService: HubService) {}
