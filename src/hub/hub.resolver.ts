@@ -23,8 +23,8 @@ import { GetOrderArgs, OrderFilterInputForHub } from './dto/order';
 import { PaginatedCategories } from 'src/categories/models/paginated-categories.model';
 import { CategoryFilterInputForHub, GetCategoryArgs } from './dto/category';
 import { Vendor } from 'src/vendors/models/vendor.model';
-
-console.log('trigger');
+import { SubscriberCountFilterInputForHub } from './dto/subscriber';
+import { SubscriberPlan } from './models/subscriber';
 
 @Resolver('hub')
 export class HubResolver {
@@ -110,6 +110,15 @@ export class HubResolver {
       filter,
     };
     return this.hubService.getCategories(data);
+  }
+
+  @UseGuards(RolesGuard)
+  @SetMetadata('role', Role.AGENT)
+  @Query(() => [SubscriberPlan])
+  subscriberCount(
+    @Args('filter', { nullable: true }) filter: SubscriberCountFilterInputForHub
+  ): Promise<[SubscriberPlan]> {
+    return this.hubService.getSubscriberCount(filter);
   }
 
   // Mutations
