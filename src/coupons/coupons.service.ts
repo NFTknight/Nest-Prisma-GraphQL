@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { CreateCouponInput } from './dto/create-coupon.input';
@@ -46,10 +46,28 @@ export class CouponsService {
     // if the vendor does not exist, this function will throw an error.
     await this.vendorService.getVendor(data.vendorId);
     // if vendor exists we can successfully create the coupon.
+    const couponExists = await this.prisma.coupon.findFirst({
+      where: { code: data.code, vendorId: data.vendorId },
+    });
+
+    if (couponExists)
+      throw new BadRequestException('Coupon already exists for this code');
+
     return this.prisma.coupon.create({ data });
   }
 
   async updateCoupon(id: string, data: UpdateCouponInput): Promise<Coupon> {
+    const coupon = await this.prisma.coupon.findUnique({
+      where: { id },
+    });
+
+    const couponExists = await this.prisma.coupon.findFirst({
+      where: { code: data.code, vendorId: coupon.vendorId, NOT: { id } },
+    });
+
+    if (couponExists)
+      throw new BadRequestException('Coupon already exists for this code');
+
     return this.prisma.coupon.update({
       where: { id },
       data: { ...data, updatedAt: new Date() },
