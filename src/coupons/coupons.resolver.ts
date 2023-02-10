@@ -73,13 +73,14 @@ export class CouponsResolver {
       where: { id: cart.vendorId },
     });
 
+    throwNotFoundException(vendor, 'Vendor');
+
     const coupon = await this.prismaService.coupon.findFirst({
       where: { code: id, active: true, vendorId: vendor.id },
     });
 
     throwNotFoundException(cart, 'Cart');
     throwNotFoundException(coupon, 'Coupon');
-    throwNotFoundException(vendor, 'Vendor');
 
     const deliveryCharges = cart?.deliveryCharges || 0;
     const discountedAmount = (cart.subTotal * coupon.discount) / 100;
