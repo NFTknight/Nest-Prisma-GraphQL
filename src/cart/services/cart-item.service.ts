@@ -81,11 +81,6 @@ export class CartItemService {
         const availableQuantity =
           product.noOfSeats -
           (product.bookedSeats + existingWorkshopBooking?._sum?.quantity || 0);
-
-        console.log({
-          availableQuantity,
-          existingWorkshopBooking: existingWorkshopBooking._sum.quantity,
-        });
         if (
           !!workshopBooking &&
           //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
