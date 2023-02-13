@@ -8,6 +8,15 @@ import { Vendor as PrismaVendor } from '@prisma/client';
 import { VendorSubscription } from './vendor-subscription.model';
 
 @ObjectType()
+export class MetaDetails {
+  @Field({ nullable: true })
+  title: string;
+
+  @Field({ nullable: true })
+  description: string;
+}
+
+@ObjectType()
 export class Vendor extends BaseModel implements PrismaVendor {
   @Field()
   name: string;
@@ -59,6 +68,12 @@ export class Vendor extends BaseModel implements PrismaVendor {
   @Directive('@hideFields')
   @Field({ nullable: true })
   notes: string;
+
+  @Field(() => MetaDetails, { nullable: true })
+  meta: MetaDetails;
+
+  @Field(() => [String], { nullable: true })
+  heading: string[];
 }
 
 @ObjectType()

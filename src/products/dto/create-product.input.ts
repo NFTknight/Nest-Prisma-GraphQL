@@ -3,6 +3,7 @@ import { InputType, Field, Int } from '@nestjs/graphql';
 import { ProductType, AttendanceType } from '@prisma/client';
 import { VariantInput } from './variant.input';
 import { LocationInput } from './location.input';
+import { MetaDetailsInput } from 'src/vendors/dto/update-vendor.input';
 
 @InputType()
 export class CreateProductInput {
@@ -83,4 +84,7 @@ export class CreateProductInput {
 
   startDate?: Date;
   endDate?: Date;
+
+  @Field(() => MetaDetailsInput, { nullable: true })
+  meta?: MetaDetailsInput;
 }
