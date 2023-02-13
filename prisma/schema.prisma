@@ -278,6 +278,7 @@ type CartItem {
   productId String        @db.ObjectId
   answers   String?
   sku       String
+  expired   Boolean?      @default(false)
   price     Float
   quantity  Int           @default(1)
   tagId     String?       @db.ObjectId

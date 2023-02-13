@@ -36,6 +36,9 @@ export class CartItem {
   @Field({ nullable: true })
   Tag?: Tag;
 
+  @Field({ defaultValue: false, nullable: true })
+  expired: boolean;
+
   @Field(() => [BookingTime], { nullable: true })
   slots: BookingTime[];
 
