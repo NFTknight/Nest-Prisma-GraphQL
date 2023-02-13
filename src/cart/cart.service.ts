@@ -127,6 +127,9 @@ export class CartService {
           if (!isWorkShopExists) {
             shouldUpdateCart = true;
             cartItems[i] = { ...cartItems[i], expired: true };
+          } else if (cartItems[i].expired === true) {
+            shouldUpdateCart = true;
+            cartItems[i] = { ...cartItems[i], expired: false };
           }
         }
       }
@@ -217,7 +220,14 @@ export class CartService {
       }
 
       if (shouldUpdateCart || updatedCartObject.totalPrice !== res.totalPrice)
-        cart = await this.updateCart(res.id, updatedCartObject);
+        try {
+          cart = await this.prisma.cart.update({
+            where: { id: res.id },
+            data: updatedCartObject,
+          });
+        } catch (err) {
+          console.log({ err });
+        }
 
       return {
         ...cart,
