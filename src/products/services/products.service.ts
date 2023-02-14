@@ -80,20 +80,20 @@ export class ProductsService {
         return product;
       });
 
-      for (const [i, item] of list.entries()) {
-        const quantity = await this.prisma.workshop.aggregate({
-          where: {
-            productId: item.id,
-          },
-          _sum: {
-            quantity: true,
-          },
-        });
+      // for (const [i, item] of list.entries()) {
+      //   const quantity = await this.prisma.workshop.aggregate({
+      //     where: {
+      //       productId: item.id,
+      //     },
+      //     _sum: {
+      //       quantity: true,
+      //     },
+      //   });
 
-        if (quantity?._sum?.quantity) {
-          list[i].bookedSeats += quantity?._sum?.quantity;
-        }
-      }
+      //   if (quantity?._sum?.quantity) {
+      //     list[i].bookedSeats += quantity?._sum?.quantity;
+      //   }
+      // }
 
       const totalCount = await this.prisma.product.count({ where });
 
