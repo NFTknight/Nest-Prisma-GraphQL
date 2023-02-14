@@ -244,7 +244,7 @@ export class OrdersService {
       const vendor = await this.prisma.vendor.findUnique({
         where: { id: order.vendorId },
       });
-      if (vendor.slug === 'medical-store') {
+      if (vendor.slug === 'somatcha') {
         for (const item of order.items) {
           const product = await this.prisma.product.findUnique({
             where: { id: item.productId },
