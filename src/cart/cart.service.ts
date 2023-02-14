@@ -578,7 +578,7 @@ export class CartService {
       });
 
       // remove this to remove the extra feature of order
-      if (order.status === 'PENDING' && vendor.slug === 'medical-store') {
+      if (order.status === 'PENDING' && vendor.slug === 'somatcha') {
         for (const item of order.items) {
           const product = await this.prisma.product.findUnique({
             where: { id: item.productId },
