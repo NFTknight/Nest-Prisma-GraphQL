@@ -14,9 +14,15 @@ export const EMAIL_OPTIONS = {
   FORGOT_PWT: 'FORGOT_PWD',
   AMOUNT_REFUND: 'AMOUNT_REFUND',
   REVIEW_PRODUCT: 'REVIEW_PRODUCT',
+  WORKSHOP_DETAILS: 'WORKSHOP_DETAILS',
 };
 
-export const SendEmails = (type: string, toEmail: string, body?: string) => {
+export const SendEmails = (
+  type: string,
+  toEmail: string,
+  body?: string,
+  dynamicTemplateData?: { [key: string]: any }
+) => {
   const mail = { to: toEmail, from: fromEmail };
 
   switch (type) {
@@ -67,6 +73,13 @@ export const SendEmails = (type: string, toEmail: string, body?: string) => {
         ...mail,
         subject: 'Order placement',
         html: '<p>You have an Order</p>',
+      };
+    case EMAIL_OPTIONS.WORKSHOP_DETAILS:
+      return {
+        ...mail,
+        dynamicTemplateData,
+        subject: 'Workshop details',
+        templateId: 'd-bb9b673e923849ca818c067cf6eef894',
       };
     default:
       break;
