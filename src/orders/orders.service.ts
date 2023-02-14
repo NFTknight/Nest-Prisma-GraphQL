@@ -9,7 +9,7 @@ import {
 import { PrismaService } from 'nestjs-prisma';
 import { CartService } from 'src/cart/cart.service';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
-import { SendEmails } from 'src/utils/email';
+import { EMAIL_OPTIONS, SendEmails } from 'src/utils/email';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { SortOrder } from 'src/common/sort-order/sort-order.input';
 import getPaginationArgs from 'src/common/helpers/getPaginationArgs';
@@ -232,6 +232,48 @@ export class OrdersService {
                 },
               });
             }
+          }
+        }
+      }
+    }
+
+    if (
+      order.status !== OrderStatus.PENDING &&
+      data.status === OrderStatus.PENDING
+    ) {
+      const vendor = await this.prisma.vendor.findUnique({
+        where: { id: order.vendorId },
+      });
+      if (vendor.slug === 'somatcha') {
+        for (const item of order.items) {
+          const product = await this.prisma.product.findUnique({
+            where: { id: item.productId },
+          });
+          if (product.type === ProductType.WORKSHOP) {
+            this.emailService.send(
+              SendEmails(
+                EMAIL_OPTIONS.WORKSHOP_DETAILS,
+                order?.customerInfo?.email,
+                '',
+                {
+                  orderID: order.id,
+                  workshop: {
+                    title: product.title,
+                    title_ar: product.title_ar,
+                    description: product.description,
+                    description_ar: product.description_ar,
+                    date: product.startDate,
+                    startTime: product.startDate,
+                    endTime: product.endDate,
+                  },
+                  attendee: {
+                    firstName: order.customerInfo.firstName,
+                    lastName: order.customerInfo.lastName,
+                    phone: order.customerInfo.phone,
+                  },
+                }
+              )
+            );
           }
         }
       }

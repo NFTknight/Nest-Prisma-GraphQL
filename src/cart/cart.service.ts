@@ -19,7 +19,7 @@ import { find, omit } from 'lodash';
 import { VendorsService } from 'src/vendors/vendors.service';
 import { nanoid } from 'nanoid';
 import { SendgridService } from 'src/sendgrid/sendgrid.service';
-import { ORDER_OPTIONS, SendEmails } from 'src/utils/email';
+import { EMAIL_OPTIONS, ORDER_OPTIONS, SendEmails } from 'src/utils/email';
 import { PaymentService } from 'src/payment/payment.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { throwNotFoundException } from 'src/utils/validation';
@@ -576,6 +576,41 @@ export class CartService {
           },
         },
       });
+
+      // remove this to remove the extra feature of order
+      if (order.status === 'PENDING' && vendor.slug === 'somatcha') {
+        for (const item of order.items) {
+          const product = await this.prisma.product.findUnique({
+            where: { id: item.productId },
+          });
+          if (product.type === ProductType.WORKSHOP) {
+            this.emailService.send(
+              SendEmails(
+                EMAIL_OPTIONS.WORKSHOP_DETAILS,
+                order?.customerInfo?.email,
+                '',
+                {
+                  orderID: order.id,
+                  workshop: {
+                    title: product.title,
+                    title_ar: product.title_ar,
+                    description: product.description,
+                    description_ar: product.description_ar,
+                    date: product.startDate,
+                    startTime: product.startDate,
+                    endTime: product.endDate,
+                  },
+                  attendee: {
+                    firstName: order.customerInfo.firstName,
+                    lastName: order.customerInfo.lastName,
+                    phone: order.customerInfo.phone,
+                  },
+                }
+              )
+            );
+          }
+        }
+      }
     }
 
     if (isOnlinePayment) {
