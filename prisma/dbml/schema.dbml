@@ -175,6 +175,7 @@ Table Order {
   vendor Vendor
   wayBill WayBill
   invoiceId String
+  qrVerified Boolean [default: false]
   consigneeAddress CartAddress
   shipperAddress CartAddress
   createdAt DateTime [default: `now()`, not null]

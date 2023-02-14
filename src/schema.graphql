@@ -535,6 +535,7 @@ type Order {
   items: [CartItem!]!
   orderId: String!
   paymentMethod: PaymentMethods
+  qrVerified: Boolean
   shipperAddress: CartAddress
   status: OrderStatus!
   subTotal: Float
@@ -583,6 +584,7 @@ type OrderPayment {
   orderId: String!
   payment: ExecutePayment
   paymentMethod: PaymentMethods
+  qrVerified: Boolean
   shipperAddress: CartAddress
   status: OrderStatus!
   subTotal: Float
@@ -980,6 +982,7 @@ input UpdateOrderInput {
   cartId: String
   deliveryMethod: DeliveryMethods
   paymentMethod: PaymentMethods
+  qrVerified: Boolean
   status: OrderStatus
   vendorId: String
 }

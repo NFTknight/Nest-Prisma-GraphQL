@@ -56,7 +56,7 @@ export class OrdersService {
         where: { id: item.productId },
       });
 
-      const variant = product.variants.find(
+      const variant = product?.variants.find(
         (variant) => variant.sku === item.sku
       );
 

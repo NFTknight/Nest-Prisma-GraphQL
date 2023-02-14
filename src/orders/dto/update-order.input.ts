@@ -18,6 +18,9 @@ export class UpdateOrderInput {
 
   @Field(() => DeliveryMethods)
   deliveryMethod?: DeliveryMethods;
+
+  @Field(() => Boolean)
+  qrVerified?: boolean;
 }
 
 @InputType()

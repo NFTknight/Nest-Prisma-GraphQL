@@ -377,6 +377,8 @@ model Order {
 
   invoiceId String?
 
+  qrVerified Boolean? @default(false)
+
   consigneeAddress CartAddress?
   shipperAddress   CartAddress?
 
