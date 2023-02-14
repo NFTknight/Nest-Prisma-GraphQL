@@ -44,6 +44,8 @@ Table Vendor {
   assign User
   assignedTo String [unique]
   notes String
+  meta MetaDetails
+  heading String[] [not null]
 }
 
 Table Tag {
@@ -73,6 +75,7 @@ Table Category {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   products Product [not null]
+  meta MetaDetails
 }
 
 Table Coupon {
@@ -122,6 +125,7 @@ Table Product {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Booking Booking [not null]
+  meta MetaDetails
 }
 
 Table Cart {

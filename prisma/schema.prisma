@@ -34,6 +34,11 @@ enum Role {
   AGENT
 }
 
+type MetaDetails {
+  title       String?
+  description String?
+}
+
 model Vendor {
   id            String  @id @default(auto()) @map("_id") @db.ObjectId
   name          String
@@ -64,6 +69,8 @@ model Vendor {
   assign       User?               @relation(name: "assignedTo", fields: [assignedTo], references: [id])
   assignedTo   String?             @unique @db.ObjectId
   notes        String?
+  meta         MetaDetails?
+  heading      String[]
 }
 
 type Certificate {
@@ -173,11 +180,12 @@ model Category {
   vendor   Vendor  @relation(fields: [vendorId], references: [id])
   slug     String?
 
-  active    Boolean   @default(true)
+  active    Boolean      @default(true)
   sortOrder Int?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   products  Product[]
+  meta      MetaDetails?
 }
 
 model Coupon {
@@ -269,9 +277,10 @@ model Product {
   startDate        DateTime?
   endDate          DateTime?
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   Booking   Booking[]
+  meta      MetaDetails?
 }
 
 type CartItem {

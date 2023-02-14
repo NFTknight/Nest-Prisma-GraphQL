@@ -1,7 +1,7 @@
 import { Field, ObjectType, Int, Float } from '@nestjs/graphql';
 import { Category } from 'src/categories/models/category.model';
 import { BaseModel } from 'src/common/models/base.model';
-import { Vendor } from 'src/vendors/models/vendor.model';
+import { MetaDetails, Vendor } from 'src/vendors/models/vendor.model';
 import { Product as PrismaProduct } from '@prisma/client';
 import {
   ProductType,
@@ -106,6 +106,10 @@ export class Product extends BaseModel implements PrismaProduct {
 
   @Field({ nullable: true })
   startDate: Date;
+
   @Field({ nullable: true })
   endDate: Date;
+
+  @Field(() => MetaDetails, { nullable: true })
+  meta: MetaDetails;
 }

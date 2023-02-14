@@ -124,6 +124,15 @@ class UpdateVendorSettingsInput implements VendorSettings {
 }
 
 @InputType()
+export class MetaDetailsInput {
+  @Field({ nullable: true })
+  title: string;
+
+  @Field({ nullable: true })
+  description: string;
+}
+
+@InputType()
 export class UpdateVendorInput {
   @Field({ nullable: true })
   name?: string;
@@ -142,4 +151,10 @@ export class UpdateVendorInput {
 
   @Field(() => AddSubscriptionInput, { nullable: true })
   subscription?: AddSubscriptionInput;
+
+  @Field(() => MetaDetailsInput, { nullable: true })
+  meta?: MetaDetailsInput;
+
+  @Field(() => [String], { nullable: true })
+  heading: string[];
 }

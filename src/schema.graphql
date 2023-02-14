@@ -190,6 +190,7 @@ type Category {
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
   id: ID!
+  meta: MetaDetails
   products: [Product!]!
   slug: String
   sortOrder: Int
@@ -265,6 +266,7 @@ input CreateBookingInput {
 
 input CreateCategoryInput {
   active: Boolean!
+  meta: MetaDetailsInput
   slug: String
   sortOrder: Int
   title: String!
@@ -299,6 +301,7 @@ input CreateProductInput {
   images: [String!]
   location: LocationInput
   meetingLink: String
+  meta: MetaDetailsInput
   minPreorderDays: Int
   noOfSeats: Int
   slug: String!
@@ -443,6 +446,16 @@ input LocationInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+type MetaDetails {
+  description: String
+  title: String
+}
+
+input MetaDetailsInput {
+  description: String
+  title: String
 }
 
 type Mutation {
@@ -713,6 +726,7 @@ type Product {
   images: [String!]
   location: Location
   meetingLink: String
+  meta: MetaDetails
   minPreorderDays: Int
   noOfSeats: Int
   slug: String!
@@ -944,6 +958,7 @@ input UpdateBookingInput {
 
 input UpdateCategoryInput {
   active: Boolean
+  meta: MetaDetailsInput
   slug: String
   sortOrder: Int
   title: String
@@ -984,6 +999,7 @@ input UpdateProductInput {
   images: [String!]
   location: LocationInput
   meetingLink: String
+  meta: MetaDetailsInput
   minPreorderDays: Int
   noOfSeats: Int
   slug: String
@@ -1050,7 +1066,9 @@ input UpdateVendorInfoInput {
 
 input UpdateVendorInput {
   bank: UpdateVendorBankInput
+  heading: [String!]
   info: UpdateVendorInfoInput
+  meta: MetaDetailsInput
   name: String
   name_ar: String
   settings: UpdateVendorSettingsInput
@@ -1061,7 +1079,9 @@ input UpdateVendorInputForHub {
   active: Boolean
   assignedTo: String
   bank: UpdateVendorBankInput
+  heading: [String!]
   info: UpdateVendorInfoInput
+  meta: MetaDetailsInput
   name: String
   name_ar: String
   notes: String
@@ -1143,8 +1163,10 @@ type Vendor {
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
+  heading: [String!]
   id: ID!
   info: VendorInfo
+  meta: MetaDetails
   name: String!
   name_ar: String
   notes: String
@@ -1243,8 +1265,10 @@ type VendorViewForHub {
 
   """Identifies the date and time when the object was created."""
   createdAt: DateTime!
+  heading: [String!]
   id: ID!
   info: VendorInfo
+  meta: MetaDetails
   name: String!
   name_ar: String
   notes: String

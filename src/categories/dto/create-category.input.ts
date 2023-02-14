@@ -1,5 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { InputType, Field, Int } from '@nestjs/graphql';
+import { MetaDetailsInput } from 'src/vendors/dto/update-vendor.input';
 
 @InputType()
 export class CreateCategoryInput {
@@ -24,4 +25,7 @@ export class CreateCategoryInput {
 
   @Field(() => Int)
   sortOrder?: number;
+
+  @Field(() => MetaDetailsInput, { nullable: true })
+  meta?: MetaDetailsInput;
 }
