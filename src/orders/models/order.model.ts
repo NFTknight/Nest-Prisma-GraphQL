@@ -7,9 +7,8 @@ import { BaseModel } from 'src/common/models/base.model';
 import { WayBill } from 'src/shipping/models/waybill.model';
 import { Vendor } from 'src/vendors/models/vendor.model';
 import { CustomerInfo } from './customer-info.model';
-import { Order as PrismaOrder } from '@prisma/client';
-import './order.enum';
 import { CartAddress } from 'src/cart/models/cart-address.model';
+import './order.enum';
 
 @ObjectType()
 export class FormResponse {
@@ -77,4 +76,7 @@ export class Order extends BaseModel {
 
   @Field(() => CartAddress, { nullable: true })
   shipperAddress: Address;
+
+  @Field(() => Boolean, { nullable: true })
+  qrVerified?: boolean;
 }
