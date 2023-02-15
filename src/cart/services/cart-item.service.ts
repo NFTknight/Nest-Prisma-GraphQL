@@ -77,9 +77,8 @@ export class CartItemService {
           },
         });
 
-        const availableQuantity =
-          product.noOfSeats -
-          (product.bookedSeats + existingWorkshopBooking?._sum?.quantity || 0);
+        const availableQuantity = product.noOfSeats - product.bookedSeats;
+        // (product.bookedSeats + existingWorkshopBooking?._sum?.quantity || 0);
         if (
           !!workshopBooking &&
           //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
