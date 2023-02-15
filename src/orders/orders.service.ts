@@ -257,7 +257,7 @@ export class OrdersService {
                 '',
                 {
                   orderID: order.id,
-                  url: `https://anyaa.io/somatcha/checkout/${order.id}/confirmation?lng=en`,
+                  url: `https://anyaa.io/qrcode/${order.id}?lng=en`,
                   workshop: {
                     title: product.title,
                     title_ar: product.title_ar,
