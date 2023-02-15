@@ -459,7 +459,7 @@ input MetaDetailsInput {
 }
 
 type Mutation {
-  VerifyQRCode(codeOTP: String!, orderId: String!): Order!
+  VerifyQRCode(codeOTP: Int!, orderId: String!): Order!
   addCouponToCart(cartId: String!, id: String!): Cart!
   addDeliveryAreas(areas: [AddDeliveryAreasInput!]!, id: String!): Vendor!
   addItemToCart(cartId: String!, data: CartItemInput!): Cart!

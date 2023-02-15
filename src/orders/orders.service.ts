@@ -285,27 +285,24 @@ export class OrdersService {
   async deleteOrder(id: string): Promise<Order> {
     return await this.prisma.order.delete({ where: { id } });
   }
-  async verifyQRCode(orderId: string, qrOTP: string): Promise<Order> {
+
+  async verifyQRCode(orderId: string, qrOTP: number): Promise<Order> {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
     });
     throwNotFoundException(order, 'Order');
 
-    if (order?.qrVerified === true) {
+    if (order?.qrVerified)
       throw new BadRequestException('QR code is already verified');
-    }
 
     let isOTPverified = false;
 
     for (const item of order.items) {
       const product = await this.prisma.product.findUnique({
-        where: { id: item.productId },
+        where: { id: item?.productId },
       });
 
-      if (
-        product.type === ProductType.WORKSHOP &&
-        product?.qrOTP?.toString() === qrOTP
-      ) {
+      if (product?.type === ProductType.WORKSHOP && product?.qrOTP === qrOTP) {
         isOTPverified = true;
       }
     }
@@ -315,7 +312,7 @@ export class OrdersService {
     return await this.prisma.order.update({
       where: { id: orderId },
       data: {
-        qrVerified: true,
+        qrVerified: isOTPverified,
       },
     });
   }
