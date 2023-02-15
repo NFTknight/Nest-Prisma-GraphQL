@@ -103,4 +103,12 @@ export class OrdersResolver {
     const order = await this.ordersService.getOrder(id);
     return this.cartItemService.resolveItems(order.items);
   }
+
+  @Mutation(() => Order)
+  async VerifyQRCode(
+    @Args('orderId') orderId: string,
+    @Args('codeOTP') codeOTP: number
+  ) {
+    return this.ordersService.verifyQRCode(orderId, codeOTP);
+  }
 }

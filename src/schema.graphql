@@ -459,6 +459,7 @@ input MetaDetailsInput {
 }
 
 type Mutation {
+  VerifyQRCode(codeOTP: Int!, orderId: String!): Order!
   addCouponToCart(cartId: String!, id: String!): Cart!
   addDeliveryAreas(areas: [AddDeliveryAreasInput!]!, id: String!): Vendor!
   addItemToCart(cartId: String!, data: CartItemInput!): Cart!
@@ -731,6 +732,7 @@ type Product {
   meta: MetaDetails
   minPreorderDays: Int
   noOfSeats: Int
+  qrOTP: Int
   slug: String!
   sortOrder: Int
   startDate: DateTime

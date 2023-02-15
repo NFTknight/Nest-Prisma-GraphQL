@@ -191,12 +191,16 @@ export class ProductsService {
     const { vendorId, categoryId, variants, tags, formId, ...rest } = data;
 
     // if the vendor does not exist, this function will throw an error.
-    await this.vendorService.getVendor(vendorId);
+    const vendor = await this.vendorService.getVendor(vendorId);
 
     // if vendor exists we can successfully create the product.
     const prod = await this.prisma.product.create({
       data: {
         ...rest,
+        qrOTP:
+          rest.type === ProductType.WORKSHOP && vendor.slug === 'somatcha'
+            ? Math.floor(Math.random() * 9000) + 1000
+            : null,
         tagIds: tags ? { set: tags } : undefined,
         variants,
         vendor: { connect: { id: vendorId } },

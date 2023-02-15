@@ -99,6 +99,7 @@ Table Product {
   image String [not null]
   images String[] [not null]
   type ProductType [not null]
+  qrOTP Int
   vendorId String [not null]
   vendor Vendor [not null]
   tagIds String[] [not null]
