@@ -24,6 +24,12 @@ export class CartItemService {
 
     throwNotFoundException(cart, 'Cart');
 
+    const vendor = await this.prisma.vendor.findUnique({
+      where: { id: cart.vendorId },
+    });
+
+    throwNotFoundException(vendor, 'Vendor');
+
     const newCart = { ...cart };
 
     const productVariant = product.variants.find(
@@ -41,130 +47,141 @@ export class CartItemService {
       sku: productVariant.sku,
     });
 
-    if (existingProductIndex !== -1) {
-      const newQuantity =
-        newCart.items[existingProductIndex].quantity + quantity;
-      if (
-        //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
-        product.type === ProductType.PRODUCT &&
-        !checkIfQuantityIsGood(newQuantity, productVariant.quantity)
-      ) {
-        throw new BadRequestException(
-          `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
-        );
-      } else {
-        if (product.type === ProductType.PRODUCT)
-          newCart.items[existingProductIndex].quantity = newQuantity;
-      }
-
-      if (product.type === ProductType.WORKSHOP) {
-        const workshopBooking = await this.prisma.workshop.findFirst({
-          where: {
-            productId: product.id,
-            cartId: cart.id,
-          },
-        });
-
-        const existingWorkshopBooking = await this.prisma.workshop.aggregate({
-          _sum: {
-            quantity: true,
-          },
-          where: {
-            productId: product.id,
-            NOT: {
-              cartId: cart.id,
-            },
-          },
-        });
-
-        const availableQuantity = product.noOfSeats - product.bookedSeats;
-        // (product.bookedSeats + existingWorkshopBooking?._sum?.quantity || 0);
-        if (
-          !!workshopBooking &&
-          //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
-          !checkIfQuantityIsGood(newQuantity, availableQuantity)
-        ) {
-          throw new BadRequestException(
-            `You can't add more than ${availableQuantity} no of seats in your cart. You already have ${newCart.items[existingProductIndex].quantity} seat(s)`
-          );
-        } else if (
-          !workshopBooking &&
-          !checkIfQuantityIsGood(quantity, availableQuantity)
-        ) {
-          if (!availableQuantity)
-            throw new BadRequestException(
-              `No seats available for this workshop`
-            );
-
-          throw new BadRequestException(
-            `You can't add more than ${availableQuantity} no of seats in your cart.`
-          );
-        }
-
-        if (!!workshopBooking) {
-          this.workshopService.updateWorkshop(workshopBooking.id, {
-            quantity: newCart.items[existingProductIndex].quantity + quantity,
-          });
-
-          newCart.items[existingProductIndex].quantity = newQuantity;
-        } else {
-          await this.workshopService.createWorkshop({
-            productId: product.id,
-            cartId: cart.id,
-            quantity: quantity,
-          });
-          newCart.items[existingProductIndex].quantity = quantity;
-        }
-      }
+    if (vendor.slug === 'somatcha') {
+      newCart.items = [
+        {
+          ...item,
+          expired: false,
+          price: productVariant.price,
+        },
+      ];
     } else {
-      if (
-        product.type === ProductType.PRODUCT &&
-        !checkIfQuantityIsGood(quantity, productVariant.quantity)
-      ) {
-        throw new BadRequestException(
-          `You can't add more than ${productVariant.quantity} no of products in your cart.`
-        );
-      }
-      if (product.type === ProductType.WORKSHOP) {
-        const existingWorkshopBooking = await this.prisma.workshop.aggregate({
-          _sum: {
-            quantity: true,
-          },
-          where: {
-            productId: product.id,
-            NOT: {
+      if (existingProductIndex !== -1) {
+        const newQuantity =
+          newCart.items[existingProductIndex].quantity + quantity;
+        if (
+          //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+          product.type === ProductType.PRODUCT &&
+          !checkIfQuantityIsGood(newQuantity, productVariant.quantity)
+        ) {
+          throw new BadRequestException(
+            `You can't add more than ${productVariant.quantity} no of products in your cart. You already have ${newCart.items[existingProductIndex].quantity} item(s)`
+          );
+        } else {
+          if (product.type === ProductType.PRODUCT)
+            newCart.items[existingProductIndex].quantity = newQuantity;
+        }
+
+        if (product.type === ProductType.WORKSHOP) {
+          const workshopBooking = await this.prisma.workshop.findFirst({
+            where: {
+              productId: product.id,
               cartId: cart.id,
             },
-          },
-        });
-        const availableQuantity =
-          product.noOfSeats -
-          (product.bookedSeats + existingWorkshopBooking?._sum?.quantity || 0);
+          });
 
-        if (!checkIfQuantityIsGood(quantity, availableQuantity)) {
-          if (availableQuantity) {
+          const existingWorkshopBooking = await this.prisma.workshop.aggregate({
+            _sum: {
+              quantity: true,
+            },
+            where: {
+              productId: product.id,
+              NOT: {
+                cartId: cart.id,
+              },
+            },
+          });
+
+          const availableQuantity = product.noOfSeats - product.bookedSeats;
+          // (product.bookedSeats + existingWorkshopBooking?._sum?.quantity || 0);
+          if (
+            !!workshopBooking &&
+            //this is to bypass the itemsToStock, needs to converted to check individual product variant quantity which is coming inside productVariant.quantity
+            !checkIfQuantityIsGood(newQuantity, availableQuantity)
+          ) {
+            throw new BadRequestException(
+              `You can't add more than ${availableQuantity} no of seats in your cart. You already have ${newCart.items[existingProductIndex].quantity} seat(s)`
+            );
+          } else if (
+            !workshopBooking &&
+            !checkIfQuantityIsGood(quantity, availableQuantity)
+          ) {
+            if (!availableQuantity)
+              throw new BadRequestException(
+                `No seats available for this workshop`
+              );
+
             throw new BadRequestException(
               `You can't add more than ${availableQuantity} no of seats in your cart.`
             );
           }
 
+          if (!!workshopBooking) {
+            this.workshopService.updateWorkshop(workshopBooking.id, {
+              quantity: newCart.items[existingProductIndex].quantity + quantity,
+            });
+
+            newCart.items[existingProductIndex].quantity = newQuantity;
+          } else {
+            await this.workshopService.createWorkshop({
+              productId: product.id,
+              cartId: cart.id,
+              quantity: quantity,
+            });
+            newCart.items[existingProductIndex].quantity = quantity;
+          }
+        }
+      } else {
+        if (
+          product.type === ProductType.PRODUCT &&
+          !checkIfQuantityIsGood(quantity, productVariant.quantity)
+        ) {
           throw new BadRequestException(
-            `Seats are not available for this workshop`
+            `You can't add more than ${productVariant.quantity} no of products in your cart.`
           );
         }
+        if (product.type === ProductType.WORKSHOP) {
+          const existingWorkshopBooking = await this.prisma.workshop.aggregate({
+            _sum: {
+              quantity: true,
+            },
+            where: {
+              productId: product.id,
+              NOT: {
+                cartId: cart.id,
+              },
+            },
+          });
+          const availableQuantity =
+            product.noOfSeats -
+            (product.bookedSeats + existingWorkshopBooking?._sum?.quantity ||
+              0);
 
-        await this.workshopService.createWorkshop({
-          productId: product.id,
-          cartId: cart.id,
-          quantity: quantity,
+          if (!checkIfQuantityIsGood(quantity, availableQuantity)) {
+            if (availableQuantity) {
+              throw new BadRequestException(
+                `You can't add more than ${availableQuantity} no of seats in your cart.`
+              );
+            }
+
+            throw new BadRequestException(
+              `Seats are not available for this workshop`
+            );
+          }
+
+          await this.workshopService.createWorkshop({
+            productId: product.id,
+            cartId: cart.id,
+            quantity: quantity,
+          });
+        }
+
+        newCart.items.push({
+          ...item,
+          expired: false,
+          price: productVariant.price,
         });
       }
-
-      newCart.items.push({
-        ...item,
-        expired: false,
-        price: productVariant.price,
-      });
     }
 
     if (product.type == ProductType.SERVICE) {
