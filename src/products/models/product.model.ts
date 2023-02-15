@@ -90,6 +90,9 @@ export class Product extends BaseModel implements PrismaProduct {
   badge: BadgeType;
 
   @Field({ nullable: true })
+  qrOTP: number;
+
+  @Field({ nullable: true })
   meetingLink: string;
 
   @Field({ nullable: true })

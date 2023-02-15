@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   DeliveryMethods,
   Order,
@@ -284,5 +284,39 @@ export class OrdersService {
 
   async deleteOrder(id: string): Promise<Order> {
     return await this.prisma.order.delete({ where: { id } });
+  }
+  async verifyQRCode(orderId: string, qrOTP: string): Promise<Order> {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    throwNotFoundException(order, 'Order');
+
+    if (order?.qrVerified === true) {
+      throw new BadRequestException('QR code is already verified');
+    }
+
+    let isOTPverified = false;
+
+    for (const item of order.items) {
+      const product = await this.prisma.product.findUnique({
+        where: { id: item.productId },
+      });
+
+      if (
+        product.type === ProductType.WORKSHOP &&
+        product?.qrOTP?.toString() === qrOTP
+      ) {
+        isOTPverified = true;
+      }
+    }
+
+    if (!isOTPverified) throw new BadRequestException('QR code is not valid');
+
+    return await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        qrVerified: true,
+      },
+    });
   }
 }

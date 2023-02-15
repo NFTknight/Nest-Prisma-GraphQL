@@ -248,6 +248,7 @@ model Product {
   image          String
   images         String[]
   type           ProductType
+  qrOTP          Int?
 
   vendorId String @db.ObjectId
   vendor   Vendor @relation(fields: [vendorId], references: [id])
