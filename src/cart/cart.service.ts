@@ -197,7 +197,7 @@ export class CartService {
               data: { deliveryArea: null, deliveryMethod: null },
             });
           } catch (error) {
-            console.error(`Query failed with error: ${error.message}`);
+            console.log(`Query failed with error: ${error.message}`);
 
             if (attempts === maxAttempts) {
               throw new Error(`Query failed after ${attempts} attempts`);
@@ -678,9 +678,11 @@ export class CartService {
       );
 
       // Email notification to customer when order is created
-      this.emailService.send(
-        SendEmails(ORDER_OPTIONS.PURCHASED, order?.customerInfo?.email)
-      );
+      if (vendor.slug !== 'somatcha') {
+        this.emailService.send(
+          SendEmails(ORDER_OPTIONS.PURCHASED, order?.customerInfo?.email)
+        );
+      }
 
       // Email notification to vendor when order is created
       if (vendor?.info?.email) {
