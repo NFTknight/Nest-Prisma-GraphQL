@@ -576,15 +576,14 @@ export class CartService {
           },
         },
       });
-
       // remove this to remove the extra feature of order
-      if (order.status === 'PENDING' && vendor.slug === 'somatcha') {
+      if (order.status === OrderStatus.PENDING && vendor.slug === 'somatcha') {
         for (const item of order.items) {
           const product = await this.prisma.product.findUnique({
             where: { id: item.productId },
           });
-          if (product.type === ProductType.WORKSHOP) {
-            this.emailService.send(
+          if (product?.type === ProductType.WORKSHOP) {
+            await this.emailService.send(
               SendEmails(
                 EMAIL_OPTIONS.WORKSHOP_DETAILS,
                 order?.customerInfo?.email,
