@@ -752,7 +752,12 @@ export class CartService {
             cartId: cart.id,
           },
         });
-        if (!workshopBooking) {
+
+        const vendor = await this.prisma.vendor.findFirst({
+          where: { id: cart.vendorId },
+        });
+
+        if (vendor.slug !== 'somatcha' && !workshopBooking) {
           cartErrors.push({
             Name: 'WorkshopIssue',
             Error: 'WorkshopBookingExpired',
