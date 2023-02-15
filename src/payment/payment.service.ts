@@ -69,7 +69,11 @@ export class PaymentService {
       DisplayCurrencyIso: this.paymentConfig.currency,
       CustomerEmail: order.customerInfo.email,
       CustomerReference: order.orderId,
-      CallBackUrl: `${this.paymentConfig.clientUrl}/${vendorSlug}/checkout/${orderId}/confirmation`,
+      CallBackUrl: `${
+        this.paymentConfig.clientUrl
+      }/${vendorSlug}/checkout/${orderId}/confirmation${
+        vendorSlug === 'somatcha' ? '?lng=en' : ''
+      }`,
       ErrorUrl: `${this.paymentConfig.clientUrl}/${vendorSlug}/checkout/${orderId}/failure`,
       InvoiceItems: order.items.map((item) => ({
         ItemName: `${item.productId}_${item.sku}`,
